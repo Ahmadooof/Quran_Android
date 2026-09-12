@@ -4,11 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -30,6 +35,7 @@ class ReaderActivity : AppCompatActivity() {
     private lateinit var bar: View
     private lateinit var mark: ImageView
     private lateinit var player: View
+    private lateinit var btnTheme: ImageView
 
     private lateinit var rc: RecitationController
 
@@ -94,11 +100,16 @@ class ReaderActivity : AppCompatActivity() {
             }
         )
 
+        btnTheme = findViewById(R.id.btn_theme)
+
         dressWindow()
         buildPager()
+        buildSwatches()
 
-        findViewById<View>(R.id.back).setOnClickListener { toMenu() }
-        findViewById<View>(R.id.back_label).setOnClickListener { toMenu() }
+        sayThemeBtn()
+        btnTheme.setOnClickListener { cycleTheme() }
+
+        findViewById<View>(R.id.btn_back).setOnClickListener { toMenu() }
         mark.setOnClickListener { Settings.toggleMark(this, page()); sayMark(page()) }
 
         wirePlayer()
@@ -264,8 +275,10 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun sayMark(page: Int) {
-        mark.setImageResource(
-            if (Settings.marked(this, page)) R.drawable.ic_bookmark else R.drawable.ic_bookmark_off
+        val marked = Settings.marked(this, page)
+        mark.setImageResource(if (marked) R.drawable.ic_bookmark else R.drawable.ic_bookmark_off)
+        mark.imageTintList = ColorStateList.valueOf(
+            getColor(if (marked) R.color.accent else R.color.text_mute)
         )
     }
 
@@ -415,6 +428,124 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
+    // --- highlight colours and reader controls ---
+
+    private val swatchColors = intArrayOf(
+        0xFFA4161A.toInt(),  // dark red (default)
+        0xFF1053A8.toInt(),  // deep blue
+        0xFF00695C.toInt(),  // teal
+        0xFF2E7D32.toInt(),  // forest green
+        0xFF6A1B9A.toInt(),  // purple
+        0xFFE65100.toInt(),  // deep orange
+    )
+
+    private lateinit var swatchViews: List<ImageView>
+    private lateinit var ayahCircle: ImageView
+
+    private fun buildSwatches() {
+        val row = findViewById<LinearLayout>(R.id.swatch_row)
+        val d = resources.displayMetrics.density
+        val sz  = (26 * d).toInt()
+        val gap = (4 * d).toInt()
+
+        /* --- text highlight presets --- */
+        swatchViews = swatchColors.map { color ->
+            ImageView(this).also { iv ->
+                iv.setImageResource(R.drawable.ic_circle)
+                iv.imageTintList = ColorStateList.valueOf(color)
+                iv.layoutParams = LinearLayout.LayoutParams(sz, sz).apply { setMargins(gap, 0, gap, 0) }
+                iv.setOnClickListener {
+                    Settings.setHighlightColor(this, color)
+                    applyHighlight(); markSwatch(color)
+                }
+                row.addView(iv)
+            }
+        }
+
+        /* "+" — text colour custom picker */
+        addPickerBtn(row, gap).setOnClickListener {
+            showColorPicker(this, Settings.highlightColor(this)) { color ->
+                Settings.setHighlightColor(this, color)
+                applyHighlight(); markSwatch(color)
+            }
+        }
+
+        row.addView(divider(d))
+
+        /* --- Ayah number colour circle + picker --- */
+        ayahCircle = ImageView(this).also { iv ->
+            iv.setImageResource(R.drawable.ic_circle)
+            iv.imageTintList = ColorStateList.valueOf(Settings.resolvedAyahColor(this))
+            iv.layoutParams = LinearLayout.LayoutParams(sz, sz).apply { setMargins(gap * 2, 0, gap, 0) }
+            row.addView(iv)
+        }
+
+        addPickerBtn(row, gap).setOnClickListener {
+            showColorPicker(this, Settings.resolvedAyahColor(this)) { color ->
+                Settings.setAyahColor(this, color)
+                ayahCircle.imageTintList = ColorStateList.valueOf(color)
+                applyAyahColor()
+            }
+        }
+
+        markSwatch(Settings.highlightColor(this))
+    }
+
+    private fun addPickerBtn(row: LinearLayout, gap: Int): TextView {
+        val d = resources.displayMetrics.density
+        return TextView(this).apply {
+            text = "+"
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setTextColor(0x99FFFFFF.toInt())
+            gravity = Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(
+                (28 * d).toInt(), LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(0, 0, gap, 0) }
+            row.addView(this)
+        }
+    }
+
+    private fun divider(d: Float): View = View(this).apply {
+        setBackgroundColor(0x33FFFFFF)
+        layoutParams = LinearLayout.LayoutParams((1 * d).toInt(), (20 * d).toInt()).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setMargins((6 * d).toInt(), 0, (6 * d).toInt(), 0)
+        }
+    }
+
+    private fun markSwatch(selected: Int) {
+        swatchViews.forEachIndexed { i, iv ->
+            iv.background = if (swatchColors[i] == selected)
+                resources.getDrawable(R.drawable.swatch_ring, theme) else null
+        }
+    }
+
+    private fun applyHighlight() {
+        val color = Settings.highlightColor(this)
+        for (i in 0 until pager.childCount) {
+            (pager.getChildAt(i) as? MushafPageView)?.setHighlight(color)
+        }
+    }
+
+    private fun applyAyahColor() {
+        val color = Settings.resolvedAyahColor(this)
+        for (i in 0 until pager.childCount) {
+            (pager.getChildAt(i) as? MushafPageView)?.setAyahColor(color)
+        }
+    }
+
+    // --- theme toggle ---
+
+    private fun cycleTheme() {
+        Settings.setTheme(this, if (night()) Settings.LIGHT else Settings.DARK)
+        /* AppCompatDelegate triggers recreation; no further work needed here. */
+    }
+
+    /* The icon shows the side you would switch to, not the side you are on. */
+    private fun sayThemeBtn() {
+        btnTheme.setImageResource(if (night()) R.drawable.ic_sun else R.drawable.ic_moon)
+    }
+
     private fun lit(surah: Int, ayah: Int, word: Int) {
         for (i in 0 until pager.childCount) {
             (pager.getChildAt(i) as? MushafPageView)?.light(surah, ayah, word)
@@ -427,6 +558,10 @@ class ReaderActivity : AppCompatActivity() {
         super.onResume()
         delegate.applyDayNight()
         sayMark(page())
+        /* Settings may have changed the colours while we were away. */
+        applyHighlight()
+        applyAyahColor()
+        markSwatch(Settings.highlightColor(this))
         rc.syncWithRecite()
 
         Recite.onChange = {

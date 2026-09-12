@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Flat list row: the mushaf's own paper, with a soft accent ripple on tap. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/accent_soft">
+    <item android:drawable="@color/paper" />
+</ripple>

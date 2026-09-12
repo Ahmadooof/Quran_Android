@@ -12,6 +12,8 @@ object Settings {
     private const val LAST_PAGE = "last-page"
     private const val RECITER = "reciter"
     private const val LANG = "language"
+    private const val HL_COLOR      = "hl-color"
+    private const val AYAH_COLOR    = "ayah-color"
 
     const val BY_SYSTEM = 0
     const val LIGHT = 1
@@ -88,5 +90,28 @@ object Settings {
 
     fun setLastPage(context: Context, page: Int) {
         store(context).edit().putInt(LAST_PAGE, page).apply()
+    }
+
+    // --- highlight colour (reader word highlight) ---
+
+    /* Unset falls through to ink_lit, which is themed — so the reset lands on a
+       red that is legible on cream by day and on dark paper by night. */
+    fun highlightColor(ctx: Context): Int =
+        store(ctx).getInt(HL_COLOR, ctx.getColor(R.color.ink_lit))
+
+    fun setHighlightColor(ctx: Context, color: Int) {
+        store(ctx).edit().putInt(HL_COLOR, color).apply()
+    }
+
+    fun resetHighlightColor(ctx: Context) {
+        store(ctx).edit().remove(HL_COLOR).apply()
+    }
+
+    // ayah marker colour on the page (rings and mark glyphs; 0 = accent)
+    fun ayahColor(ctx: Context): Int = store(ctx).getInt(AYAH_COLOR, 0)
+    fun setAyahColor(ctx: Context, color: Int) { store(ctx).edit().putInt(AYAH_COLOR, color).apply() }
+    fun resolvedAyahColor(ctx: Context): Int {
+        val s = ayahColor(ctx)
+        return if (s != 0) s else ctx.getColor(R.color.accent)
     }
 }

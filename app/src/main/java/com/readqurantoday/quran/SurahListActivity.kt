@@ -3,6 +3,7 @@ package com.readqurantoday.quran
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,11 +20,12 @@ import androidx.recyclerview.widget.RecyclerView
 class SurahListActivity : AppCompatActivity() {
 
     /* Pane index matches the nav order: 0=surahs, 1=marks, 2=settings. */
-    private val paneIds = intArrayOf(R.id.pane_index, R.id.pane_marks, R.id.pane_settings)
-    private val navIds  = intArrayOf(R.id.nav_surahs, R.id.nav_marks, R.id.nav_settings)
+    private val paneIds      = intArrayOf(R.id.pane_index, R.id.pane_marks, R.id.pane_settings)
+    private val navIds       = intArrayOf(R.id.nav_surahs, R.id.nav_marks, R.id.nav_settings)
+    private val iconsFilled  = intArrayOf(R.drawable.ic_surahs, R.drawable.ic_bookmark, R.drawable.ic_settings)
+    private val iconsOutline = intArrayOf(R.drawable.ic_surahs_outline, R.drawable.ic_bookmark_outline, R.drawable.ic_settings_outline)
 
     private lateinit var panes: List<View>
-    private lateinit var navPills: List<View>
     private lateinit var navIcons: List<ImageView>
     private lateinit var navLabels: List<TextView>
 
@@ -38,8 +40,6 @@ class SurahListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_index)
 
         panes     = paneIds.map { findViewById<View>(it) }
-        navPills  = listOf(R.id.nav_pill_surahs, R.id.nav_pill_marks, R.id.nav_pill_settings)
-            .map { findViewById<View>(it) }
         navIcons  = listOf(R.id.nav_icon_surahs, R.id.nav_icon_marks, R.id.nav_icon_settings)
             .map { findViewById<ImageView>(it) }
         navLabels = listOf(R.id.nav_label_surahs, R.id.nav_label_marks, R.id.nav_label_settings)
@@ -55,17 +55,18 @@ class SurahListActivity : AppCompatActivity() {
         marks()
     }
 
+    /* Active tab: filled icon + flat accent. Inactive: outlined icon + accent on press, muted at rest. */
     private fun choose(which: Int) {
         tab = which
         panes.forEachIndexed { i, pane ->
             pane.visibility = if (i == which) View.VISIBLE else View.GONE
         }
-        /* Chosen tab stays accent; unselected items turn accent on press (no ripple background). */
         val accent = getColor(R.color.accent)
         val muted  = getColor(R.color.text_mute)
         for (i in navIds.indices) {
-            val on = i == which
-            val tint = if (on) {
+            val selected = i == which
+            navIcons[i].setImageResource(if (selected) iconsFilled[i] else iconsOutline[i])
+            val tint = if (selected) {
                 ColorStateList.valueOf(accent)
             } else {
                 ColorStateList(
@@ -75,10 +76,7 @@ class SurahListActivity : AppCompatActivity() {
             }
             navIcons[i].imageTintList = tint
             navLabels[i].setTextColor(tint)
-            /* Selected pill: solid fill. Unselected: ghost pill (press → same fill). */
-            navPills[i].setBackgroundResource(
-                if (on) R.drawable.nav_pill else R.drawable.nav_pill_press
-            )
+            navLabels[i].setTypeface(null, if (selected) Typeface.BOLD else Typeface.NORMAL)
         }
     }
 
@@ -110,8 +108,9 @@ class SurahListActivity : AppCompatActivity() {
                 else answer(s.from)
             },
             onPlay     = { s ->
-                if (Recite.playing == s.id) { Recite.toggle(); surahAdapter?.notifyDataSetChanged() }
-                else { Recite.start(this, s.id); answer(s.from) }
+                if (Recite.playing == s.id) Recite.toggle()
+                else Recite.start(this, s.id)
+                surahAdapter?.notifyDataSetChanged()
             },
             onDownload = { s -> keep(s.id) },
             onReciter  = { s -> pickReciter(s) },
@@ -163,9 +162,9 @@ class SurahListActivity : AppCompatActivity() {
     private fun downloadState(surahId: Int): Int {
         val voice = Recite.chosen(this)?.id ?: return SurahAdapter.AWAY
         return when {
-            Downloads.has(this, surahId, voice)     -> SurahAdapter.KEPT
+            Downloads.has(this, surahId, voice)      -> SurahAdapter.KEPT
             Downloads.fetching(this, surahId, voice) -> SurahAdapter.COMING
-            else                                      -> SurahAdapter.AWAY
+            else                                     -> SurahAdapter.AWAY
         }
     }
 
@@ -200,36 +199,9 @@ class SurahListActivity : AppCompatActivity() {
         }
     }
 
+    /* Theme and language. The reciter lives on every surah row, and the reader's
+       own toolbar owns type weight and colour — none of it belongs here twice. */
     private fun settings() {
-        /* Reciter row injected into settings pane. */
-        val reciterContainer = findViewById<LinearLayout>(R.id.row_reciter)
-        val reciterRow = layoutInflater.inflate(R.layout.row_setting, reciterContainer, false)
-        reciterRow.findViewById<TextView>(R.id.set_label).setText(R.string.reciter)
-        val who = reciterRow.findViewById<TextView>(R.id.set_value)
-
-        fun sayReciter() {
-            who.text = Recite.chosen(this)?.let { r ->
-                if (r.noteAr.isEmpty()) r.nameAr else r.nameAr + " · " + r.noteAr
-            }.orEmpty()
-        }
-        sayReciter()
-
-        reciterRow.setOnClickListener {
-            val voices = Recite.reciters()
-            val now = Recite.chosen(this)?.id
-            sheet(
-                getString(R.string.reciter),
-                voices.map { Choice(it.nameAr, it.noteAr, it.id == now) }
-            ) { i ->
-                Recite.choose(this, voices[i].id)
-                sayReciter()
-                if (Recite.playing != 0) Recite.start(this, Recite.playing)
-                surahAdapter?.notifyDataSetChanged()
-            }
-        }
-        reciterContainer.addView(reciterRow)
-
-        /* Theme and language rows. */
         val themeContainer = findViewById<LinearLayout>(R.id.row_theme)
 
         val themeRow = layoutInflater.inflate(R.layout.row_setting, themeContainer, false)
@@ -261,6 +233,32 @@ class SurahListActivity : AppCompatActivity() {
             Settings.setLanguage(this, if (Settings.language(this) == "en") "ar" else "en")
         }
         themeContainer.addView(langRow)
+        themeContainer.addView(highlightColorRow(themeContainer))
+    }
+
+    /* Word highlight colour: the row opens the picker, the button beside it
+       goes back to the default red. */
+    private fun highlightColorRow(into: LinearLayout): View {
+        val row = layoutInflater.inflate(R.layout.row_setting_color, into, false)
+        row.findViewById<TextView>(R.id.set_label).setText(R.string.set_highlight_color)
+        val dot = row.findViewById<ImageView>(R.id.set_dot)
+
+        fun sayColor() {
+            dot.imageTintList = ColorStateList.valueOf(Settings.highlightColor(this))
+        }
+        sayColor()
+
+        row.setOnClickListener {
+            showColorPicker(this, Settings.highlightColor(this)) { color ->
+                Settings.setHighlightColor(this, color)
+                sayColor()
+            }
+        }
+        row.findViewById<ImageView>(R.id.set_reset).setOnClickListener {
+            Settings.resetHighlightColor(this)
+            sayColor()
+        }
+        return row
     }
 
     private fun marks() {

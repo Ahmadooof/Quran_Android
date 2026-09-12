@@ -45,6 +45,8 @@ class SurahAdapter(
         val s   = shown[position]
         val ctx = holder.itemView.context
         holder.fill(s)
+        holder.itemView.findViewById<android.view.View>(R.id.divider).visibility =
+            if (position < itemCount - 1) android.view.View.VISIBLE else android.view.View.GONE
 
         holder.itemView.setOnClickListener { onOpen(s) }
         holder.playBtn?.setOnClickListener { onPlay(s) }
@@ -60,7 +62,8 @@ class SurahAdapter(
         holder.num.setBackgroundResource(
             if (playing) R.drawable.bg_circle_accent else R.drawable.num_circle
         )
-        holder.num.setTextColor(ctx.getColor(if (playing) R.color.on_dark else R.color.accent))
+        /* Both states use on_dark (white) — ornament circle in rest, accent circle while playing. */
+        holder.num.setTextColor(ctx.getColor(R.color.on_dark))
 
         /* Disc button: pause icon while running, play icon while paused or idle. */
         holder.play?.apply {
@@ -75,23 +78,13 @@ class SurahAdapter(
 
         val dl = holder.download
         if (dl != null) {
-            when (stateOf(s)) {
-                KEPT   -> {
-                    dl.setImageResource(R.drawable.ic_downloaded)
-                    dl.imageTintList = ColorStateList.valueOf(ctx.getColor(R.color.accent))
-                    dl.alpha = 1f
-                }
-                COMING -> {
-                    dl.setImageResource(R.drawable.ic_download)
-                    dl.imageTintList = ColorStateList.valueOf(ctx.getColor(R.color.text_mute))
-                    dl.alpha = 0.4f
-                }
-                else   -> {
-                    dl.setImageResource(R.drawable.ic_download)
-                    dl.imageTintList = ColorStateList.valueOf(ctx.getColor(R.color.text_mute))
-                    dl.alpha = 1f
-                }
-            }
+            val state = stateOf(s)
+            val kept  = state == KEPT
+            dl.setImageResource(if (kept) R.drawable.ic_downloaded else R.drawable.ic_download)
+            dl.imageTintList = ColorStateList.valueOf(
+                ctx.getColor(if (kept) R.color.accent else R.color.text_mute)
+            )
+            dl.alpha = if (state == COMING) 0.4f else 1f
         }
     }
 }

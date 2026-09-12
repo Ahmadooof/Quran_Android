@@ -55,4 +55,8 @@
     <string name="set_language">اللغة</string>
     <string name="lang_ar">العربية</string>
     <string name="lang_en">English</string>
+    <string name="set_ayah_color">لون رقم الآية</string>
+    <string name="set_highlight_color">لون تظليل الكلمة</string>
+    <string name="reset">إعادة تعيين</string>
+    <string name="color_choose">اختر لوناً…</string>
 </resources>

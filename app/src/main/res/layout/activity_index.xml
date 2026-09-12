@@ -18,7 +18,8 @@
             android:id="@+id/pane_index"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@color/paper">
 
             <!-- Search bar: elevated pill, no stroke, shadow separates it. -->
             <LinearLayout
@@ -66,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="12dp" />
+                android:paddingBottom="8dp" />
         </LinearLayout>
 
         <!-- Pane 1: bookmarks — two columns side by side. -->
@@ -162,12 +163,6 @@
                 android:paddingBottom="16dp">
 
                 <LinearLayout
-                    android:id="@+id/row_reciter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-
-                <LinearLayout
                     android:id="@+id/row_theme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -176,10 +171,7 @@
         </ScrollView>
     </FrameLayout>
 
-    <!--
-      Continue reading: a floating card matching the surah rows — not a strip.
-      Gives the screen a clean visual hierarchy before the nav bar.
-    -->
+    <!-- Continue reading: full-width strip, no card styling. -->
     <LinearLayout
         android:id="@+id/card_resume"
         android:layout_width="match_parent"
@@ -187,23 +179,19 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layoutDirection="rtl"
-        android:background="@drawable/card"
-        android:elevation="1dp"
+        android:background="@drawable/strip_surface"
+        android:foreground="?selectableItemBackground"
         android:paddingStart="16dp"
         android:paddingEnd="14dp"
-        android:paddingTop="11dp"
-        android:paddingBottom="11dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:clickable="true"
         android:focusable="true"
         android:visibility="gone">
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:src="@drawable/ic_bookmark"
             android:tint="@color/accent"
             android:contentDescription="@null" />
@@ -220,15 +208,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/resume"
                 android:textColor="@color/text"
-                android:textSize="13sp" />
+                android:includeFontPadding="false"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/resume_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
                 android:textColor="@color/text_mute"
-                android:textSize="11sp" />
+                android:includeFontPadding="false"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <ImageView
@@ -264,8 +253,7 @@
                 android:id="@+id/nav_pill_surahs"
                 android:layout_width="52dp"
                 android:layout_height="28dp"
-                android:duplicateParentState="true"
-                android:background="@drawable/nav_pill">
+                android:duplicateParentState="true">
 
                 <ImageView
                     android:id="@+id/nav_icon_surahs"
@@ -273,7 +261,7 @@
                     android:layout_height="22dp"
                     android:layout_gravity="center"
                     android:duplicateParentState="true"
-                    android:src="@drawable/ic_surahs"
+                    android:src="@drawable/ic_surahs_outline"
                     android:tint="@color/accent" />
             </FrameLayout>
 
@@ -302,8 +290,7 @@
                 android:id="@+id/nav_pill_marks"
                 android:layout_width="52dp"
                 android:layout_height="28dp"
-                android:duplicateParentState="true"
-                android:background="@drawable/nav_pill_press">
+                android:duplicateParentState="true">
 
                 <ImageView
                     android:id="@+id/nav_icon_marks"
@@ -311,7 +298,7 @@
                     android:layout_height="22dp"
                     android:layout_gravity="center"
                     android:duplicateParentState="true"
-                    android:src="@drawable/ic_bookmark"
+                    android:src="@drawable/ic_bookmark_outline"
                     android:tint="@color/icon_btn" />
             </FrameLayout>
 
@@ -340,8 +327,7 @@
                 android:id="@+id/nav_pill_settings"
                 android:layout_width="52dp"
                 android:layout_height="28dp"
-                android:duplicateParentState="true"
-                android:background="@drawable/nav_pill_press">
+                android:duplicateParentState="true">
 
                 <ImageView
                     android:id="@+id/nav_icon_settings"
@@ -349,7 +335,7 @@
                     android:layout_height="22dp"
                     android:layout_gravity="center"
                     android:duplicateParentState="true"
-                    android:src="@drawable/ic_settings"
+                    android:src="@drawable/ic_settings_outline"
                     android:tint="@color/icon_btn" />
             </FrameLayout>
 

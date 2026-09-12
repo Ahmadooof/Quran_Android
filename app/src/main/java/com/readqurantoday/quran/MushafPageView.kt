@@ -75,6 +75,7 @@ class MushafPageView @JvmOverloads constructor(
     private var litIds = IntArray(64)
     private var litSpots = FloatArray(128)
 
+    /* Bounding box of the lit word, used to draw the optional bg rect. */
     /* Word bounds rebuilt each draw so a tap can name the word under it. */
     private val placed = ArrayList<FloatArray>(200)
 
@@ -99,11 +100,25 @@ class MushafPageView @JvmOverloads constructor(
     private fun dress() {
         setBackgroundColor(context.getColor(R.color.paper))
         paint.color = context.getColor(R.color.ink)
-        val labelling = context.getColor(R.color.accent)
-        label.color = labelling
-        markPaint.color = labelling
+        label.color = context.getColor(R.color.accent)
+        markPaint.color = Settings.resolvedAyahColor(context)
         titlePaint.color = context.getColor(R.color.ornament)
-        litPaint.color = context.getColor(R.color.ink_lit)
+        litPaint.color = Settings.highlightColor(context)
+        /* The lit word is always bold; weight comes from drawLit, not the paint. */
+        litPaint.isFakeBoldText = false
+        litPaint.strokeWidth = 0f
+        litPaint.style = Paint.Style.FILL
+    }
+
+    /* Called from ReaderActivity when the user changes highlight colour. */
+    fun setHighlight(color: Int) {
+        litPaint.color = color
+        invalidate()
+    }
+
+    fun setAyahColor(color: Int) {
+        markPaint.color = color
+        invalidate()
     }
 
     fun light(surah: Int, ayah: Int, word: Int) {
@@ -289,12 +304,11 @@ class MushafPageView @JvmOverloads constructor(
             }
 
             if (!isMark) {
-                placed.add(
-                    floatArrayOf(
-                        pen, began, y - slot * 0.44f, y + slot * 0.24f,
-                        ofSurah.toFloat(), ofAyah.toFloat(), ofWord.toFloat()
-                    )
+                val entry = floatArrayOf(
+                    pen, began, y - slot * 0.44f, y + slot * 0.24f,
+                    ofSurah.toFloat(), ofAyah.toFloat(), ofWord.toFloat()
                 )
+                placed.add(entry)
                 atWord++
             } else {
                 atAyah++
@@ -314,7 +328,7 @@ class MushafPageView @JvmOverloads constructor(
             }
             if (litN > 0) {
                 litPaint.textSize = size
-                canvas.drawGlyphs(litIds, 0, litSpots, 0, litN, face, litPaint)
+                drawLit(canvas, face, litN)
             }
         } else {
             /* API < 31: draw as text; the Arabic shaper is back in the way. */
@@ -324,6 +338,7 @@ class MushafPageView @JvmOverloads constructor(
             litPaint.textSize = size
             litPaint.typeface = paint.typeface
             litPaint.textAlign = Paint.Align.LEFT
+            litPaint.isFakeBoldText = true
             var wx = start
             var fbSurah = fbSurah0
             var fbAyah  = fbAyah0
@@ -347,6 +362,33 @@ class MushafPageView @JvmOverloads constructor(
                 if (!isMk) fbWord++ else { fbAyah++; fbWord = 0 }
             }
         }
+    }
+
+    /* Lit word, thickened by dilation: the same glyphs redrawn a fraction of an em
+       off in each direction. The fill is opaque, so the passes union cleanly and
+       every stroke of the outline gains the same weight. */
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.S)
+    private fun drawLit(canvas: Canvas, face: android.graphics.fonts.Font, n: Int) {
+        canvas.drawGlyphs(litIds, 0, litSpots, 0, n, face, litPaint)
+        val d = litPaint.textSize * BOLD_SPREAD
+        litPass(canvas, face, n,  d, 0f)
+        litPass(canvas, face, n, -d, 0f)
+        litPass(canvas, face, n, 0f,  d)
+        litPass(canvas, face, n, 0f, -d)
+    }
+
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.S)
+    private fun litPass(
+        canvas: Canvas,
+        face: android.graphics.fonts.Font,
+        n: Int,
+        dx: Float,
+        dy: Float
+    ) {
+        canvas.save()
+        canvas.translate(dx, dy)
+        canvas.drawGlyphs(litIds, 0, litSpots, 0, n, face, litPaint)
+        canvas.restore()
     }
 
     /* Running head: juz on the right, surah name centred, page number on the left. */
@@ -497,6 +539,9 @@ class MushafPageView @JvmOverloads constructor(
     }
 
     companion object {
+        /** How far each bold pass is offset, as a fraction of the type size. */
+        const val BOLD_SPREAD = 0.018f
+
         // --- layout tuning (all in dp) ---
         // Adjust these to control spacing around the 15-line grid.
 

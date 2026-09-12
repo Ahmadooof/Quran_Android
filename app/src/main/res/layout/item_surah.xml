@@ -1,169 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Surah row: full-width, no card chrome. A 1dp line drawn at the bottom
+  separates it from the next row; no margins, no elevation.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:layoutDirection="rtl"
-    android:background="@drawable/card"
-    android:elevation="1dp"
+    android:orientation="vertical"
+    android:background="@drawable/row_bg"
     android:clickable="true"
-    android:focusable="true"
-    android:paddingStart="14dp"
-    android:paddingEnd="6dp"
-    android:layout_marginStart="12dp"
-    android:layout_marginEnd="12dp"
-    android:layout_marginTop="7dp">
+    android:focusable="true">
 
-    <TextView
-        android:id="@+id/num"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:gravity="center"
-        android:background="@drawable/num_circle"
-        android:textColor="@color/accent"
-        android:textSize="11sp"
-        android:textStyle="bold" />
-
-    <!-- Vertical padding lives here so buttons can use match_parent on the full card height. -->
+    <!-- Horizontal content row. -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layoutDirection="rtl"
+        android:paddingStart="14dp"
+        android:paddingEnd="6dp">
 
+        <TextView
+            android:id="@+id/num"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:gravity="center"
+            android:background="@drawable/num_circle"
+            android:textColor="@color/accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <!-- Vertical padding lives here so buttons can use match_parent on the full row height. -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/name_area"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="bottom">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
-            <TextView
-                android:id="@+id/word"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text"
-                android:includeFontPadding="false"
-                android:textSize="20sp" />
+                android:orientation="horizontal"
+                android:gravity="bottom">
+
+                <TextView
+                    android:id="@+id/word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text"
+                    android:includeFontPadding="false"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:textColor="@color/text"
+                    android:includeFontPadding="false"
+                    android:textSize="20sp" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/name"
+                android:id="@+id/english"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:textColor="@color/text"
-                android:includeFontPadding="false"
-                android:textSize="20sp" />
+                android:layout_marginTop="1dp"
+                android:textColor="@color/text_mute"
+                android:textSize="13sp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/english"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:textColor="@color/text_mute"
-            android:textSize="13sp" />
+        <!-- Play -->
+        <LinearLayout
+            android:id="@+id/btn_play"
+            android:layout_width="44dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/play"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:duplicateParentState="true"
+                android:background="@drawable/chip_soft"
+                android:padding="4dp"
+                android:tint="@color/accent"
+                android:src="@drawable/ic_play"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:duplicateParentState="true"
+                android:text="@string/play"
+                android:textColor="@color/accent"
+                android:textSize="9sp"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <!-- Reciter -->
+        <LinearLayout
+            android:id="@+id/btn_reciter"
+            android:layout_width="44dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/reciter"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:duplicateParentState="true"
+                android:tint="@color/icon_btn"
+                android:src="@drawable/ic_reciter"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:duplicateParentState="true"
+                android:text="@string/reciter"
+                android:textColor="@color/icon_btn"
+                android:textSize="9sp"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <!-- Download -->
+        <LinearLayout
+            android:id="@+id/btn_get"
+            android:layout_width="44dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/get"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:duplicateParentState="true"
+                android:tint="@color/icon_btn"
+                android:src="@drawable/ic_download"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:duplicateParentState="true"
+                android:text="@string/download"
+                android:textColor="@color/icon_btn"
+                android:textSize="9sp"
+                android:maxLines="1" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!--
-      Action buttons: no background ripple.
-      duplicateParentState on children propagates the container's pressed state
-      so the icon tint and label colour change on tap instead.
-    -->
-
-    <!-- Play -->
-    <LinearLayout
-        android:id="@+id/btn_play"
-        android:layout_width="44dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:clickable="true"
-        android:focusable="true">
-
-        <ImageView
-            android:id="@+id/play"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:duplicateParentState="true"
-            android:background="@drawable/chip_soft"
-            android:padding="4dp"
-            android:tint="@color/accent"
-            android:src="@drawable/ic_play"
-            android:contentDescription="@null" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:duplicateParentState="true"
-            android:text="@string/play"
-            android:textColor="@color/accent"
-            android:textSize="9sp"
-            android:maxLines="1" />
-    </LinearLayout>
-
-    <!-- Reciter: tint and label both use the pressed-state selector. -->
-    <LinearLayout
-        android:id="@+id/btn_reciter"
-        android:layout_width="44dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:clickable="true"
-        android:focusable="true">
-
-        <ImageView
-            android:id="@+id/reciter"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:duplicateParentState="true"
-            android:tint="@color/icon_btn"
-            android:src="@drawable/ic_reciter"
-            android:contentDescription="@null" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:duplicateParentState="true"
-            android:text="@string/reciter"
-            android:textColor="@color/icon_btn"
-            android:textSize="9sp"
-            android:maxLines="1" />
-    </LinearLayout>
-
-    <!-- Download (leftmost): label uses pressed-state selector; icon tint is set by adapter. -->
-    <LinearLayout
-        android:id="@+id/btn_get"
-        android:layout_width="44dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:clickable="true"
-        android:focusable="true">
-
-        <ImageView
-            android:id="@+id/get"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:duplicateParentState="true"
-            android:tint="@color/text_mute"
-            android:src="@drawable/ic_download"
-            android:contentDescription="@null" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:duplicateParentState="true"
-            android:text="@string/download"
-            android:textColor="@color/icon_btn"
-            android:textSize="9sp"
-            android:maxLines="1" />
-    </LinearLayout>
+    <!-- Separator line between rows. -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line" />
 
 </LinearLayout>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A settings line that carries a colour: the row opens the picker, the reset
+  button beside it puts the colour back to the default. Two actions, so two
+  touch targets rather than one row that has to guess which was meant.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layoutDirection="rtl"
+    android:background="@drawable/card"
+    android:elevation="1dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="7dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/set_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/text"
+        android:textSize="15sp" />
+
+    <!-- The colour as it stands. -->
+    <ImageView
+        android:id="@+id/set_dot"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/ic_circle"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/set_reset"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_reset"
+        android:tint="@color/icon_btn"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/reset" />
+</LinearLayout>

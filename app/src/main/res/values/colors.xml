@@ -23,6 +23,6 @@
          gold at night, which is the one colour the dark stylesheet changes
          rather than merely darkens. -->
     <color name="ornament">#1A6FA3</color>
-    <!-- Highlighted word ink — deep saturated blue, pops against cream paper. -->
-    <color name="ink_lit">#1053A8</color>
+    <!-- Highlighted word ink, and what the reset in settings returns to. -->
+    <color name="ink_lit">#A4161A</color>
 </resources>

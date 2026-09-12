@@ -52,4 +52,8 @@
     <string name="set_language">Language</string>
     <string name="lang_ar">العربية</string>
     <string name="lang_en">English</string>
+    <string name="set_ayah_color">Ayah number colour</string>
+    <string name="set_highlight_color">Word highlight colour</string>
+    <string name="reset">Reset</string>
+    <string name="color_choose">Pick a colour…</string>
 </resources>
