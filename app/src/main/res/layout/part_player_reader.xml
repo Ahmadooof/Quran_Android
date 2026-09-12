@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Reader player: dark bar with icon + label columns.
+  Container IDs are the click targets; only p_play_icon and p_repeat_icon
+  need their own IDs because sayPlayer() mutates them at runtime.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/player"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:orientation="horizontal"
+    android:layoutDirection="rtl"
+    android:background="@drawable/player_bg_dark"
+    android:visibility="gone">
+
+    <!-- Locate -->
+    <LinearLayout
+        android:id="@+id/p_locate"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:tint="@color/on_dark"
+            android:src="@drawable/ic_locate"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/label_locate"
+            android:textColor="@color/on_dark"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Reciter -->
+    <LinearLayout
+        android:id="@+id/p_reciter"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:tint="@color/on_dark"
+            android:src="@drawable/ic_reciter"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/reciter"
+            android:textColor="@color/on_dark"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Play / pause — icon and tint change at runtime -->
+    <LinearLayout
+        android:id="@+id/p_play"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/p_play_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:tint="@color/on_dark"
+            android:src="@drawable/ic_play"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/p_play_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/play"
+            android:textColor="@color/on_dark"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Repeat — tint changes at runtime to show active state -->
+    <LinearLayout
+        android:id="@+id/p_repeat"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/p_repeat_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:tint="@color/on_dark"
+            android:src="@drawable/ic_repeat"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/label_repeat"
+            android:textColor="@color/on_dark"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Close -->
+    <LinearLayout
+        android:id="@+id/p_close"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:tint="@color/on_dark"
+            android:src="@drawable/ic_close"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/close"
+            android:textColor="@color/on_dark"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+</LinearLayout>

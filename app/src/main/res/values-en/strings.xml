@@ -20,8 +20,9 @@
     <string name="to_menu">Menu</string>
 
     <string name="tab_index">Surahs</string>
-    <string name="tab_listen">Listen</string>
+    <string name="tab_marks">Bookmarks</string>
     <string name="tab_settings">Settings</string>
+    <string name="search_hint">Search surahs…</string>
 
     <string name="reciter">Reciter</string>
     <string name="play">Play</string>
@@ -43,6 +44,8 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="set_marks">Saved pages</string>
+    <string name="marks_col_recent">Last read</string>
+    <string name="marks_col_saved">Bookmarks</string>
     <string name="no_marks">No saved pages</string>
     <string name="page_named">Page %1$d</string>
     <string name="mark_page">Save this page</string>

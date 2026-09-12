@@ -16,16 +16,8 @@ import androidx.core.content.ContextCompat
 import androidx.media.app.NotificationCompat as MediaCompat
 
 /**
- * A foreground service that keeps the player notification alive while a
- * recitation is running, even with the app fully in the background.
- *
- * The service does no playback — ExoPlayer lives in Recite. It only manages
- * the notification that lets the listener control playback from the shade and
- * the lock screen.
- *
- * Notification actions are handled by an inner BroadcastReceiver rather than
- * through onStartCommand(), so there is no risk of a queued start-command
- * racing against a notification rebuild.
+ * Foreground service that keeps the player notification alive while audio plays.
+ * Does no playback — ExoPlayer lives in Recite.
  */
 class PlayerService : Service() {
 
@@ -36,7 +28,7 @@ class PlayerService : Service() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_TOGGLE -> { Recite.toggle(); updateNotification() }
-                ACTION_STOP   -> Recite.stop()   /* stop() calls dismiss() */
+                ACTION_STOP   -> Recite.stop()
             }
         }
     }
@@ -49,10 +41,6 @@ class PlayerService : Service() {
         private const val ACTION_STOP   = "com.readqurantoday.quran.player.STOP"
         private const val EXTRA_SURAH   = "surah_id"
 
-        /**
-         * Start the notification, or refresh it if the service is already up.
-         * Safe to call on every state change; no-op when surah is 0.
-         */
         fun show(context: Context, surah: Int) {
             if (surah <= 0) return
             val intent = Intent(context, PlayerService::class.java)
@@ -63,7 +51,6 @@ class PlayerService : Service() {
                 context.startService(intent)
         }
 
-        /** Take the notification down and stop the service. */
         fun dismiss(context: Context) {
             context.stopService(Intent(context, PlayerService::class.java))
         }
@@ -75,7 +62,6 @@ class PlayerService : Service() {
         createChannel()
         session = MediaSessionCompat(this, "QuranPlayer").also { it.isActive = true }
 
-        /* Receive toggle/stop from notification buttons inside this process only. */
         val filter = IntentFilter().apply {
             addAction(ACTION_TOGGLE)
             addAction(ACTION_STOP)
@@ -109,9 +95,6 @@ class PlayerService : Service() {
         session.release()
     }
 
-    /* ------------------------------------------------------------------ */
-
-    /** Rebuild and post the notification in place (no service restart needed). */
     fun updateNotification() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(NOTIF_ID, buildNotification())
@@ -127,7 +110,6 @@ class PlayerService : Service() {
         val playing = Recite.wantsToPlay()
         val name    = surahName()
 
-        /* Tapping the notification body reopens the reader. */
         val openIntent = PendingIntent.getActivity(
             this, 0,
             Intent(this, ReaderActivity::class.java).apply {
@@ -152,7 +134,7 @@ class PlayerService : Service() {
             .setSmallIcon(R.drawable.ic_play)
             .setContentTitle(name)
             .setContentIntent(openIntent)
-            .setOngoing(true)        /* always dismissible only via the stop action */
+            .setOngoing(true)
             .setShowWhen(false)
             .setSilent(true)
             .addAction(
@@ -172,8 +154,7 @@ class PlayerService : Service() {
 
     private fun updateSession() {
         val name = surahName()
-        /* Metadata is required for Android's QS media-player widget to appear
-           on the first pull-down of the notification shade. */
+        /* Metadata required for the QS media widget to appear on first shade pull. */
         session.setMetadata(
             MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, name)
@@ -206,7 +187,7 @@ class PlayerService : Service() {
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
                 setShowBadge(false)
-                setSound(null, null)      /* no sound despite DEFAULT importance */
+                setSound(null, null)      // no sound despite DEFAULT importance
                 enableVibration(false)
             }.also { nm.createNotificationChannel(it) }
         }

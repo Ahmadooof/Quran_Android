@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Every footer strip wears this: one clean surface with a hairline seam on top.
+  The zones tell themselves apart by what they hold — a soft chip, a filled
+  play circle, a lit tab — not by competing background tints.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/surface" />
+    <item
+        android:drawable="@color/line"
+        android:gravity="top"
+        android:height="1dp" />
+</layer-list>

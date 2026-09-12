@@ -11,7 +11,7 @@
     <!-- The rest of the palette, the same values the stylesheet's :root sets,
          so the app and the site are one design and not two. -->
     <color name="accent">#1A6FA3</color>
-    <color name="accent_soft">#261A6FA3</color>
+    <color name="accent_soft">#4D1A6FA3</color>
     <color name="surface">#FFFFFF</color>
     <color name="surface_2">#F5F9FD</color>
     <color name="line">#DCE8F2</color>
@@ -23,4 +23,6 @@
          gold at night, which is the one colour the dark stylesheet changes
          rather than merely darkens. -->
     <color name="ornament">#1A6FA3</color>
+    <!-- Highlighted word ink — deep saturated blue, pops against cream paper. -->
+    <color name="ink_lit">#1053A8</color>
 </resources>

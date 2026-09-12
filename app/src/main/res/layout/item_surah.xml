@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  One surah in the index: its number in a disc, its name, and how many ayahs.
-
-  The name is drawn, not written. It is two glyphs out of the mushaf's own
-  names face — the word سورة and then the name — which is how the printed index
-  sets it, diacritics and all, and it is what the running head on every page
-  shows. Spelling it out in the phone's Arabic font instead is where the
-  diacritics went wrong before.
--->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -19,9 +10,7 @@
     android:clickable="true"
     android:focusable="true"
     android:paddingStart="14dp"
-    android:paddingEnd="14dp"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp"
+    android:paddingEnd="6dp"
     android:layout_marginStart="12dp"
     android:layout_marginEnd="12dp"
     android:layout_marginTop="7dp">
@@ -36,12 +25,15 @@
         android:textSize="11sp"
         android:textStyle="bold" />
 
+    <!-- Vertical padding lives here so buttons can use match_parent on the full card height. -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_marginStart="10dp">
+        android:layout_marginStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -76,10 +68,102 @@
             android:textSize="13sp" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/ayahs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_mute"
-        android:textSize="13sp" />
+    <!--
+      Action buttons: no background ripple.
+      duplicateParentState on children propagates the container's pressed state
+      so the icon tint and label colour change on tap instead.
+    -->
+
+    <!-- Play -->
+    <LinearLayout
+        android:id="@+id/btn_play"
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/play"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:duplicateParentState="true"
+            android:background="@drawable/chip_soft"
+            android:padding="4dp"
+            android:tint="@color/accent"
+            android:src="@drawable/ic_play"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:duplicateParentState="true"
+            android:text="@string/play"
+            android:textColor="@color/accent"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Reciter: tint and label both use the pressed-state selector. -->
+    <LinearLayout
+        android:id="@+id/btn_reciter"
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/reciter"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:duplicateParentState="true"
+            android:tint="@color/icon_btn"
+            android:src="@drawable/ic_reciter"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:duplicateParentState="true"
+            android:text="@string/reciter"
+            android:textColor="@color/icon_btn"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Download (leftmost): label uses pressed-state selector; icon tint is set by adapter. -->
+    <LinearLayout
+        android:id="@+id/btn_get"
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/get"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:duplicateParentState="true"
+            android:tint="@color/text_mute"
+            android:src="@drawable/ic_download"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:duplicateParentState="true"
+            android:text="@string/download"
+            android:textColor="@color/icon_btn"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
 </LinearLayout>

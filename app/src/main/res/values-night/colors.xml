@@ -23,4 +23,6 @@
     <color name="ornament">#D9B95F</color>
     <!-- Knocked out of the filled pill. Not pure white at night: it glares. -->
     <color name="on_dark">#0F1317</color>
+    <!-- Highlighted word ink — bright sky blue, stands out on dark paper. -->
+    <color name="ink_lit">#60B4FF</color>
 </resources>

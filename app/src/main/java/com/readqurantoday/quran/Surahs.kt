@@ -4,10 +4,6 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * The 114 surahs, and the two questions the reader keeps asking of them:
- * where does this one start, and which one is this page in.
- */
 object Surahs {
 
     data class Surah(
@@ -21,14 +17,11 @@ object Surahs {
 
     private val all = ArrayList<Surah>(114)
 
-    /** The page each juz opens on, from mushaf.json: 30 of them. */
     private var juz = IntArray(0)
 
     fun load(context: Context) {
         if (all.isNotEmpty()) return
 
-        /* The file is a plain array of surahs — not an object with an array
-           inside it, which is what this asked for at first and crashed on. */
         val text = context.assets.open("data/surahs.json").use { it.readBytes() }
         val arr = JSONArray(String(text, Charsets.UTF_8))
 
@@ -53,13 +46,7 @@ object Surahs {
 
     fun list(): List<Surah> = all
 
-    /**
-     * Which surah a page belongs to.
-     *
-     * A page can hold the end of one surah and the beginning of the next; the
-     * running head names the one that ends there, which is the last whose first
-     * page is this page or earlier. That is what the printed head does.
-     */
+    /** The surah whose first page is this page or earlier — what the running head names. */
     fun ofPage(page: Int): Surah? {
         var found: Surah? = null
         for (s in all) {
@@ -68,7 +55,7 @@ object Surahs {
         return found
     }
 
-    /** Which juz a page is in — 1 to 30, or 0 before the list is loaded. */
+    /** Which juz this page is in (1–30), or 0 if not yet loaded. */
     fun juzOfPage(page: Int): Int {
         var n = 0
         for (i in juz.indices) if (juz[i] <= page) n = i + 1 else break

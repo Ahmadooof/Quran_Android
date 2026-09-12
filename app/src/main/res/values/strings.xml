@@ -16,10 +16,11 @@
     <string name="resume_where">سورة %1$s · صفحة %2$d</string>
     <string name="to_menu">القائمة</string>
 
-    <!-- The drawer's three tabs, worded as the web reader words them. -->
+    <!-- Bottom nav tabs. -->
     <string name="tab_index">السور</string>
-    <string name="tab_listen">الاستماع والتحميل</string>
+    <string name="tab_marks">المواضع</string>
     <string name="tab_settings">الإعدادات</string>
+    <string name="search_hint">بحث في السور…</string>
 
     <!-- Listening. -->
     <string name="reciter">القارئ</string>
@@ -30,6 +31,8 @@
     <string name="repeat">التكرار</string>
     <string name="close">إغلاق</string>
     <string name="locate">اتبع القارئ</string>
+    <string name="label_locate">تتبع</string>
+    <string name="label_repeat">تكرار</string>
     <string name="listen_ayah">استماع الآية</string>
     <string name="listen_word">استماع الكلمة</string>
     <string name="repeat_off">بدون تكرار</string>
@@ -44,6 +47,8 @@
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
     <string name="set_marks">الصفحات المحفوظة</string>
+    <string name="marks_col_recent">آخر قراءة</string>
+    <string name="marks_col_saved">المحفوظ</string>
     <string name="no_marks">لا توجد صفحات محفوظة</string>
     <string name="page_named">صفحة %1$d</string>
     <string name="mark_page">حفظ الصفحة</string>

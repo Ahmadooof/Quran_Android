@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  The index, laid out as the web reader's drawer is: a strip of three tabs and
-  then whichever pane they choose, each owning the height left over.
-
-  It reads right to left throughout, whatever language it is set to. The
-  language switch changes the words and nothing else: this is a mushaf, it is
-  read from the right, and an English label does not turn the book around.
--->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,102 +7,147 @@
     android:fitsSystemWindows="true"
     android:background="@color/surface_2">
 
-    <LinearLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:orientation="horizontal"
-        android:background="@drawable/tab_strip"
-        android:elevation="3dp"
-        android:padding="5dp"
-        android:layout_margin="12dp">
-
-        <TextView
-            android:id="@+id/tab_index"
-            style="@style/DrawerTab"
-            android:text="@string/tab_index" />
-
-        <TextView
-            android:id="@+id/tab_listen"
-            style="@style/DrawerTab"
-            android:text="@string/tab_listen" />
-
-        <TextView
-            android:id="@+id/tab_settings"
-            style="@style/DrawerTab"
-            android:text="@string/tab_settings" />
-
-        <!-- Not a tab: there is no pane behind it. It is the way straight back
-             to the page you were on, put here because that is what most people
-             opening the app want and they should not have to look for it. -->
-        <ImageView
-            android:id="@+id/resume"
-            android:layout_width="46dp"
-            android:layout_height="match_parent"
-            android:padding="12dp"
-            android:contentDescription="@string/resume"
-            android:background="@drawable/tab_off"
-            android:src="@drawable/ic_bookmark" />
-    </LinearLayout>
-
+    <!-- Pane area: surahs, bookmarks, or settings. -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <!-- Pane 0: surah list with search. -->
         <LinearLayout
             android:id="@+id/pane_index"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <!-- Search bar: elevated pill, no stroke, shadow separates it. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/search_bg"
+                android:elevation="3dp"
+                android:stateListAnimator="@null"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="6dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <ImageView
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_search"
+                    android:tint="@color/text_mute"
+                    android:contentDescription="@string/search_hint" />
+
+                <EditText
+                    android:id="@+id/search"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/search_hint"
+                    android:textColor="@color/text"
+                    android:textColorHint="@color/text_mute"
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:paddingTop="13dp"
+                    android:paddingBottom="13dp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:maxLines="1" />
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingTop="4dp"
                 android:paddingBottom="12dp" />
         </LinearLayout>
 
+        <!-- Pane 1: bookmarks — two columns side by side. -->
         <LinearLayout
-            android:id="@+id/pane_listen"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <!-- Who is reading. Tapped, it offers the others. -->
-            <LinearLayout
-                android:id="@+id/row_reciter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/listen_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingTop="4dp"
-                android:paddingBottom="12dp" />
-        </LinearLayout>
-
-        <ScrollView
             android:id="@+id/pane_marks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layoutDirection="rtl"
             android:visibility="gone">
 
+            <!-- Right column (RTL-first = right side): last read page. -->
             <LinearLayout
-                android:id="@+id/marks"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="4dp"
-                android:paddingBottom="16dp" />
-        </ScrollView>
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/marks_col_recent"
+                    android:textColor="@color/text_mute"
+                    android:textSize="11sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="6dp" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/marks_recent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingBottom="16dp" />
+                </ScrollView>
+            </LinearLayout>
+
+            <!-- Column divider. -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/line" />
+
+            <!-- Left column: saved bookmarks. -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/marks_col_saved"
+                    android:textColor="@color/text_mute"
+                    android:textSize="11sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="6dp" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/marks_saved"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingBottom="16dp" />
+                </ScrollView>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Pane 2: settings. -->
         <ScrollView
             android:id="@+id/pane_settings"
             android:layout_width="match_parent"
@@ -121,100 +158,210 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="4dp"
+                android:paddingTop="8dp"
                 android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:id="@+id/row_reciter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
 
                 <LinearLayout
                     android:id="@+id/row_theme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
-
             </LinearLayout>
         </ScrollView>
     </FrameLayout>
 
     <!--
-      What is playing, if anything is. Lives outside the tab panes so it is
-      visible on every tab — including the surah list — whenever a recitation
-      is running. Shown and hidden by SurahListActivity.player().
+      Continue reading: a floating card matching the surah rows — not a strip.
+      Gives the screen a clean visual hierarchy before the nav bar.
     -->
     <LinearLayout
-        android:id="@+id/player"
+        android:id="@+id/card_resume"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layoutDirection="rtl"
-        android:background="@drawable/bar_round"
-        android:elevation="8dp"
-        android:layout_margin="12dp"
-        android:padding="8dp"
+        android:background="@drawable/card"
+        android:elevation="1dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="11dp"
+        android:paddingBottom="11dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:focusable="true"
         android:visibility="gone">
 
-        <!-- Primary action: filled accent circle. -->
         <ImageView
-            android:id="@+id/p_play"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:padding="14dp"
-            android:contentDescription="@string/play"
-            android:background="@drawable/bg_circle_accent"
-            android:tint="@color/on_dark"
-            android:src="@drawable/ic_play" />
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_bookmark"
+            android:tint="@color/accent"
+            android:contentDescription="@null" />
 
-        <TextView
-            android:id="@+id/p_where"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="12dp"
-            android:layout_marginEnd="4dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="@color/text"
-            android:textSize="14sp" />
+            android:orientation="vertical">
 
-        <!-- Secondary controls: muted. -->
-        <ImageView
-            android:id="@+id/p_locate"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="9dp"
-            android:contentDescription="@string/locate"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:tint="@color/text_mute"
-            android:src="@drawable/ic_locate" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/resume"
+                android:textColor="@color/text"
+                android:textSize="13sp" />
 
-        <ImageView
-            android:id="@+id/p_reciter"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="9dp"
-            android:contentDescription="@string/reciter"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:tint="@color/text_mute"
-            android:src="@drawable/ic_reciter" />
-
-        <!-- Tint updated in code when a loop mode is active. -->
-        <ImageView
-            android:id="@+id/p_repeat"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="9dp"
-            android:contentDescription="@string/repeat"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:tint="@color/text_mute"
-            android:src="@drawable/ic_repeat" />
+            <TextView
+                android:id="@+id/resume_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:textColor="@color/text_mute"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <ImageView
-            android:id="@+id/p_close"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="10dp"
-            android:contentDescription="@string/close"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:src="@drawable/ic_chevron"
             android:tint="@color/text_mute"
-            android:src="@drawable/ic_close" />
+            android:contentDescription="@null" />
+    </LinearLayout>
+
+    <!--
+      Bottom navigation: pill marks the active tab, ghost pill on press.
+      No ripple background — only the icon and label change colour.
+    -->
+    <LinearLayout
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@drawable/strip_surface">
+
+        <LinearLayout
+            android:id="@+id/nav_surahs"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/nav_pill_surahs"
+                android:layout_width="52dp"
+                android:layout_height="28dp"
+                android:duplicateParentState="true"
+                android:background="@drawable/nav_pill">
+
+                <ImageView
+                    android:id="@+id/nav_icon_surahs"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:duplicateParentState="true"
+                    android:src="@drawable/ic_surahs"
+                    android:tint="@color/accent" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/nav_label_surahs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:duplicateParentState="true"
+                android:text="@string/tab_index"
+                android:textColor="@color/accent"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_marks"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/nav_pill_marks"
+                android:layout_width="52dp"
+                android:layout_height="28dp"
+                android:duplicateParentState="true"
+                android:background="@drawable/nav_pill_press">
+
+                <ImageView
+                    android:id="@+id/nav_icon_marks"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:duplicateParentState="true"
+                    android:src="@drawable/ic_bookmark"
+                    android:tint="@color/icon_btn" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/nav_label_marks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:duplicateParentState="true"
+                android:text="@string/tab_marks"
+                android:textColor="@color/icon_btn"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_settings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/nav_pill_settings"
+                android:layout_width="52dp"
+                android:layout_height="28dp"
+                android:duplicateParentState="true"
+                android:background="@drawable/nav_pill_press">
+
+                <ImageView
+                    android:id="@+id/nav_icon_settings"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:duplicateParentState="true"
+                    android:src="@drawable/ic_settings"
+                    android:tint="@color/icon_btn" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/nav_label_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:duplicateParentState="true"
+                android:text="@string/tab_settings"
+                android:textColor="@color/icon_btn"
+                android:textSize="11sp" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

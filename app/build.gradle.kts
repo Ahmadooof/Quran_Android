@@ -4,46 +4,6 @@ plugins {
 }
 
 
-/**
- * Put the reader in the package, as part of building.
- *
- * This used to be `npm run sync:android`, remembered by hand, which meant the
- * app showed whatever the last person to remember had copied. Gradle knows
- * when public/ has changed and when it has not, so the copy happens exactly
- * when it is needed and is skipped — UP-TO-DATE — when it is not.
- *
- * The recitations and the 114 pre-rendered surah pages are left out of what is
- * watched as well as out of what is copied: the recitations alone are 5.7 GB,
- * and hashing them to decide whether to copy files that are never copied would
- * cost more than the build.
- */
-val syncWebAssets = tasks.register<Exec>("syncWebAssets") {
-    val repo = rootProject.file("..")
-    val script = File(repo, "scripts/sync-android-assets.js")
-    val source = File(repo, "public")
-
-    group = "build"
-    description = "Copies the reader from public/ into the app's assets."
-
-    inputs.files(
-        fileTree(source) {
-            exclude("audio/**", "surah/**")
-        }
-    ).withPropertyName("reader").withPathSensitivity(PathSensitivity.RELATIVE)
-    inputs.file(script).withPathSensitivity(PathSensitivity.RELATIVE)
-    outputs.dir(file("src/main/assets"))
-
-    workingDir = repo
-
-    /* node is a .cmd shim on Windows, which only the shell can start. */
-    commandLine =
-        if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
-            listOf("cmd", "/c", "node", script.absolutePath)
-        } else {
-            listOf("node", script.absolutePath)
-        }
-}
-
 android {
     namespace = "com.readqurantoday.quran"
     compileSdk = 34
@@ -56,24 +16,18 @@ android {
         versionName = "0.1"
     }
 
-    /* Two asset folders, kept apart on purpose.
-     *
-     * src/main/assets is the web reader and is wiped and rewritten by the sync
-     * script on every build; anything else put there would be deleted. The
-     * decoded page fonts belong to the native reader, are written by a
-     * different script, and so live in their own folder — packaged the same
-     * way, at the root of assets, but never in the sync script's way. */
+    /* The page fonts live in their own source set so they are packaged at the
+       root of assets alongside anything in src/main/assets. */
     sourceSets {
         getByName("main") {
             assets.srcDirs("src/main/assets", "src/main/fonts-ttf")
         }
     }
 
-    /* Both font formats are already compressed, or in the TTF's case are read
-       by mapping the file — packing them again costs build time and saves
-       nothing, and a compressed asset cannot be memory-mapped at all. */
+    /* TTF files are read by memory-mapping the asset — compressing them would
+       both waste build time and make memory-mapping impossible. */
     androidResources {
-        noCompress += listOf("woff2", "ttf")
+        noCompress += listOf("ttf")
     }
 
     buildTypes {
@@ -90,12 +44,6 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-}
-
-/* Every build, not only a release: an app built from stale assets is the thing
-   this is here to prevent, and Gradle skips the work when nothing has moved. */
-tasks.named("preBuild") {
-    dependsOn(syncWebAssets)
 }
 
 dependencies {
