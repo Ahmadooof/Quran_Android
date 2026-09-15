@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  A place in the mushaf to go back to: a recent surah, or a saved page.
-
-  The disc says which kind it is. The surah leads; under it, where in the book,
-  and — for a surah being read — how far through that surah the page stands, as a
-  thin bar. At the end, when it was read, or the way to drop a saved page.
--->
+<!-- Recent surah or saved page: kind disc, surah, place and progress, then time or remove -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

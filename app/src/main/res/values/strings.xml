@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">القرآن العظيم</string>
-    <string name="index_title">السور</string>
     <!-- "surah <name>", as a printed index names them. -->
     <string name="surah_named">سورة %1$s</string>
-    <!-- juz and page, in the order the running head has them. -->
-    <string name="place">الجزء %1$d · صفحة %2$d</string>
-    <!-- The page's own running head. The numbers arrive already written in
-         Arabic figures, so these take a string and not a count. -->
+    <!-- Numbers arrive already written in Arabic figures, so these take strings -->
     <string name="head_juz">الجزء %1$s</string>
     <string name="head_page">صفحة %1$s</string>
     <!-- The way back into the page the reader was left on. -->
@@ -15,11 +11,10 @@
     <!-- The surah and page the reader was left on, under the label above. -->
     <string name="to_menu">القائمة</string>
     <!-- Two parts of a place joined, e.g. the juz and the page in the reader's top bar. -->
-    <string name="bar_place">%1$s %2$s</string>
-    <string name="place_line">%1$s · %2$s</string>
+    <string name="bar_place" translatable="false">%1$s %2$s</string>
+    <string name="place_line" translatable="false">%1$s · %2$s</string>
 
-    <!-- Search results. A number could be a page or a surah, so the section that
-         holds both is named for what they have in common: somewhere to go. -->
+    <!-- Search section for a number: both a page and a surah to go to -->
     <string name="search_jump">الانتقال إلى</string>
     <string name="search_surahs">السور</string>
     <string name="search_ayahs">الآيات</string>
@@ -33,9 +28,7 @@
     <!-- The quiet line under a surah's name: its English name, then its length. -->
     <string name="surah_meta_juz">%1$s %2$s</string>
     <string name="surah_meta">%1$s · %2$s</string>
-    <!-- Arabic counts change the noun with the number: آيتان for two, آيات from
-         three to ten, the singular آية again from eleven. The figure arrives as a
-         string already written in Arabic numerals. -->
+    <!-- Arabic noun forms change with the count; the figure arrives as an Arabic-numeral string -->
 
     <!-- Bottom nav tabs. -->
     <string name="tab_index">السور</string>
@@ -49,20 +42,14 @@
     <string name="stop">إيقاف</string>
     <!-- Under the play button while the audio is still on its way. -->
     <string name="loading">تحميل…</string>
-    <string name="download">تنزيل</string>
-    <string name="downloaded">محفوظ · اضغط للحذف</string>
     <string name="repeat">التكرار</string>
     <string name="close">إغلاق</string>
-    <string name="locate">اتبع القارئ</string>
     <string name="label_locate">تتبع</string>
     <string name="label_repeat">تكرار</string>
-    <string name="listen_ayah">استماع الآية</string>
-    <string name="listen_word">استماع الكلمة</string>
     <string name="repeat_off">بدون تكرار</string>
     <string name="repeat_ayah">تكرار الآية</string>
     <string name="repeat_page">تكرار الصفحة</string>
     <string name="repeat_surah">تكرار السورة</string>
-    <string name="ayah_of">الآية %1$s</string>
     <string name="no_timing">لا يوجد توقيت لهذا القارئ في هذه السورة</string>
 
     <!-- The settings a phone actually changes while reading. -->
@@ -70,7 +57,6 @@
     <string name="theme_system">حسب النظام</string>
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
-    <string name="set_marks">الصفحات المحفوظة</string>
     <string name="marks_col_recent">آخر قراءة</string>
     <string name="marks_col_saved">المحفوظ</string>
     <string name="no_marks">لا توجد صفحات محفوظة</string>
@@ -78,8 +64,6 @@
     <!-- Read aloud for the progress bar on a recent surah: page 4 of its 48. -->
     <string name="place_progress">الصفحة %1$s من %2$s في السورة</string>
     <string name="remove_mark">إزالة من المحفوظ</string>
-    <string name="page_named">صفحة %1$d</string>
-    <string name="mark_page">حفظ الصفحة</string>
     <string name="mark_short">حفظ</string>
     <string name="set_language">اللغة</string>
     <string name="lang_ar">العربية</string>
@@ -87,7 +71,6 @@
     <string name="set_ayah_color">لون رقم الآية</string>
     <string name="set_highlight_color">لون تظليل الكلمة</string>
     <string name="reset">إعادة تعيين</string>
-    <string name="color_choose">اختر لوناً…</string>
     <string name="set_preview">معاينة</string>
     <!-- Settings groups. -->
     <string name="set_group_general">عام</string>
@@ -193,4 +176,15 @@
     <string name="fb_thanks">شكرًا لك، وصلت رسالتك</string>
     <string name="fb_too_many">أرسلت رسائل كثيرة، حاول لاحقًا</string>
     <string name="fb_failed">تعذّر الإرسال الآن. هل تريد إرسالها بالبريد الإلكتروني؟</string>
+    <string name="set_privacy">سياسة الخصوصية</string>
+    <string name="set_credits">المصادر والتراخيص</string>
+    <string name="credits_text">نص القرآن المستخدم في البحث: مشروع تنزيل (Tanzil Project)، tanzil.net، برخصة المشاع الإبداعي نسب المصنف 3.0، دون أي تعديل.
+
+خطوط صفحات المصحف وأسماء السور: مجمع الملك فهد لطباعة المصحف الشريف.
+
+التلاوات الصوتية: حقوقها لأصحابها من القرّاء وجهات التسجيل.
+
+خط Cairo: رخصة SIL Open Font License 1.1.
+
+مكتبات AndroidX وMedia3 من Google، ومنتقي الألوان ColorPicker من Jared Rummler: رخصة Apache 2.0.</string>
 </resources>

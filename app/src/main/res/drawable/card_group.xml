@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  A group of settings as one card. card.xml's shape without its ripple: the rows
-  inside take touches one at a time, so the card itself is never pressed.
--->
+<!-- A settings group card: no ripple, its rows take the touches -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <corners android:radius="18dp" />

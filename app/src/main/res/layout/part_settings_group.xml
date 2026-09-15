@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  A titled group of settings: the title on the pane's own ground, the rows
-  together in one card beneath it. clipToOutline so a row that paints its own
-  ground — the preview line — keeps to the card's rounded corners.
--->
+<!-- Titled settings card; clipToOutline keeps a row's own ground inside the rounded corners -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

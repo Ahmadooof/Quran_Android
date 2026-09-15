@@ -36,13 +36,7 @@ object Mushaf {
 
     private var pages: JSONObject? = null
     private var marks: JSONObject? = null
-    /*
-      Concurrent maps, not plain ones. Pages are loaded ahead on a background thread
-      (warm), and at startup the ayah map walks every page on another (Ayat.build),
-      while the pager reads them on the main thread and keepOnly prunes them there.
-      A plain HashMap written and read, or pruned mid-write, across threads can load
-      a font twice, lose an entry, or break outright — part of a page turn's stutter.
-    */
+    // Concurrent: pages load on background threads while the pager reads and prunes on main
     private val faces = ConcurrentHashMap<Int, Typeface>()
     private val tables = ConcurrentHashMap<Int, Glyphs>()
     private var nameTable: Glyphs? = null
@@ -53,8 +47,7 @@ object Mushaf {
     /* Parsed lines cached to avoid re-parsing on every page turn. */
     private val parsed = ConcurrentHashMap<Int, List<Line>>()
 
-    /* Below normal, so it never competes with drawing, but not the lowest: at the
-       lowest it could lag a quick run of swipes and leave the page arriving unloaded. */
+    // Below normal priority, but not lowest, or a quick run of swipes outpaces it
     private val ahead = java.util.concurrent.Executors.newSingleThreadExecutor { r ->
         Thread(r, "mushaf-ahead").apply { priority = Thread.NORM_PRIORITY - 2 }
     }
@@ -111,13 +104,7 @@ object Mushaf {
     }
 
     /** Pre-load pages around the current one on a background thread to avoid jank. */
-    /*
-      Load the pages around [page] off the main thread, nearest first, so the page a
-      swipe brings in is already loaded when it binds. A page loaded on the main
-      thread mid-swipe means its TTF parsed twice and its glyph table read, all
-      inside the animation. Each loader returns at once for a page already cached,
-      so warming the same neighbourhood again costs almost nothing.
-    */
+    // Loads nearby pages off the main thread so a swipe never parses a font mid-animation
     fun warm(context: Context, page: Int) {
         val ctx = context.applicationContext
         ahead.execute {
@@ -132,8 +119,7 @@ object Mushaf {
         }
     }
 
-    /* page, page+1, page-1, page+2, ... out to AHEAD either side: the next page to
-       arrive, whichever way the reader is going, is loaded before the far ones. */
+    // Nearest pages first in both directions
     private fun nearestFirst(page: Int): List<Int> {
         val out = ArrayList<Int>(AHEAD * 2 + 1)
         out.add(page)

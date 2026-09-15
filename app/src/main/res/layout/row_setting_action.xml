@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A settings line that does one thing rather than showing a value: its label
-     centred, in the accent, the way a button reads. -->
+<!-- Settings row that performs an action, styled like a button -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/set_label"
     android:layout_width="match_parent"

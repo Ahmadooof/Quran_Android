@@ -2,14 +2,7 @@ package com.readqurantoday.quran
 
 import java.text.Normalizer
 
-/**
- * Reads the search box.
- *
- * A number is a place rather than a word, and there is no way to know which
- * place: 48 is a page and it is also a surah. Both are offered and the reader
- * picks. Words are a name to find, matched with the Arabic marks stripped and
- * against the English too, so either keyboard arrives at the same surah.
- */
+// A number offers both page and surah; words match names in Arabic without marks, or English
 object Search {
 
     /** One row of the result list. */
@@ -32,9 +25,7 @@ object Search {
 
     private const val LAST_PAGE = 604
 
-    /* Harakat, the madda and hamza marks, the superscript alef, and tatweel: typed
-       or not, it is one word. The hamza marks matter because some keyboards write
-       أ as ا followed by a separate hamza, which no letter swap would ever reach. */
+    // Some keyboards type hamza as a separate mark, so marks are stripped before matching
     private val marks = Regex("[\u064B-\u0655\u0670\u0640]")
 
     /* Both sets of Arabic digits, so ٤٨ and ۴۸ read as 48. */
@@ -48,16 +39,7 @@ object Search {
         )
     }
 
-    /**
-     * One spelling for letters a reader will not think to tell apart: every alef
-     * with or without its hamza or madda, the hamza's seats on waw and ya, ya and
-     * alef maqsura, ta-marbuta and ha. Whether someone types مؤمن or مومن, بئس or
-     * بيس, they mean the same word and should get the same ayahs.
-     *
-     * NFKC goes first. It undoes presentation forms — the لا and لأ ligatures some
-     * keyboards type as a single character — and joins a separately typed hamza to
-     * its letter, so the swaps below see ordinary letters either way.
-     */
+    // One spelling for letters readers do not distinguish; NFKC first undoes ligatures and joins typed hamza
     fun fold(s: String) = marks.replace(Normalizer.normalize(s, Normalizer.Form.NFKC), "")
         .replace('آ', 'ا')
         .replace('أ', 'ا')
@@ -76,8 +58,7 @@ object Search {
 
         val hits = ArrayList<Hit>(8)
 
-        /* A bare number: the two places it could name, page first — it is the
-           finer of the two, and the one a reader copying a reference has. */
+        // Page first: it is the finer place and the one a copied reference uses
         val n = q.toIntOrNull()
         if (n != null) {
             if (n in 1..LAST_PAGE) hits.add(Hit.Page(n))
@@ -88,8 +69,7 @@ object Search {
 
         val folded = fold(q)
 
-        /* Names first: a reader typing a surah's name wants the surah, not every
-           ayah that happens to contain the word. */
+        // Surah names before ayahs that merely contain the word
         val found = all.filter {
             fold(it.name).contains(folded) || it.english.contains(q, ignoreCase = true)
         }
@@ -101,10 +81,7 @@ object Search {
         val verses = Ayahs.find(folded)
         if (verses.isNotEmpty()) {
             hits.add(Hit.Head(R.string.search_ayahs))
-            /* The fold only swaps letters on this edition, so a position in the
-               folded text is the same position in the original and the match can be
-               marked. Were that ever untrue, the length would say so, and the row
-               shows the text unmarked instead. */
+            // Folding keeps positions, so matches can be marked; if lengths differ the row is left unmarked
             for (f in verses) {
                 val at = if (f.ayah.folded.length == f.ayah.text.length) f.at else -1
                 hits.add(Hit.Verse(f.ayah, at, folded.length))

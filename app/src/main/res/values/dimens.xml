@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Spacing tokens.
-  Use these in layouts instead of hardcoded dp/sp values.
-  Add here when a value appears in more than one layout.
--->
+<!-- Spacing tokens for values used in more than one layout -->
 <resources>
 
     <!-- Horizontal margin between screen edge and cards / containers -->
@@ -17,10 +13,7 @@
 
     <!-- Icon sizes -->
     <dimen name="icon_nav">22dp</dimen>   <!-- chrome bar + bottom nav -->
-    <dimen name="icon_row">20dp</dimen>   <!-- icons inside list rows -->
 
-    <!-- Bottom navigation bar height -->
-    <dimen name="nav_bar_height">64dp</dimen>
 
     <!-- Chrome bar button row height (icon 22dp + 3dp gap + ~14dp label + padding) -->
     <dimen name="chrome_row_height">52dp</dimen>
@@ -37,13 +30,8 @@
     <!-- The space above a settings card that has no title of its own. -->
     <dimen name="group_gap">12dp</dimen>
 
-    <!-- Search bar horizontal margin (matches screen_margin) -->
-    <dimen name="search_margin_h">12dp</dimen>
 
-    <!-- Elevation levels -->
-    <dimen name="elevation_search">3dp</dimen>
     <dimen name="elevation_chrome">6dp</dimen>
     <dimen name="elevation_player">8dp</dimen>
-    <dimen name="elevation_card">1dp</dimen>
 
 </resources>

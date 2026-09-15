@@ -35,8 +35,7 @@ class SurahRow(v: View, names: Typeface?) : RecyclerView.ViewHolder(v) {
         name.text = String(Character.toChars(Mushaf.nameCode(s.id)))
         name.contentDescription = res.getString(R.string.surah_named, s.name)
 
-        /* The English name is isolated before it joins an Arabic line, or the bidi
-           algorithm pulls the juz into its run and the line reads back to front. */
+        // Isolated so bidi does not pull the juz into the English run
         val english = BidiFormatter.getInstance().unicodeWrap(s.english)
         val juz = res.getString(R.string.head_juz, figures(Surahs.juzOfPage(s.from), res))
         // The juz is for finding your way, so it stands out in the accent

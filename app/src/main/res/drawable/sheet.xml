@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The sheet's own ground: square to the screen's bottom edge, round where it
-     leaves off, so it reads as having risen from there. -->
+<!-- Square at the bottom edge, rounded on top, so the sheet reads as risen from there -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="@color/surface" />

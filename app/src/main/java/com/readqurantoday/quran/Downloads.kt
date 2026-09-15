@@ -9,13 +9,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
 
-/**
- * Surah audio kept on the phone for offline listening, one folder per reciter,
- * fetched through Android's DownloadManager so a download carries on with the app
- * closed. The files live in the app's own storage: they play without a connection,
- * go when the app is uninstalled, and other apps cannot see them. Putting a copy
- * where the reader can see it is saveToPhone's business, not this.
- */
+// Offline audio in app storage, one folder per reciter, via DownloadManager so it survives the app closing
 object Downloads {
 
     const val SURAHS = 114
@@ -39,19 +33,10 @@ object Downloads {
     fun fetching(context: Context, surah: Int, reciter: String): Boolean =
         inFlight(context, reciter).containsKey(surah).also { if (!it) running.remove(key(surah, reciter)) }
 
-    fun busy(context: Context) = running.keys.toList().any { k ->
-        val parts = k.split('/')
-        fetching(context, parts[1].toInt(), parts[0])
-    }
-
     /** A download under way: its DownloadManager id, and bytes so far of the whole (0 while unknown). */
     data class Flight(val id: Long, val done: Long, val total: Long)
 
-    /*
-      Every download of [reciter]'s surahs still pending, running or paused, by surah
-      — one query for the lot. Asking per surah was one query each, and the surah list
-      asked it for every row it drew.
-    */
+    // One query for all of a reciter's downloads instead of one per row
     fun inFlight(context: Context, reciter: String): Map<Int, Flight> {
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val dir = File(context.getExternalFilesDir("audio"), reciter).absolutePath
@@ -126,8 +111,7 @@ object Downloads {
         val name = Surahs.list().firstOrNull { it.id == surah }?.name.orEmpty()
         val request = DownloadManager.Request(Recite.urlFor(context, surah, reciter).toUri())
             .setTitle(context.getString(R.string.app_name))
-            /* The surah, by name: this used to borrow the page string, and so called
-               surah 2 "page 2" in the notification. */
+            // Named by surah, not page, in the notification
             .setDescription(context.getString(R.string.surah_named, name))
             .setDestinationUri(Uri.fromFile(target))
             .setAllowedOverRoaming(false)
@@ -179,11 +163,7 @@ object Downloads {
 
     // --- sizes ---
 
-    /*
-      The size of every surah's file, as the server reports it — asked for with HEAD,
-      which returns the length and none of the audio, and remembered per reciter so it
-      is asked once. 0 is not yet known.
-    */
+    // File sizes from a HEAD request, remembered per reciter; 0 means not known yet
     private fun sizes(context: Context) =
         context.getSharedPreferences("download-sizes", Context.MODE_PRIVATE)
 
@@ -192,11 +172,7 @@ object Downloads {
 
     private val asking = Executors.newSingleThreadExecutor { r -> Thread(r, "download-sizes") }
 
-    /**
-     * Find out, off the main thread, the size of each of [reciter]'s surahs not yet
-     * known. [landed] is called on the calling thread's looper as they arrive, in
-     * batches, so a screen can fill its sizes in.
-     */
+    // Off the main thread; landed runs on the main thread in batches
     fun learnSizes(context: Context, reciter: String, landed: () -> Unit) {
         val ctx = context.applicationContext
         val main = android.os.Handler(android.os.Looper.getMainLooper())

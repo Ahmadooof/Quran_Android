@@ -36,8 +36,7 @@ object Recite {
 
     var onChange: (() -> Unit)? = null
 
-    /* Repeat modes, smallest span to largest; the reader's sheet lists them in
-       this order and matches a choice to a mode by its position. */
+    // Order matters: the repeat sheet maps choices to modes by position
     const val ONCE = 0
     const val AYAH = 1
     const val PAGE = 2
@@ -45,9 +44,7 @@ object Recite {
 
     var repeat = ONCE
 
-    /* Where page repeat returns to if the surah's audio runs out mid-loop: the
-       first ayah of the page, in ms. Set by RecitationController, which has the
-       timings; the player only needs somewhere to go back to. */
+    // Where page repeat returns to if the audio ends mid-loop, in ms
     var loopFrom = 0
 
     fun at(): Int {
@@ -139,9 +136,7 @@ object Recite {
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
                     if (state == Player.STATE_ENDED) {
-                        /* A surah loops to its start. A page that is the surah's last
-                           loops too — the audio ends before the controller's own check
-                           past the page's last ayah can fire — back to its first ayah. */
+                        // A page that ends the surah loops here too: the audio ends before the controller's check
                         if (repeat == SURAH || repeat == PAGE) {
                             val back = if (repeat == PAGE) loopFrom else 0
                             seekTo(back.toLong())
@@ -192,12 +187,7 @@ object Recite {
 
     fun isPlaying() = player?.isPlaying == true
 
-    /*
-      Asked to play, and no sound yet: the stream is being fetched, or buffered after
-      a seek. Play has been pressed, so the button already shows pause, but nothing is
-      heard — this is the gap a spinner should fill. It ends on its own: the player
-      reports isPlaying the moment audio starts, and that change calls onChange.
-    */
+    // Play pressed but no sound yet; shows the spinner
     fun waiting() = wantsToPlay() && !isPlaying()
 
     fun stop() {

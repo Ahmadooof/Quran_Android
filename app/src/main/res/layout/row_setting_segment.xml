@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Two choices side by side, the chosen one lit. Which is lit, and the text colours,
-  are set by SettingsPane; this only lays the pair out inside the group's card.
--->
+<!-- Two side-by-side choices; SettingsPane lights the chosen one -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

@@ -2,16 +2,7 @@ package com.readqurantoday.quran
 
 import android.content.Context
 
-/**
- * The Quran as searchable text, which is the one thing the mushaf data cannot
- * give: a page stores its words as glyphs of its own font, ligated and private
- * to it, so there is nothing in it to match a typed letter against.
- *
- * Tanzil's Simple Clean edition, one ayah to a line as `surah|ayah|text`. It is
- * carried for searching and for naming what was found — never for drawing, which
- * stays the page's own business. Absent, search keeps its other answers and
- * simply offers no ayahs.
- */
+// Searchable Quran text (Tanzil Simple Clean, surah|ayah|text): page glyphs cannot be matched against typed letters
 object Ayahs {
 
     private const val ASSET = "data/quran-simple.txt"
@@ -22,9 +13,7 @@ object Ayahs {
     /** The shortest query searched at all. One letter is in nearly every ayah. */
     const val FLOOR = 2
 
-    /* Below this a query must be a whole word. Two letters as a substring hide in
-       too much else: قد sits inside قدير and قدر in 561 ayahs, but stands as a word
-       of its own in 122 — and those 122 are what someone typing قد is after. */
+    // Shorter queries must be whole words, or they match inside too many longer words
     private const val LOOSE_FROM = 3
 
     class Ayah(
@@ -75,11 +64,7 @@ object Ayahs {
     /** An ayah that matched, and where in its folded text the match begins. */
     data class Found(val ayah: Ayah, val at: Int)
 
-    /**
-     * Ayahs containing [folded], which must already be folded the way the index is.
-     * A match that opens a word comes before one buried inside it: searching for a
-     * word should find the word before it finds the middle of a longer one.
-     */
+    // Matches that open a word come before ones buried inside a word
     fun find(folded: String): List<Found> {
         if (folded.length < FLOOR || all.isEmpty()) return emptyList()
         val whole = folded.length < LOOSE_FROM
@@ -98,10 +83,7 @@ object Ayahs {
         return opens + buried.take(LIMIT - opens.size)
     }
 
-    /* The first place [q] fits. When [whole], only where it is a word by itself —
-       and the first such place, not merely the first place the letters occur, so
-       the row marks the word that was actually meant. Otherwise a word-opening
-       match is preferred over an earlier one buried inside a longer word. */
+    // Prefers a whole-word or word-opening match so the row marks the word that was meant
     private fun firstMatch(text: String, q: String, whole: Boolean): Int {
         var from = 0
         var buried = -1

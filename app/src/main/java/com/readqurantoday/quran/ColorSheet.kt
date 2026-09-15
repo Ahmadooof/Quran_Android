@@ -14,9 +14,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.jaredrummler.android.colorpicker.ColorPickerView
 
-/* Quick picks after the default. The field is for finding a colour; these are
-   for arriving at a good one in a tap. Each kind of colour has its own: a red
-   that marks a word well is no colour to print a page on. */
+// Quick picks per kind of colour: a good highlight colour is no colour for a page
 
 /** Accents, for the things that should stand out: the lit word, the ayah numbers. */
 val ACCENT_PICKS = intArrayOf(
@@ -36,21 +34,7 @@ val INK_PICKS = intArrayOf(
     0xFF5A5A5A.toInt(), 0xFFA2A7AD.toInt(), 0xFFE8E6E1.toInt()
 )
 
-/**
- * A colour, chosen on a sheet against a real line of the page.
- *
- * Every move of the field, and every tap on a quick pick, restyles the preview at
- * once, so the reader watches the colour land where it will be used rather than
- * judging a swatch in isolation. Nothing is saved while they look: [keep] is
- * called only for Done, and backing out leaves the setting as it was.
- *
- * The preview is drawn in [look]'s theme — the one whose style is being edited,
- * which need not be the theme the app is in.
- *
- * [trial] says how the colour should show on the preview — as the lit word, the
- * ayah markers, the text or the page. [fallback] is the default, offered as the
- * first pick, ahead of [picks].
- */
+// Colour picker that restyles a real page line live; saves only on Done
 fun Activity.colorSheet(
     title: String,
     look: Context,
@@ -82,14 +66,12 @@ fun Activity.colorSheet(
 
     var chosen = initial
 
-    /* Ring every swatch that matches what is in hand — a colour in use can be a
-       quick pick too, and both are that colour. */
+    // A colour in use can also be a quick pick, so every matching swatch is ringed
     fun ring() {
         for ((r, c) in rings) r.setBackgroundResource(if (c == chosen) R.drawable.swatch_ring else 0)
     }
 
-    /* The code in the box follows the colour, except while the box is being typed in
-       — rewriting it then would fight the reader's own keystrokes. */
+    // The hex box is not rewritten while being typed in
     var typing = false
     var echoing = false
     fun sayHex(color: Int) {

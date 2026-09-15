@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One line of a settings group: what it is, and what it is set to. The group's
-     card is the ground; the row only lights when touched. -->
+<!-- Settings row: label and current value -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

@@ -1,5 +1,6 @@
 package com.readqurantoday.quran
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -17,10 +18,7 @@ import android.view.ViewConfiguration
 import android.widget.OverScroller
 import kotlin.math.abs
 
-/**
- * One page of the mushaf drawn by placing pre-resolved glyphs.
- * Each page has its own TTF; same codepoint = different word on a different page.
- */
+// One mushaf page drawn from pre-resolved glyphs; each page has its own font
 class MushafPageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -65,14 +63,10 @@ class MushafPageView @JvmOverloads constructor(
     /** The page on show. */
     val page get() = pageNo
 
-    /*
-      Where finished images of pages come from (PageShots), or null to always draw live.
-      See onDraw for when a shot stands in for drawing.
-    */
+    // Pre-rendered page images, or null to always draw live
     var shots: ((Int, Int, Int) -> Bitmap?)? = null
 
-    /* Fingers on the glass. A pinch or pan is drawn from the shot while they are, and
-       the page is drawn sharp, live, once they lift. */
+    // Pinch and pan draw from the shot while fingers are down; the page is redrawn sharp on lift
     private var fingers = false
 
     /** What a sideways drag turns the page with, when pages turn rather than slide. */
@@ -143,8 +137,7 @@ class MushafPageView @JvmOverloads constructor(
     private var dragX = 0f
     private var dragY = 0f
 
-    /* A gesture that pinched or panned is a zoom, not a tap: it must not reach the
-       click and long-click listeners, or it lights a word the reader never chose. */
+    // A pinch or pan must not reach click listeners, or it lights a word by mistake
     private var pinching = false
     private var panning = false
     private var downX = 0f
@@ -156,8 +149,7 @@ class MushafPageView @JvmOverloads constructor(
             override fun onScale(d: ScaleGestureDetector): Boolean {
                 val newZoom = (zoom * d.scaleFactor).coerceIn(1f, MAX_ZOOM)
                 val dF = newZoom / zoom          // actual factor after clamping
-                /* Keep the pinch focal point fixed: pan adjusts so content under the
-                   fingers doesn't move. Formula: pan_new = dF*pan + (1-dF)*(focus - center). */
+                // Keeps the content under the fingers still: pan = dF*pan + (1-dF)*(focus - center)
                 panX = dF * panX + (1f - dF) * (d.focusX - width  / 2f)
                 panY = dF * panY + (1f - dF) * (d.focusY - height / 2f)
                 zoom = newZoom
@@ -183,19 +175,7 @@ class MushafPageView @JvmOverloads constructor(
     /* Draw live even where a shot would do: set only while laying out for a tap. */
     private var forceLive = false
 
-    /*
-      A finished image of this page stands in for drawing it — so a swipe or a pinch
-      moves a picture instead of stroking every glyph again each frame — whenever what
-      is on screen is the page as it was shot:
-
-        - at rest and unzoomed, where the shot is the page pixel for pixel;
-        - mid-pinch or mid-pan, fingers down, where it is stretched for speed and
-          sharpened by a live draw the moment the fingers lift.
-
-      Never while a word is lit (recitation moves the light every word, and the shot has
-      none), never on a page that scrolls (the shot is one screen, not the whole page),
-      and never zoomed at rest, where only live type is sharp.
-    */
+    // The shot stands in at rest unzoomed and mid-gesture; never with a lit word, a scrolling page, or zoomed at rest
     private fun shotToDraw(): Bitmap? {
         if (forceLive || litWord >= 0 || flashAyah > 0 || maxScroll > 0f || scrollTop != 0f) return null
         if (zoom != 1f && !fingers) return null
@@ -213,8 +193,8 @@ class MushafPageView @JvmOverloads constructor(
         if (zoomed) canvas.restore()
     }
 
-    /* A page drawn only from its shot has never laid its words out, so a tap would find
-       none: lay it out once, drawn into a Picture nobody sees, the first time one is asked for. */
+    // A shot-only page has no word bounds, so taps need one hidden layout pass; onDraw skips the background
+    @SuppressLint("WrongCall")
     private fun ensureLaidOut() {
         if (laidOut || width == 0 || height == 0) return
         forceLive = true
@@ -224,19 +204,7 @@ class MushafPageView @JvmOverloads constructor(
         forceLive = false
     }
 
-    /** Reset zoom and pan — call from a double-tap handler if desired. */
-    fun resetZoom() { zoom = 1f; panX = 0f; panY = 0f; invalidate() }
-
-    /*
-      These words are pre-shaped: neighbouring glyphs overlap, the way a joined
-      letter's tail runs under the next letter's head. Each glyph is composited
-      separately, so the shared edge carries two partial coverages instead of one
-      full one, and a hairline of paper shows through. At 1x that crack is inside a
-      pixel and invisible; magnified it lands on whole pixels and the letters look
-      torn. Stroking the outline outward by a third of a pixel closes it, and at a
-      third of a pixel it adds no weight the eye can find. The width is divided by
-      the zoom because the canvas scales it back up again.
-    */
+    // Overlapping pre-shaped glyphs leave hairline cracks when magnified; a 1/3px outward stroke closes them
     private fun seamGuard(on: Boolean) {
         val w = if (on) SEAM_STROKE / zoom else 0f
         for (p in arrayOf(paint, markPaint, litPaint, titlePaint)) {
@@ -280,11 +248,7 @@ class MushafPageView @JvmOverloads constructor(
                     val dx = e.x - dragX
                     val dy = e.y - dragY
                     val turns = turner
-                    /*
-                      Pages turn: a drag mostly sideways, past the slop, on a page at rest
-                      — unzoomed and not one that scrolls — takes hold of the page. Right
-                      is toward the next page, as the book reads.
-                    */
+                    // A mostly sideways drag on an unzoomed, non-scrolling page turns it; right is next
                     if (turns != null && zoom == 1f && !scrolls && !turning && !panning &&
                         abs(e.x - downX) > slop && abs(e.x - downX) > abs(e.y - downY)
                     ) {
@@ -305,14 +269,12 @@ class MushafPageView @JvmOverloads constructor(
                             val wantY = panY + dy
                             panY = wantY
                             clampPan()
-                            /* What the zoomed view could not take up and down, the page
-                               takes as scroll, so a zoomed page still reads to its end. */
+                            // Vertical pan the zoomed view cannot take becomes page scroll
                             spill(wantY - panY)
                             invalidate()
                         }
                     } else if (maxScroll > 0f) {
-                        /* Mostly up or down, past the slop: this drag reads the page.
-                           Mostly sideways is left alone, for the pager to turn it. */
+                        // Mostly vertical drags scroll; sideways ones are left to the pager
                         if (!scrolling && abs(e.y - downY) > slop && abs(e.y - downY) > abs(e.x - downX)) {
                             scrolling = true
                             dropPress(e)
@@ -345,21 +307,15 @@ class MushafPageView @JvmOverloads constructor(
             }
         }
 
-        /*
-          Hold the pager off for the whole of a pinch, pan, scroll or turn, not just while
-          zoomed. Keyed on zoom alone it let go the moment a pinch-out passed 1x, and
-          the rest of that same gesture read as a swipe and turned the page.
-        */
+        // Held for the whole gesture, or a pinch passing 1x turns into a page swipe
         parent?.requestDisallowInterceptTouchEvent(zoom > 1f || pinching || panning || scrolling || turning)
 
-        /* A clean single-finger press still reaches the listeners at any zoom, so
-           tap-for-chrome and long-press-for-a-word keep working zoomed in. */
+        // Clean presses still reach listeners at any zoom
         if (pinching || panning || scrolling || turning) return true
         return super.onTouchEvent(e) || zoom > 1f
     }
 
-    /* Pan movement past the zoomed view's edge, in screen pixels, becomes scroll.
-       Divided by zoom: the page moves in page pixels, which the zoom magnifies. */
+    // Divided by zoom: scroll is in page pixels
     private fun spill(over: Float) {
         if (over == 0f || maxScroll <= 0f) return
         scrollTop = (scrollTop - over / zoom).coerceIn(0f, maxScroll)
@@ -408,15 +364,12 @@ class MushafPageView @JvmOverloads constructor(
     /* The style version this view last dressed at. -1 so the first draw dresses. */
     private var dressedAt = -1
 
-    /* Dilation spread for the text, the ayah marks and the lit word, read from
-       settings when the view dresses rather than per line per frame: a pinch draws
-       the whole page at 60 frames a second, and the weights never change mid-pinch. */
+    // Read when dressing, not per frame: a pinch redraws the page 60 times a second
     private var inkSpread = 0f
     private var markSpread = 0f
     private var litSpread = 0f
 
-    /* Everything drawLine and the running head need that depends only on the page,
-       worked out once in show() instead of on every frame. */
+    // Depends only on the page, so built once in show()
     private var lineWords: List<List<String>> = emptyList()
     private var pageMarks = ""
     private var headJuz = ""
@@ -430,22 +383,16 @@ class MushafPageView @JvmOverloads constructor(
 
     // --- page geometry and scrolling ---
 
-    /* The type size and row height for this view's size, worked out in layOut().
-       The type is always set by width, so a line always fills it; the rows either
-       share out the screen's height or, where that would crowd them, keep their
-       upright proportion and let the page run taller than the screen. */
+    // Type is sized by width; rows share the height, or keep upright proportions and scroll
     private var body = 0f
     private var step = 0f
 
-    /* How tall the whole page stands, and how far it is scrolled from its top. The
-       lines never change — the mushaf fixes every word to its row — only the size
-       they are drawn at, and how much of the page is on screen. */
+    // Rows are fixed by the mushaf; only draw size and scroll change
     private var pageTall = 0f
     private var scrollTop = 0f
     private val maxScroll get() = (pageTall - height).coerceAtLeast(0f)
 
-    /* A drag that is scrolling the page, its fling, and a lit word waiting to be
-       brought into view once the words are placed. */
+    // A lit word waits to be revealed until words are placed
     private var scrolling = false
     private var tracker: VelocityTracker? = null
     private val flinger = OverScroller(context)
@@ -464,13 +411,10 @@ class MushafPageView @JvmOverloads constructor(
         scrollTop = scrollTop.coerceIn(0f, maxScroll)
     }
 
-    /* True once placed holds this page's word bounds at this size. The bounds are in
-       page coordinates — zoom, the lit word and style do not move them — so they are
-       built on the first draw after a page or size change, not rebuilt every frame. */
+    // Word bounds are in page coordinates, so built once per page or size change
     private var laidOut = false
 
-    /* Colours being tried on in the picker, ahead of being saved. Null wears the
-       saved setting. Only a preview line is ever given these. */
+    // Unsaved picker colours for the preview line; null uses the saved setting
     private var litTrial: Int? = null
     private var markTrial: Int? = null
     private var inkTrial: Int? = null
@@ -499,8 +443,7 @@ class MushafPageView @JvmOverloads constructor(
         inkSpread = spread(Settings.inkWeight(context))
         markSpread = spread(Settings.ayahWeight(context))
         litSpread = spread(Settings.litWeight(context))
-        /* Weight is drawn by drawRun, never set on a paint — see there for why. The
-           API < 31 fallback, which has no glyph runs, sets fake bold for itself. */
+        // Never fake bold: it tears these glyphs. drawRun thickens by dilation instead
         paint.isFakeBoldText = false
         markPaint.isFakeBoldText = false
         litPaint.isFakeBoldText = false
@@ -567,12 +510,7 @@ class MushafPageView @JvmOverloads constructor(
         invalidate()
     }
 
-    /*
-      Bring the lit word into view, if the page scrolls and the word is not on screen
-      with a row to spare either side. It goes to about a third of the way down,
-      where the lines after it — the ones about to be read — are showing too. A word
-      not on this page (recitation lights every page in the pager) is let go.
-    */
+    // Scrolls a lit word to about a third down, so the lines about to be read show too
     private fun reveal() {
         revealPending = false
         if (maxScroll <= 0f) return
@@ -610,20 +548,6 @@ class MushafPageView @JvmOverloads constructor(
         return null
     }
 
-    /** Visual bounds [left, right, top, bottom] of the word at (x, y). */
-    fun wordRectUnder(x: Float, y: Float): FloatArray? {
-        ensureLaidOut()
-        val cx = toCanvas(x, panX, width.toFloat())
-        /* Undo the zoom, then the scroll: the word bounds are in page coordinates. */
-        val cy = toCanvas(y, panY, height.toFloat()) + scrollTop
-        for (w in placed) {
-            if (cx >= w[0] && cx <= w[1] && cy >= w[2] && cy <= w[3]) {
-                return floatArrayOf(w[0], w[1], w[2], w[3])
-            }
-        }
-        return null
-    }
-
     /** When true, onDraw renders only the first text line centered in the view. */
     var previewMode = false
 
@@ -642,7 +566,7 @@ class MushafPageView @JvmOverloads constructor(
         val juz = Surahs.juzOfPage(page)
         headJuz = if (juz > 0) context.getString(R.string.head_juz, figures(juz, resources)) else ""
         headPage = context.getString(R.string.head_page, figures(page, resources))
-        headSurah = Surahs.ofPage(page)?.id ?: 0
+        headSurah = Surahs.headOfPage(page)?.id ?: 0
         folioText = figures(page, resources)
         laidOut = false
 
@@ -659,12 +583,7 @@ class MushafPageView @JvmOverloads constructor(
         /* Word bounds were placed for the old size. */
         laidOut = false
 
-        /*
-          A turn of the phone keeps the reader's place. The row at the top of the
-          screen is noted in rows, not pixels — rows are what survive a resize — and
-          set back at the top once the new rows are measured. A lit word, if there is
-          one, then wins: it is brought into view wherever that leaves it.
-        */
+        // Rotation keeps the top row, measured in rows; a lit word then takes priority
         val top = padTop + headBand
         val row = if (step > 0f && scrollTop > top) (scrollTop - top) / step else -1f
         flinger.forceFinished(true)
@@ -674,8 +593,7 @@ class MushafPageView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        /* A style setting changed since this view last dressed — possibly while it
-           sat in the pager's cache, where no bind would ever have come to tell it. */
+        // The view may have been cached when the style changed, with no bind to tell it
         if (dressedAt != Settings.styleVersion) dress()
         val glyphs = table ?: return
         if (lines.isEmpty()) return
@@ -709,17 +627,7 @@ class MushafPageView @JvmOverloads constructor(
             canvas.scale(zoom, zoom, width / 2f, height / 2f)
         }
         if (scrollTop != 0f) canvas.translate(0f, -scrollTop)
-        /*
-          On whenever the type lands large on the screen — its size times the zoom —
-          and not only when zoomed. The seam shows by the pixel, not by the zoom: a
-          phone turned on its side sets the type more than twice its upright size
-          with no zoom at all, and keyed on zoom the guard never came on there. On for
-          every such frame, the moving ones included; skipping it mid-pinch to save
-          the stroke's cost was tried, and the seams showed while the page moved.
-        */
-        /* Either reason is enough. By pixels alone, a small phone's type would not
-           reach the threshold until nearly 2x, and the zooms between would lose a guard
-           they used to have; by zoom alone, a large or turned screen never gets one. */
+        // Seam guard on for large type by zoom or by pixel size, moving frames included, or cracks show mid-pinch
         seamGuard(zoom > SEAM_ZOOM || body * zoom > SEAM_FROM_PX)
         drawFlash(canvas)
         runningHead(canvas, left, measure)
@@ -920,8 +828,7 @@ class MushafPageView @JvmOverloads constructor(
                 drawRun(canvas, face, litIds, litSpots, litN, litPaint, litSpread)
             }
         } else {
-            /* API < 31: draw as text; the Arabic shaper is back in the way. There are
-               no glyph runs to thicken here, so any weight falls back to fake bold. */
+            // API < 31 has no glyph runs, so it falls back to text and fake bold
             paint.isFakeBoldText = inkSpread > 0f
             markPaint.isFakeBoldText = markSpread > 0f
             markPaint.textSize = size
@@ -956,20 +863,7 @@ class MushafPageView @JvmOverloads constructor(
         }
     }
 
-    /*
-      A run of glyphs, thickened by dilation when [spread] is above zero: the same
-      glyphs drawn again, nudged each way by [spread] of the type size. The spread
-      is the weight — the further the nudge, the heavier the letters — which is
-      what makes a lighter bold possible at all.
-
-      Not isFakeBoldText. That has Skia grow each glyph's outline, one glyph at a
-      time, and these pre-shaped outlines are built of overlapping pieces with
-      strokes a hair wide — grown, the overlaps fold over, the winding flips, and
-      letters come out hollow or torn. The same thing that tore them under zoom.
-      Dilation never touches an outline, only draws the true one more than once, so
-      nothing in the glyph can fold. The lit word has always been drawn this way,
-      which is why it was the one bold that never broke.
-    */
+    // Weight by dilation: redraws the glyphs nudged each way. Fake bold grows outlines and tears overlapping glyphs
     @androidx.annotation.RequiresApi(Build.VERSION_CODES.S)
     private fun drawRun(
         canvas: Canvas,
@@ -1163,20 +1057,10 @@ class MushafPageView @JvmOverloads constructor(
         /** Lines to a mushaf page. */
         const val GRID = 15
 
-        /**
-         * Type size as a share of row height, past which a page no longer fits its
-         * screen and scrolls instead. Measured over a sample of the page fonts, the
-         * tallest words stand about 1.93em with their marks. Portrait phones sit at
-         * 0.44 (20:9) to 0.56 (16:9); 0.6 is past all of them, so no portrait page
-         * scrolls, while a phone on its side, at about 2.6, always does.
-         */
+        // Type-to-row ratio past which a page scrolls: portrait phones are 0.44-0.56, landscape about 2.6
         const val TALL_FROM = 0.6f
 
-        /**
-         * The row a scrolling page is set in, as type size over row height: 0.45, a
-         * modern phone's portrait proportion, so a page read on its side has the line
-         * spacing it has upright — only more of it off the bottom of the screen.
-         */
+        // Row proportion for scrolling pages: a portrait phone's, so landscape keeps the same line spacing
         const val READING_ROW = 0.45f
 
         /** How long bringing a lit word into view takes, in ms: quick enough to keep up with recitation. */
@@ -1194,13 +1078,7 @@ class MushafPageView @JvmOverloads constructor(
         /** Furthest the page may be pinched. Past 3x the glyphs gain nothing. */
         const val MAX_ZOOM = 3f
 
-        /**
-         * Type size on screen, in pixels, from which the seam between overlapping
-         * glyphs starts to show. 76px is where the guard used to come on: 1.2x zoom of
-         * an upright 20:9 phone's 63px type. Measured in pixels, it now also comes on
-         * for type that is large without being zoomed — a phone on its side, a big
-         * screen.
-         */
+        // On-screen type size where glyph seams start to show
         const val SEAM_FROM_PX = 76f
 
         /** Zoom past which the seam guard comes on whatever the type's size — the original rule, kept for small screens. */
@@ -1209,8 +1087,7 @@ class MushafPageView @JvmOverloads constructor(
         /** Outward stroke that closes that seam, in screen pixels. */
         const val SEAM_STROKE = 0.35f
 
-        // --- layout tuning (all in dp) ---
-        // Adjust these to control spacing around the 15-line grid.
+        // --- layout tuning (dp) ---
 
         /** Gap between the left/right edge and the text grid. */
         const val PAD_X = 14f

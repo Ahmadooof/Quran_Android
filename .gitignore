@@ -17,6 +17,7 @@ local.properties
 # Signed release keystores — never commit private keys
 *.jks
 *.keystore
+keystore.properties
 
 # ProGuard / R8 generated mapping files (keep if you need stack-trace de-obfuscation;
 # otherwise exclude to avoid leaking internals)

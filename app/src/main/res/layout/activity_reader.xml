@@ -18,8 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- The reader's top bar: its own ground with a shadow, so it reads as floating over the page.
-         liftBar() owns its top padding at runtime, which is how it clears the status bar. -->
+    <!-- Top bar floats over the page; liftBar() sets its top padding to clear the status bar -->
     <LinearLayout
         android:id="@+id/bar"
         android:layout_width="match_parent"
@@ -31,10 +30,7 @@
         android:elevation="@dimen/elevation_chrome"
         android:visibility="gone">
 
-        <!--
-          Fixed height so every button can fill it with match_parent.
-          Two buttons each side, so where you are sits in the middle.
-        -->
+        <!-- Fixed height so buttons fill it; two buttons each side keep the place centred -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/chrome_row_height"
@@ -99,10 +95,7 @@
                     android:maxLines="1" />
             </LinearLayout>
 
-            <!--
-              Where the reader is: the juz and the page, on one line. No surah name —
-              the page's own running head already carries it, just below.
-            -->
+            <!-- Juz and page only; the page's running head already names the surah -->
             <TextView
                 android:id="@+id/bar_place"
                 android:layout_width="0dp"

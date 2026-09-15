@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  One surah in the downloads screen: its name, and under it its size or how far its
-  download has come; then, once it is on the phone, the way to save a copy out; and
-  last the one action its state allows — download, stop, or delete. Each icon is labelled.
--->
+<!-- Downloads row: name and status, then the save/share button and the state's action -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

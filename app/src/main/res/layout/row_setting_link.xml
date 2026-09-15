@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  A settings line that leads to a screen of its own. It carries the two colours
-  that screen sets, so the row says what is behind it without being opened, and
-  a chevron, so it reads as a way somewhere rather than a switch.
--->
+<!-- Row leading to another screen, with its colour dots and a chevron -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

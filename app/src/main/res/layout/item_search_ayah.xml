@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  An ayah result. The line itself leads and its reference follows quietly: the
-  reader is scanning the words to find the one they meant, and will only look at
-  the surah and number once they have.
-
-  The text is the plain searchable edition, not the mushaf's own glyphs — those
-  belong to the page, and the page is one tap away.
--->
+<!-- Ayah result: the plain searchable text leads, the reference follows -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

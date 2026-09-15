@@ -15,8 +15,7 @@ object Settings {
     private const val LANG = "language"
     private const val HL_COLOR      = "hl-color"
     private const val AYAH_COLOR    = "ayah-color"
-    /* The three old on/off bolds, superseded by the weights below them; still read
-       until a weight is chosen, so an old "on" arrives as bold. See weight(). */
+    // Old on/off bold keys, still read until a weight is chosen
     private const val BOLD_LIT      = "bold-lit"
     private const val BOLD_AYAH     = "bold-ayah"
     private const val BOLD_INK      = "bold-ink"
@@ -104,6 +103,16 @@ object Settings {
         store(context).edit().putInt(LAST_PAGE, page).apply()
     }
 
+    // --- notifications ---
+
+    private const val NOTIFICATIONS_ASKED = "notifications-asked"
+
+    fun notificationsAsked(context: Context) = store(context).getBoolean(NOTIFICATIONS_ASKED, false)
+
+    fun setNotificationsAsked(context: Context) {
+        store(context).edit().putBoolean(NOTIFICATIONS_ASKED, true).apply()
+    }
+
     // --- page motion ---
 
     private const val PAGE_TURN = "page-turn"
@@ -122,16 +131,10 @@ object Settings {
 
     private const val RECENT = "recent"
 
-    /* How many surahs are remembered. Enough to go back to what was being read in
-       the last few sittings; more is a list to search rather than a place to return. */
+    // More than a few recent surahs becomes a list to search, not a place to return to
     const val RECENT_KEEP = 5
 
-    /*
-      The surahs read lately, newest first, one entry each: returning to Al-Baqarah
-      after reading Yusuf goes to the page Al-Baqarah was left on, not to its start
-      and not to Yusuf's. Empty until something is read with this kept; the places
-      tab stands the old single last page in for it until then.
-    */
+    // Newest first, one entry per surah, each at the page it was left on
     fun recent(ctx: Context): List<Read> {
         val saved = store(ctx).getString(RECENT, "").orEmpty()
         return saved.split(';').mapNotNull { entry ->
@@ -155,14 +158,7 @@ object Settings {
 
     // --- page style ---
 
-    /*
-      Bumped by every write that changes how a page is drawn. A page compares it
-      with the number it last dressed at and re-reads the style when they differ,
-      so a change reaches every page — on screen, cached off to the side, or not
-      yet drawn — without any screen having to go round telling them.
-
-      A new style setting only has to call restyled() in its setter to be covered.
-    */
+    // Bumped by any style change; pages re-read their style when it differs
     @Volatile
     var styleVersion = 0
         private set
@@ -171,28 +167,14 @@ object Settings {
 
     // --- reading style ---
 
-    /*
-      Every reading style setting is kept once for day and once for night, and each
-      theme's defaults come from resources — values/ by day, values-night/ by night
-      — so a theme never set shows its own designed look, not the other's.
-
-      Page and text colours first made this necessary: dark ink chosen on cream by
-      day was dark ink on dark paper the moment the theme turned. The accents and
-      weights followed, so the two themes can be tuned apart.
-
-      Which theme is meant is read off [ctx]'s configuration. The reader passes
-      itself and gets the theme it is in; the reading style screen passes a context
-      set to whichever theme is being edited.
-    */
+    // Style is stored per theme so dark ink chosen by day does not land on dark paper at night
     private fun themed(ctx: Context, key: String): String = key + if (isNight(ctx)) "-night" else "-day"
 
     private fun isNight(ctx: Context) =
         (ctx.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
             Configuration.UI_MODE_NIGHT_YES
 
-    /* A colour for this theme: its own if set; else one saved before colours were
-       kept per theme ([shared], where there was such a key, and 0 meant unset); else
-       the theme's default resource. */
+    // Own value, else a colour saved before per-theme keys (0 = unset), else the theme default
     private fun colour(ctx: Context, key: String, shared: String?, default: Int): Int {
         val s = store(ctx)
         val own = themed(ctx, key)
@@ -208,8 +190,7 @@ object Settings {
         restyled()
     }
 
-    /* The theme's own value and any shared one from before: left, the shared value
-       would step straight back in ahead of the default being restored. */
+    // Clears the old shared key too, or it would outrank the restored default
     private fun resetColour(ctx: Context, key: String, shared: String?) {
         store(ctx).edit().apply {
             remove(themed(ctx, key))
@@ -245,11 +226,7 @@ object Settings {
     const val WEIGHT_MEDIUM = 2
     const val WEIGHT_BOLD = 3
 
-    /*
-      A weight for this theme: its own if set; else one chosen before weights were
-      kept per theme ([shared]); else the old on/off bold it replaced ([old]), only
-      if that was ever actually switched; else the theme's default resource.
-    */
+    // Own value, else a pre-per-theme weight, else the old bold flag if ever set, else the default
     private fun weight(ctx: Context, key: String, old: String, default: Int): Int {
         val s = store(ctx)
         val own = themed(ctx, key)
@@ -275,11 +252,7 @@ object Settings {
     fun ayahWeight(ctx: Context) = weight(ctx, AYAH_WEIGHT, BOLD_AYAH, R.integer.default_ayah_weight)
     fun setAyahWeight(ctx: Context, weight: Int) = setWeight(ctx, AYAH_WEIGHT, weight)
 
-    /**
-     * Every reading style setting back to its default for [ctx]'s theme. The values
-     * kept from before settings were per theme go too: left, they would outrank the
-     * defaults being restored.
-     */
+    // Removes pre-per-theme keys too, or they would outrank the restored defaults
     fun resetStyle(ctx: Context) {
         store(ctx).edit().apply {
             for (key in listOf(HL_COLOR, AYAH_COLOR, INK_COLOR, PAPER_COLOR, INK_WEIGHT, LIT_WEIGHT, AYAH_WEIGHT)) {

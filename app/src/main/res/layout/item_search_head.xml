@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  A section title. Small, muted, and on the list's own paper: it names the group
-  under it without becoming a row in its own right.
--->
+<!-- Section title in search results -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/head"
     android:layout_width="match_parent"

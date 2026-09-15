@@ -5,53 +5,82 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
+import android.os.Build
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
-/*
-  The strip beside the camera, and the one under the navigation keys, take their
-  colour from whatever is actually behind them — read off the views rather than
-  named a second time in code.
-
-  It has to be read, not fixed, because the ground differs from screen to screen
-  and pane to pane. And reading it means a future change to any of those
-  backgrounds carries up to the bars on its own, with nothing to remember to
-  update.
-*/
+// Bar colours are read from the views behind them, so a background change needs no second edit
 
 /** Paint the status bar [roof] and the navigation bar [floor], icons to suit. Null leaves a bar as it is. */
 fun Activity.paintBars(roof: Int?, floor: Int?) {
     val under = floor ?: roof
-    if (roof != null) window.statusBarColor = roof
-    if (under != null) window.navigationBarColor = under
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+        // Bar colours are ignored from Android 15, so coloured strips sit behind the bars instead
+        window.isNavigationBarContrastEnforced = false
+        window.isStatusBarContrastEnforced = false
+        val content = findViewById<ViewGroup>(android.R.id.content)
+        if (roof != null) strip(content, Edge.TOP).setBackgroundColor(roof)
+        if (under != null) for (edge in listOf(Edge.BOTTOM, Edge.LEFT, Edge.RIGHT)) strip(content, edge).setBackgroundColor(under)
+    } else {
+        @Suppress("DEPRECATION")
+        if (roof != null) window.statusBarColor = roof
+        @Suppress("DEPRECATION")
+        if (under != null) window.navigationBarColor = under
+    }
 
-    /* Icon contrast from the colour itself, so a new palette needs no second edit
-       to stay legible. */
+    // Icon contrast follows the colour, so a new palette stays legible
     WindowInsetsControllerCompat(window, window.decorView).apply {
         if (roof != null) isAppearanceLightStatusBars = pale(roof)
         if (under != null) isAppearanceLightNavigationBars = pale(under)
     }
 }
 
-/**
- * For a screen that always shows the phone's bars: ask for them back as ordinary
- * bars, then paint them. Call it whenever the window gains focus.
- *
- * The reader hides the bars while reading, in immersive mode, where they only come
- * back briefly and see-through on a swipe. A screen opened over it can inherit that
- * state, and a navigation bar shown that way ignores its colour — it came up bare
- * under the index until a tab tap happened to paint it again. Painting alone is not
- * enough; the bars have to be asked for. And only with focus: without it the request
- * is dropped, which is why the reader re-applies its own bars on focus too.
- */
+// Asks for the bars back before painting: an immersive screen underneath leaves them bare. Needs window focus
 fun Activity.showBars(roof: Int?, floor: Int?) {
     WindowInsetsControllerCompat(window, window.decorView).apply {
         systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         show(WindowInsetsCompat.Type.systemBars())
     }
     paintBars(roof, floor)
+}
+
+private enum class Edge { TOP, BOTTOM, LEFT, RIGHT }
+
+// One strip per edge, added once and sized to whatever system bar sits there
+private fun strip(content: ViewGroup, edge: Edge): View {
+    val tag = "bar-strip-$edge"
+    content.findViewWithTag<View>(tag)?.let { return it }
+    val gravity = when (edge) {
+        Edge.TOP -> Gravity.TOP
+        Edge.BOTTOM -> Gravity.BOTTOM
+        Edge.LEFT -> Gravity.START
+        Edge.RIGHT -> Gravity.END
+    }
+    val view = View(content.context).apply { this.tag = tag }
+    val vertical = edge == Edge.TOP || edge == Edge.BOTTOM
+    content.addView(view, FrameLayout.LayoutParams(
+        if (vertical) ViewGroup.LayoutParams.MATCH_PARENT else 0,
+        if (vertical) 0 else ViewGroup.LayoutParams.MATCH_PARENT,
+        gravity
+    ))
+    ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        val size = when (edge) {
+            Edge.TOP -> bars.top
+            Edge.BOTTOM -> bars.bottom
+            Edge.LEFT -> bars.left
+            Edge.RIGHT -> bars.right
+        }
+        v.layoutParams = v.layoutParams.apply { if (vertical) height = size else width = size }
+        insets
+    }
+    ViewCompat.requestApplyInsets(view)
+    return view
 }
 
 /** What touches the top of the screen in [pane]: its first child if painted, else the pane's own ground. */

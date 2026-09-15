@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ring marking the selected colour swatch. Themed: a white ring vanished on
-     the light toolbar, which is the ground this actually sits on. -->
+<!-- Selected swatch ring, themed so it stays visible on light grounds -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <stroke android:width="2dp" android:color="@color/text" />

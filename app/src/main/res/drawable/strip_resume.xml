@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  The resume strip wears the same surface every other footer strip wears, with
-  the same hairline seam on top. It used to be a full-width accent tint, which
-  is the one thing strip_surface says not to do: a zone earns its place by what
-  it holds — here a soft accent disc — and not by colouring its whole ground.
-
-  Tapping it leads somewhere, so it takes the accent ripple the list rows take.
--->
+<!-- Resume strip: plain surface with a top seam and a ripple, since it is tappable -->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="@color/accent_soft">
     <item>

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -47,14 +48,7 @@ class ReaderActivity : AppCompatActivity() {
     private var turnPages = false
     private var dragNext: Boolean? = null
 
-    /*
-      What the reader does when the player's state changes. One instance, kept, so
-      the reader can tell whether Recite's single listener slot still holds it.
-      Recite has one slot and two screens use it: returning from the surah list, the
-      reader resumes before the list is destroyed, and a list that cleared the slot
-      unconditionally wiped the reader's fresh listener — audio started and the
-      player bar never heard, its spinner turning on after the sound had begun.
-    */
+    // Kept as one instance so the reader can tell whether Recite's single listener slot still holds it
     private val heard: () -> Unit = {
         if (Recite.wantsToPlay()) rc.follow()
         sayPlayer()
@@ -70,8 +64,7 @@ class ReaderActivity : AppCompatActivity() {
     /* Navigation-bar inset: keeps player above the nav bar when it is visible. */
     private var foot = 0
 
-    /* The camera cutout's reach from each edge, and the navigation keys' at the sides.
-       Kept apart: the page keeps clear of the cutout only, the controls of both. */
+    // Kept apart: the page clears only the cutout, the controls clear both
     private var cutTop = 0
     private var cutLeft = 0
     private var cutRight = 0
@@ -116,6 +109,7 @@ class ReaderActivity : AppCompatActivity() {
         Surahs.load(this)
 
         setContentView(R.layout.activity_reader)
+        onBackPressedDispatcher.addCallback(this) { toMenu() }
         pager  = findViewById(R.id.pager)
         bar    = findViewById(R.id.bar)
         mark      = findViewById(R.id.mark)
@@ -207,17 +201,14 @@ class ReaderActivity : AppCompatActivity() {
         pager.layoutManager = lanes
         pager.adapter = Pages()
         pager.setHasFixedSize(true)
-        /* Pages just turned past stay laid out, so turning back to one does not bind
-           and lay it out again mid-swipe. Past the default two, since readers go back. */
+        // Keeps pages just turned past laid out, since readers often go back
         pager.setItemViewCacheSize(3)
         Snap().attachToRecyclerView(pager)
 
         pager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             private var warmedFor = -1
 
-            /* Warm as the swipe moves, not once it has settled: by settling, the page it
-               was bringing in has already bound, loaded or not. Keyed on the page being
-               entered, so a swipe asks once rather than every frame. */
+            // Warms the page being entered during the swipe, once per page
             override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
                 val first = lanes.findFirstVisibleItemPosition()
                 val last = lanes.findLastVisibleItemPosition()
@@ -274,9 +265,7 @@ class ReaderActivity : AppCompatActivity() {
 
     class Holder(v: View) : RecyclerView.ViewHolder(v)
 
-    /* The page the reader is on: the one it last arrived at. Read from the layout
-       only before any arrival, since just after a jump the layout still holds the
-       page being left — which is what the top bar used to show. */
+    // After a jump the layout still holds the old page, so the last arrival wins
     private fun page() = if (current > 0) current else
         (lanes.findFirstCompletelyVisibleItemPosition()
             .takeIf { it != RecyclerView.NO_POSITION } ?: 0) + 1
@@ -287,13 +276,7 @@ class ReaderActivity : AppCompatActivity() {
         arrived(page)
     }
 
-    /*
-      Everything that follows from being on a page, whichever way the reader got
-      there: a swipe settling, or a jump — follow the reciter, recitation turning the
-      page, a pick from the index, a turn of the phone. Jumps used to skip it, since
-      only the scroll listener called it and a jump never scrolls: the page moved and
-      the top bar went on naming the one before, and the last-read page was not kept.
-    */
+    // Runs for swipes and jumps alike, so the top bar and last-read page stay current
     private fun arrived(page: Int) {
         if (page !in 1..pages) return
         current = page
@@ -382,8 +365,7 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
-    /* Have this page and the ones either side ready as images, at the size a page is
-       shown. Posted, so the size is read after any layout the arrival set off. */
+    // Posted so the size is read after the layout the arrival triggered
     private fun prepareShots(page: Int) {
         pager.post {
             val w = pager.width - pager.paddingLeft - pager.paddingRight
@@ -392,14 +374,11 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
-    /* The reader takes rotation itself rather than being rebuilt, so every page
-       changes width under the pager. Note the page first, and seat it squarely once
-       the new layout has run, so a turn never leaves the reader between two pages. */
+    // Rotation is handled here, so the page is noted first and re-seated after layout
     override fun onConfigurationChanged(newConfig: Configuration) {
         val at = page()
         super.onConfigurationChanged(newConfig)
-        /* Upright and on its side keep clear of the camera differently; set it for the
-           new way round now, whichever of this and the new insets arrives first. */
+        // Set now, whichever of this and the new insets arrives first
         padPage()
         pager.post { go(at) }
     }
@@ -420,21 +399,7 @@ class ReaderActivity : AppCompatActivity() {
             liftBar()
         }
 
-        /*
-          What the page must keep clear of is the camera, and only the camera. The
-          phone's own bars are hidden while reading, so the space they would take is
-          the page's; the controls, which only ever show together with those bars,
-          are the ones that step clear of them.
-
-          Upright, the camera sits in the status band, so the page keeps below the
-          band as it always has. On its side the camera moves to one edge, the band
-          over the page is empty, and the page takes the top and the side away from
-          the camera — only the camera's side is given up.
-
-          Everything is measured ignoring visibility, as the band is fixed once:
-          controls showing and hiding take the phone's bars with them, and a page that
-          stepped in and out each time would move under the reader's eye.
-        */
+        // The page clears only the camera cutout; the bars are hidden while reading. Measured ignoring visibility so the page never jumps
         ViewCompat.setOnApplyWindowInsetsListener(pager) { _, insets ->
             val cut = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
             val nav = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())
@@ -461,14 +426,12 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
-    /* The top bar only shows with the phone's bars, so it clears all of them: the
-       status band above, and a side camera or side keys at either end. */
+    // Shows only with the phone's bars, so it clears the status band and side cutouts or keys
     private fun liftBar() {
         bar.setPadding(maxOf(cutLeft, navLeft), band, maxOf(cutRight, navRight), 0)
     }
 
-    /* The page clears the camera and nothing else. Upright that is the status band;
-       on its side it is one edge, and the page runs to the top. */
+    // Upright the cutout is the status band; on its side it is one edge
     private fun padPage() {
         val upright = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
         pager.setPadding(cutLeft, if (upright) band else cutTop, cutRight, 0)
@@ -496,19 +459,7 @@ class ReaderActivity : AppCompatActivity() {
         if (hasWindowFocus()) applyBars()
     }
 
-    /*
-      Show or hide the phone's bars to match the controls — only ever with focus.
-
-      Returning from the index, the result hid the bars and onResume's player showed
-      them again, both before the reader had focus. Without focus the system never
-      acts on either, but the window still records each request; so when focus came
-      and the bars were asked for once more, the window already had them down as
-      shown and did nothing. The strip the window paints under the navigation bar is
-      sized from those insets, and it stayed at nothing: a bare navigation bar with
-      the page showing through, until the controls were toggled by hand. Kept to
-      focus, every request is one the system acts on, and onWindowFocusChanged
-      applies whatever the controls came to want in the meantime.
-    */
+    // Only with focus: without it the system records the request but never acts, leaving a bare navigation bar
     private fun applyBars() {
         bars?.let {
             if (chrome) it.show(WindowInsetsCompat.Type.systemBars())
@@ -534,8 +485,7 @@ class ReaderActivity : AppCompatActivity() {
             getString(R.string.bar_place, getString(R.string.head_juz, figures(juz, resources)), at)
         } else at
 
-        /* Filled or outlined carries the saved state; the icon is accent either way,
-           and the label turns accent only while the page is kept. */
+        // Icon fill shows the saved state; the label turns accent only when saved
         val marked = Settings.marked(this, page)
         mark.setImageResource(if (marked) R.drawable.ic_bookmark else R.drawable.ic_bookmark_off)
         mark.imageTintList = ColorStateList.valueOf(getColor(R.color.accent))
@@ -544,11 +494,7 @@ class ReaderActivity : AppCompatActivity() {
 
     // --- recitation ---
 
-    /*
-     * Long-press: highlight the pressed word and show the player bar.
-     * Audio does NOT start — the user must tap Play.
-     * If audio is already running, it seeks to the new word instead.
-     */
+    // Highlights the pressed word and shows the player without starting audio; seeks if already playing
     private fun offer(view: MushafPageView, x: Float, y: Float) {
         val word = view.wordUnder(x, y) ?: return
         val surah = word[0]; val ayah = word[1]; val w = word[2]
@@ -588,26 +534,14 @@ class ReaderActivity : AppCompatActivity() {
         sayPlayer()
     }
 
-    /* The controls are one set: the player never comes up without the top bar.
-       showChrome sets the flag before it reaches back here, so this recurses once
-       and stops. */
+    // The player never shows without the top bar; showChrome recurses here once
     private fun showPlayer() {
         seatPlayer()
         player.visibility = View.VISIBLE
         if (!chrome) showChrome(true) else sayBars()
     }
 
-    /*
-      Both bars follow the controls, together. While they are up, the status bar
-      takes the top bar's ground and the navigation bar the player strip's — the
-      same surface, so the phone's own bars read as part of the controls. While they
-      are down, both take the page's paper.
-
-      The navigation bar follows the controls, not the player. Keyed on the player
-      being visible, it went back to paper whenever the controls were up without
-      audio, and sat cream under a white top bar. The phone only shows its bars
-      while the controls are up anyway, so that is the state that decides.
-    */
+    // Bars take the controls' colours while they are up, the page colour while they are down
     private fun sayBars() {
         val paper = Settings.paperColor(this)
         paintBars(
@@ -618,8 +552,7 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun sayPlayer() {
         val isPlaying = Recite.wantsToPlay()
-        /* Pressed but not yet heard: a spinner where the icon is, and say so, so the
-           silence while the audio arrives does not read as a button that did nothing. */
+        // A spinner while audio is on its way, so the silence does not look like a dead button
         val waiting = Recite.waiting()
         findViewById<ImageView>(R.id.p_play_icon).apply {
             setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
@@ -633,8 +566,7 @@ class ReaderActivity : AppCompatActivity() {
                 else      -> R.string.play
             }
         )
-        /* Repeat is a state, so it reads the way a selected tab does: accent while
-           on, muted while off. */
+        // Repeat reads like a selected tab: accent while on
         val repeating = getColor(if (Recite.repeat != Recite.ONCE) R.color.accent else R.color.text_mute)
         findViewById<ImageView>(R.id.p_repeat_icon).imageTintList = ColorStateList.valueOf(repeating)
         findViewById<TextView>(R.id.p_repeat_label).setTextColor(repeating)
@@ -755,11 +687,9 @@ class ReaderActivity : AppCompatActivity() {
         delegate.applyDayNight()
         sayMotion()
         sayPage(page())
-        /* Pages re-read their style themselves when it has changed; they only need
-           asking to draw. The pager's cached pages redraw when they come back. */
+        // Pages re-read their style on draw; they only need invalidating
         for (i in 0 until pager.childCount) pager.getChildAt(i).invalidate()
-        /* The page colour is also what shows above the pages, beside the camera,
-           and in the phone's bars while the controls are down. */
+        // The page colour also shows beside the camera and in the hidden bars
         findViewById<View>(R.id.root).setBackgroundColor(Settings.paperColor(this))
         sayBars()
         /* A style changed while away leaves the shots stale; they are made again. */
@@ -789,10 +719,6 @@ class ReaderActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) showChrome(chrome)
-    }
-
-    override fun onBackPressed() {
-        toMenu()
     }
 
     companion object {

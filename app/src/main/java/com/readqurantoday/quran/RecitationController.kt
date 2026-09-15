@@ -3,18 +3,7 @@ package com.readqurantoday.quran
 import android.content.Context
 import android.view.View
 
-/**
- * Tracks recitation state and drives the word-highlight follower.
- * Extracted from ReaderActivity so the activity only handles UI events and navigation.
- *
- * @param tickView   view to post/remove the follower Runnable on
- * @param pageCount  total mushaf page count
- * @param currentPage returns which page is currently visible
- * @param onChanged  player state changed — update the player bar UI
- * @param onNavigate turn to this page (recitation moved to a new ayah)
- * @param onLight    light this word on screen (surah, ayah, word)
- * @param onStopped  recitation ended — hide the player bar
- */
+// Recitation state and the word-highlight follower, kept out of ReaderActivity
 class RecitationController(
     private val context: Context,
     private val tickView: View,
@@ -32,13 +21,10 @@ class RecitationController(
     var until = 0
     var startedAt = 0
 
-    /* The ayahs page repeat loops over, or null until the next tick anchors it on
-       the page the ayah then playing opens on. */
+    // Null until the next tick anchors it on the current ayah's page
     private var loop: IntRange? = null
 
-    /* Whether the player was waiting for audio at the last tick. The player reports
-       its own changes too, but the follower is already watching every 50ms, so a
-       flip it sees is passed on — the spinner cannot outlast the sound starting. */
+    // The 50ms follower passes on waiting changes so the spinner never outlasts the sound
     private var wasWaiting = false
 
     /** Let page repeat settle on wherever recitation now is, rather than where it was. */
@@ -87,10 +73,7 @@ class RecitationController(
         onChanged()
     }
 
-    /* The page being repeated, as a range of this surah's ayahs: every ayah that
-       opens on the page the current one opens on. A page that sits wholly inside
-       one long ayah opens none of its own, so it is that ayah alone. The player
-       is told the loop's start in case the surah's audio runs out first. */
+    // Ayahs that open on the current page; a page inside one long ayah loops that ayah
     private fun pageLoop(timing: Timing): IntRange {
         loop?.let { return it }
         val surah = readingSurah
@@ -148,8 +131,7 @@ class RecitationController(
                     Recite.seek(startedAt)
                 }
 
-                /* Past the end of what is being repeated: back to its start. An end of
-                   0 is a timing that was never recorded, and must not read as passed. */
+                // An end of 0 is an unrecorded timing and must not count as passed
                 val span = if (Recite.repeat == Recite.PAGE && litAyah > 0) pageLoop(timing) else null
                 val lastEnd = span?.let { timing.endOf(it.last) } ?: 0
 

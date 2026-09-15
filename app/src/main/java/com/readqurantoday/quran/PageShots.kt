@@ -4,29 +4,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Picture
 import android.os.Build
+import androidx.annotation.RequiresApi
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import java.util.concurrent.Executors
 
-/**
- * Pages drawn ahead as finished images, so turning and zooming move pictures rather
- * than drawing type.
- *
- * A page drawn live is stroked glyph by glyph — the seam guard that keeps joined
- * letters from cracking makes every glyph an outline, which the glyph cache cannot
- * hold — and a swipe redrew all of that on every frame: on a 1440px phone the slow
- * frames reached 53 to 69ms. Drawn once, with the guard, into a GPU bitmap, a page
- * costs a single texture draw per frame after that, and nothing in it can crack when
- * it is moved or scaled, because nothing in it is being drawn.
- *
- * The page in view and the ones either side are kept. Each is recorded on the main
- * thread as a Picture — laying out the lines, a few ms, done one page per message
- * while the reader is still, never mid-swipe — and rasterised into a hardware bitmap
- * on a background thread. A shot is only used while it still matches: the same page,
- * the same size, and the same style version, so a change of colour or weight is never
- * shown stale. [landed] hears which page has a fresh shot, to redraw it.
- */
+// Pages pre-rendered to hardware bitmaps so swipes and zoom move images instead of stroked glyphs
 class PageShots(private val context: Context, private val landed: (Int) -> Unit) {
 
     private class Shot(val w: Int, val h: Int, val style: Int, val bitmap: Bitmap)
@@ -48,10 +32,7 @@ class PageShots(private val context: Context, private val landed: (Int) -> Unit)
         return if (s.w == width && s.h == height && s.style == Settings.styleVersion) s.bitmap else null
     }
 
-    /**
-     * Have [page] and its neighbours ready at [width] × [height]. Call when the reader
-     * settles on a page. Far pages are let go — each image is a screen of GPU memory.
-     */
+    // Keeps only this page and its neighbours: each shot is a screen of GPU memory
     fun around(page: Int, width: Int, height: Int) {
         /* Recording to a hardware bitmap arrived in Android 9; below that pages are live. */
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return
@@ -70,11 +51,11 @@ class PageShots(private val context: Context, private val landed: (Int) -> Unit)
         next()
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun next() {
         val page = waiting.removeFirstOrNull() ?: return
         underway += page
-        /* Posted, so each page's recording is its own short piece of main-thread work
-           rather than three laid end to end. */
+        // One page recorded per message, so the main thread never does three at once
         main.post {
             val width = w
             val height = h
@@ -98,11 +79,7 @@ class PageShots(private val context: Context, private val landed: (Int) -> Unit)
         }
     }
 
-    /**
-     * The image of [page] now, made on the spot if it is not ready: for a page turn that
-     * has begun, which cannot wait. One page's worth of main-thread work, once; null
-     * below Android 9.
-     */
+    // Made on the spot for a page turn that cannot wait; null below Android 9
     fun now(page: Int, width: Int, height: Int): Bitmap? {
         get(page, width, height)?.let { return it }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P || width <= 0 || height <= 0) return null

@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Reading style, on a screen of its own. The head strip is the one the surah
-  pane wears — surface, seam below — with the way back at its start and the
-  screen's name beside it, so arriving here looks like going one step further
-  into the same place rather than somewhere else.
--->
+<!-- Reading style screen, with the same head strip as the other settings screens -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/style_root"
     android:layout_width="match_parent"

@@ -11,23 +11,13 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
-/**
- * The settings, built into a container as titled groups.
- *
- * General is how the app is set up, and it ends in a way through to Reading style:
- * how a page looks, on a screen of its own. That screen is led by a line of an
- * actual page, so every change below it is seen on the thing it changes. Its rows
- * come as colour then weight, for each thing on a page that can be styled: the
- * page itself (with its ground), the highlighted word, and the ayah numbers — and
- * a way to put all of it back.
- */
+// Settings screens built as titled cards: general, and reading style with a live page preview
 class SettingsPane(private val host: Activity, private val into: LinearLayout) {
 
     private val blow = host.layoutInflater
     private var preview: MushafPageView? = null
 
-    /* The theme whose reading style is on screen: a context set to it, so the settings
-       read and write that theme's values and the preview is drawn in its colours. */
+    // A context in the theme being styled, so values and preview colours follow it
     private var look: Context = host
 
     /** The settings tab: General, ending in the ways through to reading style and downloads. */
@@ -61,6 +51,16 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
 
         group(R.string.set_group_help) { rows ->
             rows.add(linkRow(R.string.set_report, { host.startActivity(android.content.Intent(host, FeedbackActivity::class.java)) }, emptyList()))
+            rows.add(linkRow(R.string.set_privacy, { openLink(PRIVACY_URL) }, emptyList()))
+            rows.add(linkRow(R.string.set_credits, { host.notice(host.getString(R.string.credits_text)) }, emptyList()))
+        }
+    }
+
+    private fun openLink(url: String) {
+        try {
+            host.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
+        } catch (_: android.content.ActivityNotFoundException) {
+            host.notice(url)
         }
     }
 
@@ -69,8 +69,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         into.removeAllViews()
         look = inTheme(night)
 
-        /* Which theme is being styled. Each keeps its own look; everything below edits
-           and previews the one picked here, whatever theme the app is in right now. */
+        // Each theme keeps its own look; everything below edits the one picked here
         group(0) { rows ->
             rows.add(themeSwitch(night))
         }
@@ -79,8 +78,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
             rows.add(previewLine())
         }
 
-        /* The page itself first: its ground and its ink decide everything else's
-           contrast, so they are what a reader settles before the accents. */
+        // Page and ink first: they decide contrast for everything else
         group(R.string.set_group_page) { rows ->
             rows.add(colorRow(
                 label = R.string.set_paper_color,
@@ -144,10 +142,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
             ))
         }
 
-        /* Everything back at once, for the theme being styled, asked first: it undoes
-           choices that took a while to arrive at, and one stray tap should not cost
-           them. The question names the theme, since the other keeps its own. Built
-           again after, so every row shows its default. */
+        // Asks first, naming the theme, since a stray tap would undo a lot of choices
         val themeName = host.getString(if (night) R.string.theme_dark else R.string.theme_light)
         group(0) { rows ->
             rows.add(actionRow(R.string.reset_all) {
@@ -160,8 +155,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         }
     }
 
-    /* A title, then the rows in one card with a seam between each pair. A title of 0
-       is a card on its own, for a row that needs no heading. */
+    // Title 0 means a card without a heading
     private fun group(title: Int, fill: (MutableList<View>) -> Unit) {
         val rows = ArrayList<View>()
         fill(rows)
@@ -182,13 +176,11 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         return row
     }
 
-    /* A way to another screen. It shows the two colours set there, read fresh on
-       every build, so the row is current whenever the tab is built again. */
+    // Colour dots are read fresh on every build
     private fun linkRow(label: Int, open: () -> Unit, dots: List<Int>): View {
         val row = blow.inflate(R.layout.row_setting_link, into, false)
         row.findViewById<TextView>(R.id.set_label).setText(label)
-        /* Up to two colour dots saying what lies behind the row; none for a screen that
-           has no colours to show. */
+        // No dots for a screen without colours
         listOf(R.id.set_dot, R.id.set_dot_2).forEachIndexed { i, id ->
             val dot = row.findViewById<ImageView>(id)
             val colour = dots.getOrNull(i)
@@ -201,9 +193,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         return row
     }
 
-    /* A label and which of several [options] it is set to. Tapping opens a sheet of
-       them with the current one ticked; picking one sets it, then the row and the
-       preview re-read. [current] and [choose] speak in indexes into [options]. */
+    // Indexes into options; picking re-reads the row and preview
     private fun choiceRow(
         label: Int,
         options: List<Int>,
@@ -229,8 +219,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         return row
     }
 
-    /* Light and dark, side by side; the one being styled is lit. Picking the other
-       rebuilds the screen in that theme. */
+    // Picking the other theme rebuilds the screen in it
     private fun themeSwitch(night: Boolean): View {
         val row = blow.inflate(R.layout.row_setting_segment, into, false)
         val day = row.findViewById<TextView>(R.id.seg_day)
@@ -245,9 +234,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         return row
     }
 
-    /* A context whose resources and configuration are the given theme's. Settings key
-       its values by the configuration's night bit, and colours resolve from values or
-       values-night by it, so one context carries both. */
+    // Settings keys and colour resources both follow the configuration's night bit
     private fun inTheme(night: Boolean): Context {
         val conf = Configuration(host.resources.configuration)
         conf.uiMode = (conf.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
@@ -259,8 +246,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         (ctx.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
             Configuration.UI_MODE_NIGHT_YES
 
-    /* The colours the theme being styled uses now, for the sheet to offer as-is: the
-       page, its text, the lit word, the ayah numbers. */
+    // The theme's current colours, offered as-is on the sheet
     private fun inUse() = intArrayOf(
         Settings.paperColor(look),
         Settings.inkColor(look),
@@ -309,8 +295,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         return row
     }
 
-    /* A line of a real page, drawn the way the reader draws it. Style settings bump
-       Settings.styleVersion, and the line re-reads them on its next draw. */
+    // Re-reads the style on its next draw via Settings.styleVersion
     private fun previewLine(): View {
         Mushaf.load(host)
         val line = MushafPageView(look).apply {
@@ -326,6 +311,8 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
     }
 
     private companion object {
+        private const val PRIVACY_URL = "https://readqurantoday.com/privacy/"
+
         /* In the order of Settings.WEIGHT_*, lightest first. */
         val WEIGHT_NAMES = listOf(
             R.string.weight_regular, R.string.weight_light, R.string.weight_medium, R.string.weight_bold

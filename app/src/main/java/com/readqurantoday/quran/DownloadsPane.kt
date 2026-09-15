@@ -8,24 +8,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
-/**
- * The downloads screen, built into a container as titled cards.
- *
- * Everything on it is for one reciter, picked at the top: downloads and copies saved
- * to the phone are kept per reciter, so the sizes, what is done and what each action
- * would do all follow that choice. Picking one here does not change the reciter the
- * player uses — a reader can fetch another voice for later without switching to it.
- *
- * A short note says what downloading and saving to the phone are each for. Saved
- * copies can be shared, one or all, and their folder opened.
- * Then how much is on the phone and what the whole book would take; the actions that
- * work on every surah at once; and each surah on its own, with its size and the one
- * action its state allows. While anything is downloading the screen keeps itself
- * current, once a second.
- *
- * [askToSave] runs its argument once the app may write to the Download folder — at once
- * from Android 10, after the storage permission below that.
- */
+// Downloads screen for one reciter at a time; picking one here does not change the player's reciter
 class DownloadsPane(
     private val host: Activity,
     private val into: LinearLayout,
@@ -35,8 +18,7 @@ class DownloadsPane(
     private val blow = host.layoutInflater
     private var reciter: Recite.Reciter = Recite.chosen(host) ?: Recite.reciters().first()
 
-    /* The views that change as downloads move, kept to update in place: rebuilding 114
-       rows a second would reset the reader's scroll and flicker the list. */
+    // Updated in place: rebuilding 114 rows every second would reset scroll and flicker
     private lateinit var reciterValue: TextView
     private lateinit var keptValue: TextView
     private lateinit var wholeValue: TextView
@@ -88,8 +70,7 @@ class DownloadsPane(
         })
 
         refresh()
-        /* Sizes this reciter's files have not reported yet, asked for in the background
-           and filled in as they come. */
+        // Sizes not known yet are fetched in the background
         Downloads.learnSizes(host, reciter.id) { if (!host.isFinishing) refresh() }
     }
 
@@ -106,8 +87,7 @@ class DownloadsPane(
             figures(kept.size, host.resources), figures(Downloads.SURAHS, host.resources), bytes(used)
         )
 
-        /* The whole book, once every surah's size is in; until then, a running figure
-           marked as still counting, so it is never passed off as the total. */
+        // Marked as still counting until every surah size is known
         val sizes = (1..Downloads.SURAHS).map { Downloads.size(host, it, reciter.id) }
         val known = sizes.count { it > 0 }
         wholeValue.text = if (known == Downloads.SURAHS) bytes(sizes.sum())

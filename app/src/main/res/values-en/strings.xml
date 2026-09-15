@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  English, for a reader who wants the app in it.
-
-  The mushaf itself does not translate and is not offered in translation: the
-  page is drawn from the Madinah faces whichever language this is set to. What
-  changes is everything around the page — the tabs, the settings, the labels on
-  the running head — which is exactly what the website's own language switch
-  changes and no more.
--->
+<!-- English UI; the mushaf pages themselves are never translated -->
 <resources>
     <string name="app_name">The Great Quran</string>
-    <string name="index_title">Surahs</string>
     <string name="surah_named">Surah %1$s</string>
-    <string name="place">Juz %1$d · Page %2$d</string>
     <string name="head_juz">Juz %1$s</string>
     <string name="head_page">Page %1$s</string>
     <string name="resume">Continue reading</string>
@@ -39,32 +29,24 @@
     <string name="play">Play</string>
     <string name="stop">Stop</string>
     <string name="loading">Loading…</string>
-    <string name="download">Download</string>
-    <string name="downloaded">Saved · tap to remove</string>
     <string name="repeat">Repeat</string>
     <string name="close">Close</string>
-    <string name="listen_ayah">Listen to this ayah</string>
-    <string name="listen_word">Listen to this word</string>
     <string name="repeat_off">No repeat</string>
     <string name="repeat_ayah">Repeat ayah</string>
     <string name="repeat_page">Repeat page</string>
     <string name="repeat_surah">Repeat surah</string>
-    <string name="ayah_of">Ayah %1$s</string>
     <string name="no_timing">This reciter has no timings for this surah</string>
 
     <string name="set_theme">Theme</string>
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-    <string name="set_marks">Saved pages</string>
     <string name="marks_col_recent">Last read</string>
     <string name="marks_col_saved">Bookmarks</string>
     <string name="no_marks">No saved pages</string>
     <string name="no_recent">Nothing read yet</string>
     <string name="place_progress">Page %1$s of %2$s in the surah</string>
     <string name="remove_mark">Remove from saved</string>
-    <string name="page_named">Page %1$d</string>
-    <string name="mark_page">Save this page</string>
     <string name="mark_short">Save</string>
     <string name="set_language">Language</string>
     <string name="lang_ar">العربية</string>
@@ -72,7 +54,6 @@
     <string name="set_ayah_color">Ayah number colour</string>
     <string name="set_highlight_color">Word highlight colour</string>
     <string name="reset">Reset</string>
-    <string name="color_choose">Pick a colour…</string>
     <string name="set_preview">Preview</string>
     <string name="set_group_general">General</string>
     <string name="set_group_reading">Reading style</string>
@@ -139,7 +120,6 @@
     <string name="dl_save_denied">Storage permission is needed to save to the phone</string>
     <string name="label_locate">Follow</string>
     <string name="label_repeat">Repeat</string>
-    <string name="locate">Follow the reciter</string>
     <string name="set_group_help">Help</string>
     <string name="set_report">Report an issue or suggest</string>
     <string name="report_subject">Issue in %1$s</string>
@@ -175,4 +155,15 @@ Language: %5$s</string>
     <string name="fb_thanks">Thank you, your message was sent</string>
     <string name="fb_too_many">Too many messages sent, please try later</string>
     <string name="fb_failed">Could not send right now. Send it by email instead?</string>
+    <string name="set_privacy">Privacy policy</string>
+    <string name="set_credits">Sources and licences</string>
+    <string name="credits_text">Quran text used for search: Tanzil Project, tanzil.net, under Creative Commons Attribution 3.0, unmodified.
+
+Mushaf page and surah name fonts: King Fahd Glorious Quran Printing Complex.
+
+Recitation audio: rights belong to the reciters and their recording publishers.
+
+Cairo font: SIL Open Font License 1.1.
+
+AndroidX and Media3 libraries by Google, and ColorPicker by Jared Rummler: Apache License 2.0.</string>
 </resources>

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Search pill. It sits on the head strip, which is the same surface it is, so a
-  shadow alone would leave a white field floating on white with no edge to find.
-  A hairline in the line colour draws the field instead, the way the cards do.
--->
+<!-- A hairline edge, since a shadow alone vanishes on the same-coloured head strip -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <corners android:radius="14dp" />

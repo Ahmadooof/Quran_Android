@@ -13,8 +13,7 @@
         android:layout_height="34dp"
         android:layout_gravity="center">
 
-        <!-- Painted in code: the colour, with a hairline edge so a white or a
-             paper colour still shows as a disc on the white sheet. -->
+        <!-- Painted in code, with a hairline edge for white or paper colours -->
         <View
             android:id="@+id/swatch_dot"
             android:layout_width="24dp"

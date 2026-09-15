@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Surah row: full-width, no card chrome. A 1dp line drawn at the bottom
-  separates it from the next row; no margins, no elevation.
--->
+<!-- Surah row: full width, separated by a 1dp line -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -33,14 +30,7 @@
             android:textStyle="bold"
             android:includeFontPadding="false" />
 
-        <!--
-          Vertical padding lives here so buttons can use match_parent on the full
-          row height.
-
-          The title leads, large, in the surah-name face: «سورة» and the name, as the
-          head of a surah is written in the mushaf. Under it, quietly, what a reader
-          choosing a surah weighs: its English name, and how long it is.
-        -->
+        <!-- Padding here so the buttons can match the full row height -->
         <LinearLayout
             android:id="@+id/name_area"
             android:layout_width="0dp"

@@ -3,10 +3,7 @@ package com.readqurantoday.quran
 import android.content.Context
 import org.json.JSONObject
 
-/**
- * Word-level timing for one surah in one voice.
- * Each ayah has a [start, end] span and a flat run of (ms, word) pairs from that ayah's start.
- */
+// Word timings for one surah in one voice: per-ayah spans and (ms, word) pairs
 class Timing private constructor(
     val ayat: List<IntArray>,
     private val words: List<IntArray>

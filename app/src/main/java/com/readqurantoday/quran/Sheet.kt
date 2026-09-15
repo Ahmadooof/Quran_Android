@@ -15,10 +15,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 /** One line in a sheet: what it says, an optional second line, and whether it is the current pick. */
 data class Choice(val label: String, val note: String = "", val on: Boolean = false)
 
-/**
- * The app's one menu shape: choices on a sheet against the bottom edge, within
- * reach of the thumb that opened it. Nothing floats over the middle of a page.
- */
+// Choices on a bottom sheet, within reach of the thumb
 fun Activity.sheet(title: String, choices: List<Choice>, pick: (Int) -> Unit) {
     val dialog = Dialog(this, R.style.SheetDialog)
     val view = layoutInflater.inflate(R.layout.part_sheet, null)
@@ -52,8 +49,7 @@ fun Activity.notice(said: String) {
     raise(dialog, view)
 }
 
-/* Full width against the bottom edge, and the host's system bars left as they
-   were — the reader reads with its bars hidden and a sheet must not blink them back. */
+// Leaves the host's system bars as they are, so a sheet does not bring back hidden bars
 internal fun Activity.raise(dialog: Dialog, view: View) {
     dialog.setContentView(view)
 

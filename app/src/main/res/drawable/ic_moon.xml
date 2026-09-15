@@ -3,11 +3,7 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24">
-    <!--
-      Crescent: outer circle r=8 centred (12,12), bite circle r=6 centred (15,9).
-      They intersect at ≈(11.7, 4.0) and ≈(20.0, 12.3).
-      Large CCW arc on the outer circle, then short CW arc on the bite circle.
-    -->
+    <!-- Crescent: outer circle r=8 at (12,12) minus a bite circle r=6 at (15,9) -->
     <path
         android:pathData="M11.7,4 A8,8 0 1 0 20,12.3 A6,6 0 0 1 11.7,4 Z"
         android:fillColor="#00000000"

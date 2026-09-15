@@ -35,11 +35,7 @@ class DownloadsActivity : AppCompatActivity() {
         sayBars()
     }
 
-    /*
-      Run [save] once the app may write to the Download folder. From Android 10 it always
-      may, through MediaStore; below that it needs the storage permission, asked for
-      the first time a save is tried rather than up front.
-    */
+    // Below Android 10 writing to Download needs the storage permission, asked on first save
     private fun whenMaySave(save: () -> Unit) {
         val needed = saveNeedsPermission &&
             checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED

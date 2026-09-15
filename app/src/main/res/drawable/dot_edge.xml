@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A hairline ring behind a colour dot, so a white or paper colour still reads
-     as a dot on a white card. -->
+<!-- Hairline ring so a white or paper colour dot still shows on a white card -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <solid android:color="@android:color/transparent" />

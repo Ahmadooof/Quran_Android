@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- The mushaf is in the package and needs nothing. This is for the
-         recitations, which live on the CDN and are gigabytes. -->
+    <!-- For recitation audio, which is streamed and downloaded from the CDN -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Only to save audio to the phone's Download folder on Android 9 and below. From 10
-         on the app writes there through MediaStore, which needs no permission. -->
+    <!-- Only for saving to Download on Android 9 and below; MediaStore needs no permission from 10 -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
@@ -34,8 +32,7 @@
             </intent-filter>
         </activity>
 
-        <!-- adjustResize so the keyboard reports itself as an inset and the list
-             keeps the room the footers give up, rather than being panned. -->
+        <!-- adjustResize so the keyboard is an inset and the list keeps the space the footers give up -->
         <activity
             android:name=".SurahListActivity"
             android:exported="false"

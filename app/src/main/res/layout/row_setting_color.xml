@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  A settings line that carries a colour: the row opens the picker, the reset
-  button beside it puts the colour back to the default. Two actions, so two
-  touch targets rather than one row that has to guess which was meant.
--->
+<!-- Colour row: tap opens the picker, the reset button restores the default -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

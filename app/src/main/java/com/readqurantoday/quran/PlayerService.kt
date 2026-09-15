@@ -15,10 +15,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.media.app.NotificationCompat as MediaCompat
 
-/**
- * Foreground service that keeps the player notification alive while audio plays.
- * Does no playback — ExoPlayer lives in Recite.
- */
+// Keeps the player notification alive while audio plays; playback itself lives in Recite
 class PlayerService : Service() {
 
     private lateinit var session: MediaSessionCompat

@@ -22,12 +22,7 @@
             android:orientation="vertical"
             android:background="@color/paper">
 
-            <!--
-              Head strip: the surface the bottom nav wears, seam on its lower edge,
-              so the search sits in a white band that answers the one at the foot.
-              It is the pane's first child, which is what paintBars reads to colour
-              the status bar above it.
-            -->
+            <!-- Head strip is the pane's first child, which paintBars reads for the status bar colour -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,12 +68,7 @@
             </LinearLayout>
             </FrameLayout>
 
-            <!--
-              Weighted, not match_parent: below the search bar, match_parent asks
-              for the whole pane's height and hangs its last stretch off the bottom
-              where nothing can scroll it back into view. The ayah results, being
-              last in the list, were sitting in exactly that dead band.
-            -->
+            <!-- Weighted, not match_parent, or the last results hang below the screen out of reach -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
@@ -88,10 +78,7 @@
                 android:paddingBottom="8dp" />
         </LinearLayout>
 
-        <!--
-          Pane 1: places to return to — surahs read lately, and saved pages — as titled
-          cards, the way settings are laid out. Filled by PlacesPane.
-        -->
+        <!-- Places pane: recent surahs and saved pages, filled by PlacesPane -->
         <ScrollView
             android:id="@+id/pane_marks"
             android:layout_width="match_parent"
@@ -130,15 +117,7 @@
         </ScrollView>
     </FrameLayout>
 
-    <!--
-      Continue reading. The accent is spent on the disc alone; the ground is the
-      plain surface, so the strip sits with the nav below it instead of cutting a
-      coloured band across the screen.
-
-      The label is the quiet half and the place is the loud one: what a reader
-      wants off this strip is which surah and which page, not to be told again
-      that the app can resume.
-    -->
+    <!-- Continue reading strip: accent only on the disc, surah and page are the prominent part -->
     <LinearLayout
         android:id="@+id/card_resume"
         android:layout_width="match_parent"
@@ -213,10 +192,7 @@
             android:contentDescription="@null" />
     </LinearLayout>
 
-    <!--
-      Bottom navigation: pill marks the active tab, ghost pill on press.
-      No ripple background — only the icon and label change colour.
-    -->
+    <!-- Bottom navigation: only the icon and label change colour -->
     <LinearLayout
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"

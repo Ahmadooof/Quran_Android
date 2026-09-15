@@ -8,15 +8,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
-/**
- * The places tab: where to go back to in the mushaf, built into a container as
- * titled cards, the way the settings are.
- *
- * Recently read comes first — the surahs read lately, each at the page it was left
- * on, with how far through the surah that is and how long ago it was — because it
- * is what a reader opening this tab usually wants. Saved pages follow, in mushaf
- * order, each with a way to drop it. [open] takes a page to go to.
- */
+// Places tab: recent surahs first, then saved pages in mushaf order
 class PlacesPane(
     private val host: Activity,
     private val into: LinearLayout,
@@ -53,10 +45,7 @@ class PlacesPane(
         val surah = Surahs.list().firstOrNull { it.id == read.surah }
         fillSurahTitle(row.findViewById(R.id.place_title), read.surah, TITLE_SP)
 
-        /* Where in the mushaf, as everywhere else in the app names a page; and how far
-           through the surah that is, as the bar alone. Given as words too — "page 4
-           of 48" — it sat beside the mushaf's own page number and read as a second
-           page number that disagreed with the first. */
+        // Progress as a bar only; a second page number in words read as a contradiction
         row.findViewById<TextView>(R.id.place_detail).text = where(read.page)
         if (surah != null) {
             val of = (surah.to - surah.from + 1).coerceAtLeast(1)
@@ -71,8 +60,7 @@ class PlacesPane(
             weigh(row.findViewById(R.id.place_rest), (of - at).toFloat())
         }
 
-        /* When: "5 minutes ago", "yesterday" — in the app's language. Unknown for the
-           one page carried over from before times were kept, so left off. */
+        // Entries carried over from before times were kept have no time
         if (read.at > 0L) {
             row.findViewById<TextView>(R.id.place_when).apply {
                 text = DateUtils.getRelativeTimeSpanString(

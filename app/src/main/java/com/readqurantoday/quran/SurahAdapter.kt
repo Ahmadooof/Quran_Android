@@ -12,13 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-/**
- * The index's result list: open, play/pause, reciter. Downloads live in their own screen.
- *
- * With an empty search box every row is a surah. With something typed the list
- * becomes whatever Search made of it — titled sections, a page to jump to, or a
- * line saying nothing matched — so the rows are no longer all of one kind.
- */
+// Surah list, or search results in sections when something is typed
 class SurahAdapter(
     private val all: List<Surahs.Surah>,
     private val names: Typeface?,
@@ -88,8 +82,7 @@ class SurahAdapter(
         val ctx = row.context
         val a = hit.ayah
 
-        /* Mark the part that was matched, so the eye lands on it rather than
-           reading the whole line to find out why it is here. */
+        // Highlights the matched part so the eye finds it at once
         val body = row.findViewById<TextView>(R.id.ayah_text)
         if (hit.at >= 0 && hit.at + hit.len <= a.text.length) {
             val span = SpannableString(a.text)
@@ -118,7 +111,7 @@ class SurahAdapter(
         row.findViewById<TextView>(R.id.page_title).text =
             ctx.getString(R.string.search_page, figures(page, ctx.resources))
         val where = row.findViewById<TextView>(R.id.page_where)
-        val surah = Surahs.ofPage(page)
+        val surah = Surahs.headOfPage(page)
         where.text = if (surah == null) "" else
             ctx.getString(R.string.search_page_in, surah.name)
         where.visibility = if (surah == null) View.GONE else View.VISIBLE
@@ -137,18 +130,11 @@ class SurahAdapter(
         holder.playBtn?.setOnClickListener { onPlay(s) }
         holder.reciterBtn?.setOnClickListener { onReciter(s) }
 
-        /* `playing` = this surah is the assigned track (even if paused).
-           `active`  = it is currently running — drives the pause/play icon. */
+        // playing: the assigned track even if paused; active: currently running
         val playing = playingId() == s.id
         val active  = playing && Recite.wantsToPlay()
 
-        /*
-          The surah playing looks like every other row: the same number circle, the same
-          soft play disc. Only what the button does changes — pause while it runs, a
-          spinner while its audio is on its way — since that is what a tap on it does.
-          It used to be filled in accent, number and disc both, which set one row apart
-          in colour on a list meant to read evenly.
-        */
+        // The playing row looks like the others; only its button changes
         holder.num.setBackgroundResource(R.drawable.num_circle)
         holder.num.setTextColor(ctx.getColor(R.color.on_dark))
 

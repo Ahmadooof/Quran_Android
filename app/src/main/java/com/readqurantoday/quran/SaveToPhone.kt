@@ -14,16 +14,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import java.io.File
 
-/*
-  A downloaded surah copied out to where the reader can see it: the phone's Download
-  folder, as Download/Quran/<reciter>/002 Al-Baqarah.mp3. There it shows in file
-  managers, can be shared or moved to a computer, and stays when the app is
-  uninstalled — none of which is true of the app's own downloads.
-
-  Only a kept download is copied, so saving never spends data. Which surahs have been
-  saved, per reciter, is remembered, so the screen can say so and "save all" can skip
-  them; a file the reader deletes from the phone later is theirs to delete.
-*/
+// Copies kept downloads to Download/Quran/<reciter>/, which survives uninstall; never downloads
 
 private fun saved(context: Context) =
     context.getSharedPreferences("saved-to-phone-download", Context.MODE_PRIVATE)
@@ -35,10 +26,7 @@ fun isOnPhone(context: Context, surah: Int, reciter: String) =
 /** True below Android 10, where writing to the Download folder needs the storage permission. */
 val saveNeedsPermission get() = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
 
-/**
- * Copy a kept download of [surah] by [reciter] into the phone's Download folder. Returns
- * whether it is there afterwards. Blocking file work: call it off the main thread.
- */
+// Blocking file work: call off the main thread
 fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean {
     val source = Downloads.file(context, surah, reciter.id)
     if (!source.exists() || source.length() == 0L) return false
@@ -136,11 +124,7 @@ fun Activity.shareAudio(uris: List<Uri>) {
     startActivity(Intent.createChooser(send, getString(R.string.dl_share)))
 }
 
-/*
-  Show where saved surahs are. There is no one standard way to open a folder: Samsung's
-  file manager takes a path, the system file picker a folder address, and failing both
-  the Downloads app opens, one tap away from Quran.
-*/
+// No standard folder intent: try Samsung My Files, then the system picker, then Downloads
 fun Activity.openPhoneFolder(reciter: Recite.Reciter) {
     @Suppress("DEPRECATION")
     val root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)

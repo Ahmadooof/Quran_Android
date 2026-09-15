@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  A page result. Built like the resume strip — soft disc, bold line, muted line,
-  chevron — because it does the same thing: one tap and you are on that page.
--->
+<!-- Page result, built like the resume strip since it also jumps to a page -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

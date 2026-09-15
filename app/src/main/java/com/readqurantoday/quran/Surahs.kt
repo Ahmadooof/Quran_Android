@@ -46,13 +46,23 @@ object Surahs {
 
     fun list(): List<Surah> = all
 
-    /** The surah whose first page is this page or earlier — what the running head names. */
+    /** The surah whose first page is this page or earlier. */
     fun ofPage(page: Int): Surah? {
         var found: Surah? = null
         for (s in all) {
             if (s.from <= page) found = s else break
         }
         return found
+    }
+
+    // The surah the page opens in: none when several start here, the previous one when a surah starts mid-page
+    fun headOfPage(page: Int): Surah? {
+        val lines = Mushaf.lines(page)
+        val titles = lines.filter { it.kind == "surah" && it.surah > 0 }
+        if (titles.size > 1) return null
+        val title = titles.firstOrNull() ?: return ofPage(page)
+        val opensWithTitle = lines.firstOrNull { it.kind == "surah" || it.kind == "ayah" } === title
+        return all.firstOrNull { it.id == if (opensWithTitle) title.surah else title.surah - 1 }
     }
 
     /** Which juz this page is in (1–30), or 0 if not yet loaded. */
