@@ -16,12 +16,13 @@ import java.io.File
 
 // Copies kept downloads to Download/Quran/<reciter>/, which survives uninstall; never downloads
 
+// Each saved surah keeps the address of its copy, since the phone renames a copy whose name is taken
 private fun saved(context: Context) =
-    context.getSharedPreferences("saved-to-phone-download", Context.MODE_PRIVATE)
+    context.getSharedPreferences("saved-to-phone-copies", Context.MODE_PRIVATE)
 
 /** Whether surah [surah] of [reciter] has been saved to the phone from here. */
 fun isOnPhone(context: Context, surah: Int, reciter: String) =
-    saved(context).getBoolean("$reciter/$surah", false)
+    saved(context).contains("$reciter/$surah")
 
 /** True below Android 10, where writing to the Download folder needs the storage permission. */
 val saveNeedsPermission get() = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
@@ -35,7 +36,7 @@ fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean 
     val title = phoneTitle(surah)
     val folder = phoneFolder(reciter)
 
-    val ok = try {
+    val copy: String? = try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val resolver = context.contentResolver
             val values = ContentValues().apply {
@@ -55,7 +56,7 @@ fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean 
                 values.clear()
                 values.put(MediaStore.Downloads.IS_PENDING, 0)
                 resolver.update(uri, values, null, null)
-                true
+                uri.toString()
             } catch (e: Exception) {
                 /* Leave no half-written entry behind in the reader's downloads. */
                 resolver.delete(uri, null, null)
@@ -68,14 +69,14 @@ fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean 
             val target = File(dir, "$title.mp3")
             source.copyTo(target, overwrite = true)
             MediaScannerConnection.scanFile(context, arrayOf(target.absolutePath), arrayOf("audio/mpeg"), null)
-            true
+            target.absolutePath
         }
     } catch (_: Exception) {
-        false
+        null
     }
 
-    if (ok) saved(context).edit().putBoolean("${reciter.id}/$surah", true).apply()
-    return ok
+    if (copy != null) saved(context).edit().putString("${reciter.id}/$surah", copy).apply()
+    return copy != null
 }
 
 private fun phoneTitle(surah: Int): String {
@@ -85,30 +86,29 @@ private fun phoneTitle(surah: Int): String {
 
 private fun phoneFolder(reciter: Recite.Reciter) = "Quran/${reciter.name}"
 
-/** The saved copy of [surah] by [reciter] as a shareable content address, or null if it is gone. Blocking. */
+/** The saved copy of [surah] by [reciter] as a shareable content address; null, and no longer counted as saved, if it is gone. Blocking. */
 fun phoneUri(context: Context, surah: Int, reciter: Recite.Reciter): Uri? {
-    val name = "${phoneTitle(surah)}.mp3"
-    return try {
+    val key = "${reciter.id}/$surah"
+    val copy = saved(context).getString(key, null) ?: return null
+    val uri = try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val collection = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-            context.contentResolver.query(
-                collection, arrayOf(MediaStore.Downloads._ID),
-                "${MediaStore.Downloads.RELATIVE_PATH}=? AND ${MediaStore.Downloads.DISPLAY_NAME}=?",
-                arrayOf("${Environment.DIRECTORY_DOWNLOADS}/${phoneFolder(reciter)}/", name), null
-            )?.use { c -> if (c.moveToFirst()) ContentUris.withAppendedId(collection, c.getLong(0)) else null }
+            val stored = Uri.parse(copy)
+            context.contentResolver.query(stored, arrayOf(MediaStore.Downloads._ID), null, null, null)
+                ?.use { c -> if (c.moveToFirst()) stored else null }
         } else {
-            @Suppress("DEPRECATION")
-            val path = File(File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), phoneFolder(reciter)), name).absolutePath
             val collection = MediaStore.Files.getContentUri("external")
             @Suppress("DEPRECATION")
             context.contentResolver.query(
                 collection, arrayOf(MediaStore.Files.FileColumns._ID),
-                "${MediaStore.Files.FileColumns.DATA}=?", arrayOf(path), null
+                "${MediaStore.Files.FileColumns.DATA}=?", arrayOf(copy), null
             )?.use { c -> if (c.moveToFirst()) ContentUris.withAppendedId(collection, c.getLong(0)) else null }
         }
     } catch (_: Exception) {
         null
     }
+    // Deleted from the phone: the surah can be saved again
+    if (uri == null) saved(context).edit().remove(key).apply()
+    return uri
 }
 
 /** Open the share sheet for [uris], one file or many. */

@@ -226,7 +226,10 @@ class DownloadsPane(
         Thread {
             val uri = phoneUri(host, surah, voice)
             host.runOnUiThread {
-                if (uri != null) host.shareAudio(listOf(uri)) else host.notice(host.getString(R.string.dl_share_missing))
+                if (uri != null) host.shareAudio(listOf(uri)) else {
+                    host.notice(host.getString(R.string.dl_share_missing))
+                    refresh()
+                }
             }
         }.start()
     }
@@ -244,6 +247,7 @@ class DownloadsPane(
                 val uris = saved.mapNotNull { phoneUri(host, it, voice) }
                 host.runOnUiThread {
                     if (uris.isNotEmpty()) host.shareAudio(uris) else host.notice(host.getString(R.string.dl_share_missing))
+                    if (uris.size < saved.size) refresh()
                 }
             }.start()
         }

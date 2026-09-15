@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import java.util.Locale
 
 object Settings {
 
@@ -82,6 +83,16 @@ object Settings {
     }
 
     fun applyLanguage(context: Context) = speak(language(context))
+
+    /** [base] with the chosen language, when the system has not applied it yet. */
+    fun inLanguage(base: Context): Context {
+        val want = Locale.forLanguageTag(language(base))
+        val config = base.resources.configuration
+        if (config.locales[0].language == want.language) return base
+        // Views set to follow the locale take their direction from the default, not the context
+        Locale.setDefault(want)
+        return base.createConfigurationContext(Configuration(config).apply { setLocale(want) })
+    }
 
     private fun speak(tag: String) {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))

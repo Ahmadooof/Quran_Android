@@ -8,10 +8,9 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 
 /** Report an issue or suggest something; sent to our own server, with email as the fallback. */
-class FeedbackActivity : AppCompatActivity() {
+class FeedbackActivity : LanguageActivity() {
 
     private lateinit var into: LinearLayout
     private var kind = Feedback.BUG

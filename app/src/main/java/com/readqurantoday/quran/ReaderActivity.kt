@@ -13,7 +13,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -24,7 +23,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 
 /** Full-screen mushaf reader: 604 pages, edge-to-edge, chrome hidden while reading. */
-class ReaderActivity : AppCompatActivity() {
+class ReaderActivity : LanguageActivity() {
 
     private val pages = 604
 
@@ -166,7 +165,8 @@ class ReaderActivity : AppCompatActivity() {
         wirePlayer()
 
         val last = Settings.lastPage(this).let { if (it in 1..pages) it else 2 }
-        go(last)
+        // Opening behind the menu is not reading, so nothing is noted until a page is chosen
+        go(last, note = false)
         // restore chrome state on recreation (e.g. after theme toggle)
         showChrome(savedInstanceState?.getBoolean(CHROME) ?: false)
 
@@ -272,19 +272,21 @@ class ReaderActivity : AppCompatActivity() {
         (lanes.findFirstCompletelyVisibleItemPosition()
             .takeIf { it != RecyclerView.NO_POSITION } ?: 0) + 1
 
-    private fun go(page: Int) {
+    private fun go(page: Int, note: Boolean = true) {
         lanes.scrollToPositionWithOffset(page - 1, 0)
         /* A jump fires no scroll state, so nothing downstream would learn of it. */
-        arrived(page)
+        arrived(page, note)
     }
 
     // Runs for swipes and jumps alike, so the top bar and last-read page stay current
-    private fun arrived(page: Int) {
+    private fun arrived(page: Int, note: Boolean = true) {
         if (page !in 1..pages) return
         current = page
         sayPage(page)
-        Settings.setLastPage(this, page)
-        Surahs.ofPage(page)?.let { Settings.noteRead(this, it.id, page) }
+        if (note) {
+            Settings.setLastPage(this, page)
+            Surahs.ofPage(page)?.let { Settings.noteRead(this, it.id, page) }
+        }
         Mushaf.warm(this, page)
         /* Kept one page wider than warmed, both ways, so nothing warmed is dropped. */
         Mushaf.keepOnly((page - Mushaf.AHEAD - 1)..(page + Mushaf.AHEAD + 1))

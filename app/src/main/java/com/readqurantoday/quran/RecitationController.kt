@@ -27,6 +27,9 @@ class RecitationController(
     // The 50ms follower passes on waiting changes so the spinner never outlasts the sound
     private var wasWaiting = false
 
+    // A reader rebuilt mid-recitation (theme, language) keeps its page until the recitation moves on
+    private var catchingUp = true
+
     /** Let page repeat settle on wherever recitation now is, rather than where it was. */
     fun reanchor() {
         loop = null
@@ -143,11 +146,13 @@ class RecitationController(
                     val ayah = timing.ayahAt(at, litAyah)
                     if (ayah > 0) {
                         if (ayah != litAyah) {
+                            val first = catchingUp && litAyah == 0
                             litAyah = ayah
                             onChanged()
                             val on = Ayat.pageOf(readingSurah, ayah)
-                            if (on in 1..pageCount && on != currentPage()) onNavigate(on)
+                            if (!first && on in 1..pageCount && on != currentPage()) onNavigate(on)
                         }
+                        catchingUp = false
                         val w = timing.wordAt(ayah, at)
                         litWord = w
                         onLight(readingSurah, ayah, w)

@@ -4,10 +4,9 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 
 /** How a page looks: the preview line, and the colour and weight of what can be styled. */
-class ReadingStyleActivity : AppCompatActivity() {
+class ReadingStyleActivity : LanguageActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

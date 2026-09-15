@@ -7,10 +7,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 
 /** Downloads: per reciter, what is kept for offline listening, and copies saved to the phone. */
-class DownloadsActivity : AppCompatActivity() {
+class DownloadsActivity : LanguageActivity() {
 
     /* What to run once the storage permission comes back granted: a save that asked. */
     private var afterGrant: (() -> Unit)? = null

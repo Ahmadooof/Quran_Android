@@ -18,12 +18,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Index screen: surah list (with play+download), bookmarks, and settings. Returns a page number. */
-class SurahListActivity : AppCompatActivity() {
+class SurahListActivity : LanguageActivity() {
 
     /* Pane index matches the nav order: 0=surahs, 1=marks, 2=settings. */
     private val paneIds      = intArrayOf(R.id.pane_index, R.id.pane_marks, R.id.pane_settings)

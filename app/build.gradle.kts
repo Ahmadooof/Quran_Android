@@ -19,8 +19,8 @@ android {
         applicationId = "com.readqurantoday.quran"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.0.1"
     }
 
     // Page fonts packaged at the root of assets
@@ -35,6 +35,13 @@ android {
         noCompress += listOf("ttf")
     }
 
+    // The in-app language switch needs both languages installed, whatever the phone's language
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     signingConfigs {
         if (keystore != null) {
             create("upload") {
@@ -47,6 +54,10 @@ android {
     }
 
     buildTypes {
+        // Installs beside the Play version, which is signed with another key
+        debug {
+            applicationIdSuffix = ".dev"
+        }
         release {
             isMinifyEnabled = false
             if (keystore != null) signingConfig = signingConfigs.getByName("upload")
