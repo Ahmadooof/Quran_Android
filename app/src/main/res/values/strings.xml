@@ -61,6 +61,31 @@
     <string name="marks_col_saved">المحفوظ</string>
     <string name="no_marks">لا توجد صفحات محفوظة</string>
     <string name="no_recent">لم تُقرأ أي سورة بعد</string>
+    <string name="ago_now">الآن</string>
+    <plurals name="ago_minutes">
+        <item quantity="zero">قبل %1$s دقيقة</item>
+        <item quantity="one">قبل دقيقة</item>
+        <item quantity="two">قبل دقيقتين</item>
+        <item quantity="few">قبل %1$s دقائق</item>
+        <item quantity="many">قبل %1$s دقيقة</item>
+        <item quantity="other">قبل %1$s دقيقة</item>
+    </plurals>
+    <plurals name="ago_hours">
+        <item quantity="zero">قبل %1$s ساعة</item>
+        <item quantity="one">قبل ساعة</item>
+        <item quantity="two">قبل ساعتين</item>
+        <item quantity="few">قبل %1$s ساعات</item>
+        <item quantity="many">قبل %1$s ساعة</item>
+        <item quantity="other">قبل %1$s ساعة</item>
+    </plurals>
+    <plurals name="ago_days">
+        <item quantity="zero">قبل %1$s يوم</item>
+        <item quantity="one">أمس</item>
+        <item quantity="two">قبل يومين</item>
+        <item quantity="few">قبل %1$s أيام</item>
+        <item quantity="many">قبل %1$s يومًا</item>
+        <item quantity="other">قبل %1$s يوم</item>
+    </plurals>
     <!-- Read aloud for the progress bar on a recent surah: page 4 of its 48. -->
     <string name="place_progress">الصفحة %1$s من %2$s في السورة</string>
     <string name="remove_mark">إزالة من المحفوظ</string>

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -56,6 +57,7 @@ class ReaderActivity : AppCompatActivity() {
 
     private var bars: WindowInsetsControllerCompat? = null
     private var chrome = false
+    private var fromBarEdge = false
 
     /* Status-bar height, settled once; everything about page layout follows from it. */
     private var band = 0
@@ -719,6 +721,21 @@ class ReaderActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) showChrome(chrome)
+    }
+
+    // A swipe that pulls the hidden bars in starts on their edge; it must not also turn or scroll the page
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN) fromBarEdge = !chrome && onBarEdge(ev.rawY)
+        return fromBarEdge || super.dispatchTouchEvent(ev)
+    }
+
+    private fun onBarEdge(y: Float): Boolean {
+        val insets = ViewCompat.getRootWindowInsets(window.decorView) ?: return false
+        val bars = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars())
+        val gestures = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+        val top = maxOf(bars.top, gestures.top)
+        val bottom = maxOf(bars.bottom, gestures.bottom)
+        return y < top || y > window.decorView.height - bottom
     }
 
     companion object {

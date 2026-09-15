@@ -45,6 +45,19 @@
     <string name="marks_col_saved">Bookmarks</string>
     <string name="no_marks">No saved pages</string>
     <string name="no_recent">Nothing read yet</string>
+    <string name="ago_now">Just now</string>
+    <plurals name="ago_minutes">
+        <item quantity="one">1 min ago</item>
+        <item quantity="other">%1$s min ago</item>
+    </plurals>
+    <plurals name="ago_hours">
+        <item quantity="one">1 hour ago</item>
+        <item quantity="other">%1$s hours ago</item>
+    </plurals>
+    <plurals name="ago_days">
+        <item quantity="one">Yesterday</item>
+        <item quantity="other">%1$s days ago</item>
+    </plurals>
     <string name="place_progress">Page %1$s of %2$s in the surah</string>
     <string name="remove_mark">Remove from saved</string>
     <string name="mark_short">Save</string>

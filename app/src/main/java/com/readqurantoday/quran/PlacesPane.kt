@@ -2,7 +2,6 @@ package com.readqurantoday.quran
 
 import android.app.Activity
 import android.content.res.ColorStateList
-import android.text.format.DateUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -63,10 +62,7 @@ class PlacesPane(
         // Entries carried over from before times were kept have no time
         if (read.at > 0L) {
             row.findViewById<TextView>(R.id.place_when).apply {
-                text = DateUtils.getRelativeTimeSpanString(
-                    read.at, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS,
-                    DateUtils.FORMAT_ABBREV_RELATIVE
-                )
+                text = ago(read.at, host.resources)
                 visibility = View.VISIBLE
             }
         }
