@@ -54,7 +54,7 @@ fun Activity.notice(said: String) {
 
 /* Full width against the bottom edge, and the host's system bars left as they
    were — the reader reads with its bars hidden and a sheet must not blink them back. */
-private fun Activity.raise(dialog: Dialog, view: View) {
+internal fun Activity.raise(dialog: Dialog, view: View) {
     dialog.setContentView(view)
 
     val bare = ViewCompat.getRootWindowInsets(window.decorView)

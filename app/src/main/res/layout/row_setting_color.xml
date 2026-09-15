@@ -9,18 +9,13 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:layoutDirection="rtl"
-    android:background="@drawable/card"
-    android:elevation="1dp"
+    android:layoutDirection="locale"
+    android:background="@drawable/row_flat"
     android:clickable="true"
     android:focusable="true"
-    android:layout_marginStart="12dp"
-    android:layout_marginEnd="12dp"
-    android:layout_marginTop="7dp"
+    android:minHeight="52dp"
     android:paddingStart="14dp"
-    android:paddingEnd="6dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:paddingEnd="6dp">
 
     <TextView
         android:id="@+id/set_label"
@@ -35,15 +30,16 @@
         android:id="@+id/set_dot"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:background="@drawable/dot_edge"
         android:layout_marginEnd="4dp"
         android:src="@drawable/ic_circle"
         android:contentDescription="@null" />
 
     <ImageView
         android:id="@+id/set_reset"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:padding="8dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="10dp"
         android:src="@drawable/ic_reset"
         android:tint="@color/icon_btn"
         android:clickable="true"

@@ -67,4 +67,8 @@ dependencies {
     /* MediaSessionCompat and NotificationCompat.MediaStyle for the player
        notification shown in the shade and on the lock screen. */
     implementation("androidx.media:media:1.7.0")
+    /* Colour picker. A hand-rolled one was three RGB sliders, which is a way to
+       tune a colour you already have rather than a way to find one. This is an
+       HSV wheel with a hex field, so a colour can be arrived at directly. */
+    implementation("com.jaredrummler:colorpicker:1.1.0")
 }

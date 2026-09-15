@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Spacing tokens.
+  Use these in layouts instead of hardcoded dp/sp values.
+  Add here when a value appears in more than one layout.
+-->
+<resources>
+
+    <!-- Horizontal margin between screen edge and cards / containers -->
+    <dimen name="screen_margin">12dp</dimen>
+
+    <!-- Vertical padding inside list rows (top and bottom) -->
+    <dimen name="row_pad_v">11dp</dimen>
+
+    <!-- Vertical padding inside compact cards / chips -->
+    <dimen name="card_pad_v">8dp</dimen>
+
+    <!-- Icon sizes -->
+    <dimen name="icon_nav">22dp</dimen>   <!-- chrome bar + bottom nav -->
+    <dimen name="icon_row">20dp</dimen>   <!-- icons inside list rows -->
+
+    <!-- Bottom navigation bar height -->
+    <dimen name="nav_bar_height">64dp</dimen>
+
+    <!-- Chrome bar button row height (icon 22dp + 3dp gap + ~14dp label + padding) -->
+    <dimen name="chrome_row_height">52dp</dimen>
+
+    <!-- Gap between icon and its text label in chrome / nav buttons -->
+    <dimen name="icon_label_gap">3dp</dimen>
+
+    <!-- The width of every seam and edge line. -->
+    <dimen name="hairline">1dp</dimen>
+
+    <!-- The one line of a real page used to preview reading style. -->
+    <dimen name="preview_line">56dp</dimen>
+
+    <!-- The space above a settings card that has no title of its own. -->
+    <dimen name="group_gap">12dp</dimen>
+
+    <!-- Search bar horizontal margin (matches screen_margin) -->
+    <dimen name="search_margin_h">12dp</dimen>
+
+    <!-- Elevation levels -->
+    <dimen name="elevation_search">3dp</dimen>
+    <dimen name="elevation_chrome">6dp</dimen>
+    <dimen name="elevation_player">8dp</dimen>
+    <dimen name="elevation_card">1dp</dimen>
+
+</resources>

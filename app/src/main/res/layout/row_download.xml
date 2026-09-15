@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One surah in the downloads screen: its name, and under it its size or how far its
+  download has come; then, once it is on the phone, the way to save a copy out; and
+  last the one action its state allows — download, stop, or delete. Each icon is labelled.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layoutDirection="locale"
+    android:minHeight="56dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="4dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/dl_title"
+            layout="@layout/part_surah_title" />
+
+        <TextView
+            android:id="@+id/dl_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/text_mute"
+            android:textSize="11sp"
+            android:includeFontPadding="false"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dl_save_wrap"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:background="@drawable/row_flat"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/dl_save"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_save_phone"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/dl_save_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textSize="9sp"
+            android:includeFontPadding="false"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dl_action_wrap"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:background="@drawable/row_flat"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/dl_action"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/dl_action_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textSize="9sp"
+            android:includeFontPadding="false"
+            android:maxLines="1" />
+    </LinearLayout>
+</LinearLayout>

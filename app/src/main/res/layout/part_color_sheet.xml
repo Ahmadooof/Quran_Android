@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The colour sheet. It rises from the bottom like every other menu, and holds
+  only what choosing a colour needs, in the order it is used: the line the colour
+  will land on, the field to find it in, quick picks, and the two ways out.
+
+  The preview is at the top so the thumb working the field below never covers it.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layoutDirection="locale"
+    android:background="@drawable/sheet"
+    android:paddingTop="10dp"
+    android:paddingBottom="8dp">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/grip" />
+
+    <TextView
+        android:id="@+id/color_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:textColor="@color/text_mute"
+        android:textSize="13sp" />
+
+    <!-- The line itself, restyled as the colour moves. -->
+    <FrameLayout
+        android:id="@+id/color_preview"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/preview_line"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/card_group"
+        android:clipToOutline="true" />
+
+    <com.jaredrummler.android.colorpicker.ColorPickerView
+        android:id="@+id/color_field"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:layout_marginTop="12dp" />
+
+    <!--
+      The colour as a code, to read off exactly or type in exactly. Left to right
+      whatever the language, as a code is written, and it follows the field as the
+      field moves.
+    -->
+    <EditText
+        android:id="@+id/color_hex"
+        android:layout_width="140dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/search_bg"
+        android:gravity="center"
+        android:layoutDirection="ltr"
+        android:textDirection="ltr"
+        android:fontFamily="monospace"
+        android:textColor="@color/text"
+        android:textSize="14sp"
+        android:inputType="textNoSuggestions|textCapCharacters"
+        android:maxLength="7"
+        android:imeOptions="actionDone"
+        android:importantForAutofill="no"
+        android:contentDescription="@string/color_hex" />
+
+    <!-- The colours this theme already uses, so one thing can take another's exactly. -->
+    <TextView
+        android:id="@+id/color_in_use_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/color_in_use"
+        android:textColor="@color/text_mute"
+        android:textSize="11sp"
+        android:includeFontPadding="false" />
+
+    <LinearLayout
+        android:id="@+id/color_in_use"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal" />
+
+    <LinearLayout
+        android:id="@+id/color_swatches"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <TextView
+            android:id="@+id/color_done"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@drawable/row_flat"
+            android:text="@string/done"
+            android:textColor="@color/accent"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/color_cancel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@drawable/row_flat"
+            android:text="@string/cancel"
+            android:textColor="@color/text_mute"
+            android:textSize="15sp" />
+    </LinearLayout>
+</LinearLayout>

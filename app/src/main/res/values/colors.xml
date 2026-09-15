@@ -11,8 +11,13 @@
     <!-- The rest of the palette, the same values the stylesheet's :root sets,
          so the app and the site are one design and not two. -->
     <color name="accent">#1A6FA3</color>
+    <!-- App icon: cream calligraphy on the app's blue; the same by day and night. -->
+    <color name="icon_ground">#1A6FA3</color>
+    <color name="icon_ink">#FFFDF7</color>
     <color name="accent_soft">#4D1A6FA3</color>
     <color name="surface">#FFFFFF</color>
+    <!-- Reader bars over the page: white by day, lifted above the page by a shadow. -->
+    <color name="reader_chrome">#FFFFFF</color>
     <color name="surface_2">#F5F9FD</color>
     <color name="line">#DCE8F2</color>
     <color name="text">#16283A</color>
@@ -25,4 +30,6 @@
     <color name="ornament">#1A6FA3</color>
     <!-- Highlighted word ink, and what the reset in settings returns to. -->
     <color name="ink_lit">#A4161A</color>
+    <!-- The ayah markers on the page, until the reader picks a colour: the accent. -->
+    <color name="ayah_mark">@color/accent</color>
 </resources>

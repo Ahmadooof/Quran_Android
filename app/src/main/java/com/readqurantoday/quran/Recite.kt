@@ -36,11 +36,19 @@ object Recite {
 
     var onChange: (() -> Unit)? = null
 
+    /* Repeat modes, smallest span to largest; the reader's sheet lists them in
+       this order and matches a choice to a mode by its position. */
     const val ONCE = 0
     const val AYAH = 1
-    const val SURAH = 2
+    const val PAGE = 2
+    const val SURAH = 3
 
     var repeat = ONCE
+
+    /* Where page repeat returns to if the surah's audio runs out mid-loop: the
+       first ayah of the page, in ms. Set by RecitationController, which has the
+       timings; the player only needs somewhere to go back to. */
+    var loopFrom = 0
 
     fun at(): Int {
         val p = player ?: return if (wanted >= 0) wanted else 0
@@ -131,10 +139,14 @@ object Recite {
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
                     if (state == Player.STATE_ENDED) {
-                        if (repeat == SURAH) {
-                            seekTo(0)
+                        /* A surah loops to its start. A page that is the surah's last
+                           loops too — the audio ends before the controller's own check
+                           past the page's last ayah can fire — back to its first ayah. */
+                        if (repeat == SURAH || repeat == PAGE) {
+                            val back = if (repeat == PAGE) loopFrom else 0
+                            seekTo(back.toLong())
                             play()
-                            wanted = 0
+                            wanted = back
                             onChange?.invoke()
                             return
                         }
@@ -179,6 +191,14 @@ object Recite {
     }
 
     fun isPlaying() = player?.isPlaying == true
+
+    /*
+      Asked to play, and no sound yet: the stream is being fetched, or buffered after
+      a seek. Play has been pressed, so the button already shows pause, but nothing is
+      heard — this is the gap a spinner should fill. It ends on its own: the player
+      reports isPlaying the moment audio starts, and that change calls onChange.
+    */
+    fun waiting() = wantsToPlay() && !isPlaying()
 
     fun stop() {
         val ctx = app

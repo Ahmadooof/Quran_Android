@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A quick pick: the colour as a disc, and the ring (the frame's background) when it is the one in hand. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="36dp"
+    android:layout_weight="1"
+    android:clickable="true"
+    android:focusable="true">
+
+    <FrameLayout
+        android:id="@+id/swatch_ring"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_gravity="center">
+
+        <!-- Painted in code: the colour, with a hairline edge so a white or a
+             paper colour still shows as a disc on the white sheet. -->
+        <View
+            android:id="@+id/swatch_dot"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
+</FrameLayout>

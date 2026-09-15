@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A settings line that does one thing rather than showing a value: its label
+     centred, in the accent, the way a button reads. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/set_label"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="52dp"
+    android:gravity="center"
+    android:background="@drawable/row_flat"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:textColor="@color/accent"
+    android:textSize="15sp" />

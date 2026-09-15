@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The reader's top bar: its own ground over the page, seam along the bottom. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/reader_chrome" />
+    <item
+        android:drawable="@color/line"
+        android:gravity="bottom"
+        android:height="1dp" />
+</layer-list>

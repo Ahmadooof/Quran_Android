@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Reading style weights a theme starts with, until the reader chooses their own.
+  0 regular, 1 light, 2 medium, 3 bold — Settings.WEIGHT_*. values-night has the
+  dark theme's.
+
+  By day: the text regular; the lit word and the ayah numbers medium, enough to
+  find on the page without shouting from it.
+-->
+<resources>
+    <integer name="default_ink_weight">0</integer>
+    <integer name="default_lit_weight">2</integer>
+    <integer name="default_ayah_weight">2</integer>
+</resources>

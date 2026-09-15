@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The dark theme's starting weights, as chosen in the reading style screen. Light
+  type on dark ground reads heavier than the same weight the other way round — it
+  spreads — so the ayah numbers are left regular at night where day has them medium.
+  The lit word stays medium, to be found at a glance mid-recitation; the text regular.
+-->
+<resources>
+    <integer name="default_ink_weight">0</integer>
+    <integer name="default_lit_weight">2</integer>
+    <integer name="default_ayah_weight">0</integer>
+</resources>

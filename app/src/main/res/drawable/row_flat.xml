@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A row inside a grouped card: no ground of its own, so the card's surface shows
+  through, and the accent ripple on touch. The mask keeps the ripple to the row;
+  without one it would spread to the nearest bounded parent, the whole card.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/accent_soft">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFFFF" />
+        </shape>
+    </item>
+</ripple>

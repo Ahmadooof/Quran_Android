@@ -12,109 +12,174 @@
         android:orientation="horizontal"
         android:layoutDirection="rtl" />
 
+    <!-- A page being turned is drawn here, over the pager; see PageCurlView. -->
+    <com.readqurantoday.quran.PageCurlView
+        android:id="@+id/curl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- The reader's top bar: its own ground with a shadow, so it reads as floating over the page.
+         liftBar() owns its top padding at runtime, which is how it clears the status bar. -->
     <LinearLayout
         android:id="@+id/bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:orientation="vertical"
-        android:layoutDirection="rtl"
-        android:background="@color/chrome"
-        android:elevation="6dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:layoutDirection="locale"
+        android:background="@drawable/reader_head"
+        android:elevation="@dimen/elevation_chrome"
         android:visibility="gone">
 
-        <!-- Row 1: back area, utility toggles, bookmark. -->
+        <!--
+          Fixed height so every button can fill it with match_parent.
+          Two buttons each side, so where you are sits in the middle.
+        -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/chrome_row_height"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Back: icon + label share one touch target. -->
             <LinearLayout
                 android:id="@+id/btn_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/row_flat"
                 android:clickable="true"
-                android:focusable="true"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:paddingEnd="8dp">
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/back"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:padding="4dp"
+                    android:layout_width="@dimen/icon_nav"
+                    android:layout_height="@dimen/icon_nav"
                     android:src="@drawable/ic_back"
                     android:tint="@color/accent"
                     android:contentDescription="@null" />
 
                 <TextView
-                    android:id="@+id/back_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="@dimen/icon_label_gap"
                     android:text="@string/to_menu"
-                    android:textColor="@color/accent"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/text_mute"
+                    android:textSize="10sp"
+                    android:includeFontPadding="false"
+                    android:maxLines="1" />
             </LinearLayout>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <!-- Day/night, paired with the bookmark: both are page-level switches. -->
-            <ImageView
-                android:id="@+id/btn_theme"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="9dp"
-                android:contentDescription="@string/set_theme"
-                android:tint="@color/accent"
-                android:src="@drawable/ic_moon"
+            <LinearLayout
+                android:id="@+id/btn_mark"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/row_flat"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true">
 
-            <ImageView
-                android:id="@+id/mark"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
-                android:contentDescription="@string/mark_page"
-                android:tint="@color/accent"
-                android:src="@drawable/ic_bookmark_off" />
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/mark"
+                    android:layout_width="@dimen/icon_nav"
+                    android:layout_height="@dimen/icon_nav"
+                    android:src="@drawable/ic_bookmark_off"
+                    android:contentDescription="@null" />
 
-        <!-- Row 2: colour pickers (populated in code), scrollable. -->
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp">
+                <TextView
+                    android:id="@+id/mark_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/icon_label_gap"
+                    android:text="@string/mark_short"
+                    android:textColor="@color/text_mute"
+                    android:textSize="10sp"
+                    android:includeFontPadding="false"
+                    android:maxLines="1" />
+            </LinearLayout>
+
+            <!--
+              Where the reader is: the juz and the page, on one line. No surah name —
+              the page's own running head already carries it, just below.
+            -->
+            <TextView
+                android:id="@+id/bar_place"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <LinearLayout
-                android:id="@+id/swatch_row"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp" />
+                android:id="@+id/btn_turn_wrap"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/row_flat"
+                android:clickable="true"
+                android:focusable="true">
 
-        </HorizontalScrollView>
+                <ImageView
+                    android:id="@+id/btn_turn"
+                    android:layout_width="@dimen/icon_nav"
+                    android:layout_height="@dimen/icon_nav"
+                    android:src="@drawable/ic_motion_slide"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/turn_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/icon_label_gap"
+                    android:text="@string/motion_slide"
+                    android:textColor="@color/text_mute"
+                    android:textSize="10sp"
+                    android:includeFontPadding="false"
+                    android:maxLines="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btn_theme_wrap"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/row_flat"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/btn_theme"
+                    android:layout_width="@dimen/icon_nav"
+                    android:layout_height="@dimen/icon_nav"
+                    android:src="@drawable/ic_moon"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/theme_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/icon_label_gap"
+                    android:text="@string/set_theme"
+                    android:textColor="@color/text_mute"
+                    android:textSize="10sp"
+                    android:includeFontPadding="false"
+                    android:maxLines="1" />
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Player bar — transparent dark pill, shown on long-press and while audio plays. -->
+    <!-- Player bar — the footer strip, shown on long-press and while audio plays. -->
     <include
         layout="@layout/part_player_reader"
         android:layout_width="match_parent"

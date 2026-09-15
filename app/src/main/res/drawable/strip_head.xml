@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  strip_surface turned upside down: the same surface, with the hairline seam on
+  the bottom edge instead of the top. The strip at the head of a pane wears it,
+  so the top of the screen and the footer below read as one set of bands around
+  the list rather than two different ideas of what a bar is.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/surface" />
+    <item
+        android:drawable="@color/line"
+        android:gravity="bottom"
+        android:height="1dp" />
+</layer-list>

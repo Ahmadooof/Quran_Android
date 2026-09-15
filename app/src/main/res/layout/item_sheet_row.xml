@@ -6,7 +6,7 @@
     android:minHeight="54dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:layoutDirection="rtl"
+    android:layoutDirection="locale"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"

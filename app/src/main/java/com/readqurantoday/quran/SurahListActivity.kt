@@ -3,6 +3,7 @@ package com.readqurantoday.quran
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
@@ -30,14 +31,28 @@ class SurahListActivity : AppCompatActivity() {
     private lateinit var navLabels: List<TextView>
 
     private var tab = 0
+
+    /* This screen's player listener, kept so it can clear only itself from Recite's slot. */
+    private val heard: () -> Unit = { runOnUiThread { surahAdapter?.notifyDataSetChanged() } }
+
+    /* The tab labels' face as the theme gave it, read off a label before any of
+       them is restyled — so the weight can change and the family follow the theme. */
+    private val labelFace by lazy { navLabels[0].typeface }
     private var surahAdapter: SurahAdapter? = null
-    private var watching = false
+
+    /* The keyboard is up. */
+    private var typing = false
+
+    /* There is a page worth resuming. Whether the strip shows is a separate
+       question from whether it has anything to say. */
+    private var canResume = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Surahs.load(this)
         Recite.load(this)
         setContentView(R.layout.activity_index)
+        watchKeyboard()
 
         panes     = paneIds.map { findViewById<View>(it) }
         navIcons  = listOf(R.id.nav_icon_surahs, R.id.nav_icon_marks, R.id.nav_icon_settings)
@@ -51,8 +66,42 @@ class SurahListActivity : AppCompatActivity() {
         buildSurahList()
         wireSearch()
         wireResume()
-        settings()
-        marks()
+    }
+
+    /*
+      The keyboard already owns the bottom of the screen. Leaving the nav and the
+      resume strip stacked above it would spend most of what is left on two rows
+      nobody is looking at mid-search, so they stand down until it is gone.
+
+      Measured off the window, not asked of the insets. Asking looked cleaner and
+      does not work here: the root fits system windows and the activity resizes, so
+      the decor has already taken the keyboard out of the content's height and the
+      inset the content is handed reads zero. What is left to go on is the window's
+      own visible frame, which every version reports and adjustResize shrinks.
+    */
+    private fun watchKeyboard() {
+        val root = findViewById<View>(R.id.index_root)
+        val seen = Rect()
+        root.viewTreeObserver.addOnGlobalLayoutListener {
+            val whole = root.rootView.height
+            if (whole > 0) {
+                root.getWindowVisibleDisplayFrame(seen)
+                /* The status and navigation bars together never reach a fifth of the
+                   screen, and a keyboard never comes in under it. */
+                val up = whole - seen.height() > whole / 5
+                if (up != typing) {
+                    typing = up
+                    sayFooters()
+                }
+            }
+        }
+    }
+
+    private fun sayFooters() {
+        findViewById<View>(R.id.bottom_nav).visibility =
+            if (typing) View.GONE else View.VISIBLE
+        findViewById<View>(R.id.card_resume).visibility =
+            if (canResume && !typing) View.VISIBLE else View.GONE
     }
 
     /* Active tab: filled icon + flat accent. Inactive: outlined icon + accent on press, muted at rest. */
@@ -76,15 +125,36 @@ class SurahListActivity : AppCompatActivity() {
             }
             navIcons[i].imageTintList = tint
             navLabels[i].setTextColor(tint)
-            navLabels[i].setTypeface(null, if (selected) Typeface.BOLD else Typeface.NORMAL)
+            /* The theme's font as the family, not null: null means the system
+               default, and would put the tab labels back in it on every switch. */
+            navLabels[i].setTypeface(labelFace, if (selected) Typeface.BOLD else Typeface.NORMAL)
         }
+        /* Each pane has its own ground, so the bars are re-read per tab. */
+        sayBars()
+    }
+
+    private fun sayBars() {
+        showBars(
+            roof = topOf(panes.getOrNull(tab)) ?: groundOf(findViewById(R.id.index_root)),
+            floor = groundOf(findViewById(R.id.bottom_nav))
+        )
+    }
+
+    /* Coming back over the reader, which reads with its bars hidden, the bars are
+       asked for and painted again here: see showBars. */
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) sayBars()
     }
 
     override fun onResume() {
         super.onResume()
-        Recite.onChange = { runOnUiThread { surahAdapter?.notifyDataSetChanged() } }
+        Recite.onChange = heard
         /* Refresh resume card in case the last page changed while in the reader. */
         wireResume()
+        /* Built on every return, so the reading style row shows colours just changed. */
+        settings()
+        marks()
     }
 
     override fun onSaveInstanceState(out: Bundle) {
@@ -92,9 +162,13 @@ class SurahListActivity : AppCompatActivity() {
         out.putInt(TAB, tab)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Recite.onChange = null
+    /*
+      On pause, and only if the slot still holds this screen's listener. Cleared on
+      destroy it ran after the reader had resumed and set its own, and wiped that.
+    */
+    override fun onPause() {
+        super.onPause()
+        if (Recite.onChange === heard) Recite.onChange = null
     }
 
     private fun buildSurahList() {
@@ -107,14 +181,14 @@ class SurahListActivity : AppCompatActivity() {
                 if (Recite.playing == s.id && Recite.wantsToPlay()) answer(0)
                 else answer(s.from)
             },
+            onPage     = { page -> answer(page) },
+            onVerse    = { surah, ayah -> answer(pageOfAyah(surah, ayah), surah, ayah) },
             onPlay     = { s ->
                 if (Recite.playing == s.id) Recite.toggle()
                 else Recite.start(this, s.id)
                 surahAdapter?.notifyDataSetChanged()
             },
-            onDownload = { s -> keep(s.id) },
             onReciter  = { s -> pickReciter(s) },
-            stateOf    = { s -> downloadState(s.id) },
             playingId  = { Recite.playing }
         )
         val list = findViewById<RecyclerView>(R.id.list)
@@ -123,12 +197,20 @@ class SurahListActivity : AppCompatActivity() {
         surahAdapter = adapter
     }
 
+    /* Where an ayah sits. Ayat knows it exactly once it has walked the pages; until
+       then the surah's own first page is close, and never wrong by much. */
+    private fun pageOfAyah(surah: Int, ayah: Int): Int {
+        val exact = if (Ayat.ready) Ayat.pageOf(surah, ayah) else 0
+        if (exact in 1..604) return exact
+        return Surahs.list().firstOrNull { it.id == surah }?.from ?: 1
+    }
+
     private fun wireSearch() {
         findViewById<EditText>(R.id.search).addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
-                surahAdapter?.filter(s?.toString().orEmpty())
+                surahAdapter?.submit(s?.toString().orEmpty())
             }
         })
     }
@@ -136,53 +218,17 @@ class SurahListActivity : AppCompatActivity() {
     private fun wireResume() {
         val card = findViewById<View>(R.id.card_resume)
         val page = Settings.lastPage(this)
-        if (page !in 1..604) {
-            card.visibility = View.GONE
-            return
-        }
-        card.visibility = View.VISIBLE
-        val surahName = Surahs.ofPage(page)?.name.orEmpty()
-        findViewById<TextView>(R.id.resume_detail).text =
-            getString(R.string.resume_where, surahName, page)
+        canResume = page in 1..604
+        sayFooters()
+        if (!canResume) return
+        val surah = Surahs.ofPage(page)
+        surah?.let { fillSurahTitle(findViewById(R.id.resume_title), it.id, RESUME_TITLE_SP) }
+        val at = getString(R.string.head_page, figures(page, resources))
+        // English name isolated so it does not pull the separator into its run on an Arabic line
+        findViewById<TextView>(R.id.resume_detail).text = surah?.let {
+            getString(R.string.surah_meta, android.text.BidiFormatter.getInstance().unicodeWrap(it.english), at)
+        } ?: at
         card.setOnClickListener { answer(page) }
-    }
-
-    /* Toggle download: fetch if absent, delete if present. */
-    private fun keep(surahId: Int) {
-        val voice = Recite.chosen(this)?.id ?: return
-        if (Downloads.has(this, surahId, voice)) {
-            Downloads.remove(this, surahId, voice)
-            surahAdapter?.notifyDataSetChanged()
-            return
-        }
-        Downloads.start(this, surahId, voice)
-        pollDownloads()
-    }
-
-    private fun downloadState(surahId: Int): Int {
-        val voice = Recite.chosen(this)?.id ?: return SurahAdapter.AWAY
-        return when {
-            Downloads.has(this, surahId, voice)      -> SurahAdapter.KEPT
-            Downloads.fetching(this, surahId, voice) -> SurahAdapter.COMING
-            else                                     -> SurahAdapter.AWAY
-        }
-    }
-
-    /* Poll every 1.5s while downloads are in progress; stop when the queue clears. */
-    private fun pollDownloads() {
-        if (watching) return
-        watching = true
-        val tick = object : Runnable {
-            override fun run() {
-                surahAdapter?.notifyDataSetChanged()
-                if (Downloads.busy(this@SurahListActivity)) {
-                    findViewById<View>(R.id.list).postDelayed(this, 1500)
-                } else {
-                    watching = false
-                }
-            }
-        }
-        findViewById<View>(R.id.list).postDelayed(tick, 1500)
     }
 
     /* Open the reciter sheet. s is the surah whose row was tapped (null = settings row). */
@@ -199,95 +245,18 @@ class SurahListActivity : AppCompatActivity() {
         }
     }
 
-    /* Theme and language. The reciter lives on every surah row, and the reader's
-       own toolbar owns type weight and colour — none of it belongs here twice. */
+    /* Theme, language, and how a page looks: see SettingsPane. */
     private fun settings() {
-        val themeContainer = findViewById<LinearLayout>(R.id.row_theme)
-
-        val themeRow = layoutInflater.inflate(R.layout.row_setting, themeContainer, false)
-        themeRow.findViewById<TextView>(R.id.set_label).setText(R.string.set_theme)
-        val themeValue = themeRow.findViewById<TextView>(R.id.set_value)
-
-        fun sayTheme() {
-            themeValue.setText(
-                when (Settings.theme(this)) {
-                    Settings.LIGHT -> R.string.theme_light
-                    Settings.DARK  -> R.string.theme_dark
-                    else           -> R.string.theme_system
-                }
-            )
-        }
-        sayTheme()
-        themeRow.setOnClickListener {
-            Settings.setTheme(this, (Settings.theme(this) + 1) % 3)
-            sayTheme()
-        }
-        themeContainer.addView(themeRow)
-
-        val langRow = layoutInflater.inflate(R.layout.row_setting, themeContainer, false)
-        langRow.findViewById<TextView>(R.id.set_label).setText(R.string.set_language)
-        langRow.findViewById<TextView>(R.id.set_value).setText(
-            if (Settings.language(this) == "en") R.string.lang_en else R.string.lang_ar
+        SettingsPane(this, findViewById(R.id.settings_groups)).general(
+            openStyle = { startActivity(Intent(this, ReadingStyleActivity::class.java)) },
+            openDownloads = { startActivity(Intent(this, DownloadsActivity::class.java)) }
         )
-        langRow.setOnClickListener {
-            Settings.setLanguage(this, if (Settings.language(this) == "en") "ar" else "en")
-        }
-        themeContainer.addView(langRow)
-        themeContainer.addView(highlightColorRow(themeContainer))
     }
 
-    /* Word highlight colour: the row opens the picker, the button beside it
-       goes back to the default red. */
-    private fun highlightColorRow(into: LinearLayout): View {
-        val row = layoutInflater.inflate(R.layout.row_setting_color, into, false)
-        row.findViewById<TextView>(R.id.set_label).setText(R.string.set_highlight_color)
-        val dot = row.findViewById<ImageView>(R.id.set_dot)
-
-        fun sayColor() {
-            dot.imageTintList = ColorStateList.valueOf(Settings.highlightColor(this))
-        }
-        sayColor()
-
-        row.setOnClickListener {
-            showColorPicker(this, Settings.highlightColor(this)) { color ->
-                Settings.setHighlightColor(this, color)
-                sayColor()
-            }
-        }
-        row.findViewById<ImageView>(R.id.set_reset).setOnClickListener {
-            Settings.resetHighlightColor(this)
-            sayColor()
-        }
-        return row
-    }
-
+    /* Recently read and saved pages: see PlacesPane. Built on every return, since
+       reading in between moves the history and can add or drop a saved page. */
     private fun marks() {
-        val recent = findViewById<LinearLayout>(R.id.marks_recent)
-        recent.removeAllViews()
-        val last = Settings.lastPage(this)
-        if (last in 1..604) {
-            recent.addView(markRow(recent, last, Surahs.ofPage(last)?.name.orEmpty()))
-        }
-
-        val saved = findViewById<LinearLayout>(R.id.marks_saved)
-        saved.removeAllViews()
-        val pages = Settings.marks(this)
-        if (pages.isEmpty()) {
-            val none = layoutInflater.inflate(R.layout.item_mark, saved, false)
-            none.findViewById<TextView>(R.id.mark_surah).setText(R.string.no_marks)
-            none.isClickable = false
-            saved.addView(none)
-            return
-        }
-        for (p in pages) saved.addView(markRow(saved, p, Surahs.ofPage(p)?.name.orEmpty()))
-    }
-
-    private fun markRow(into: LinearLayout, page: Int, said: String): View {
-        val row = layoutInflater.inflate(R.layout.item_mark, into, false)
-        row.findViewById<TextView>(R.id.mark_page).text = getString(R.string.page_named, page)
-        row.findViewById<TextView>(R.id.mark_surah).text = said
-        row.setOnClickListener { answer(page) }
-        return row
+        PlacesPane(this, findViewById(R.id.places_groups)) { page -> answer(page) }.build()
     }
 
     @Suppress("OVERRIDE_DEPRECATION")
@@ -295,13 +264,17 @@ class SurahListActivity : AppCompatActivity() {
         finishAffinity()
     }
 
-    private fun answer(page: Int) {
-        setResult(Activity.RESULT_OK, Intent().putExtra(PAGE, page))
+    // [surah] and [ayah] are set when an ayah was picked, so the reader can highlight it
+    private fun answer(page: Int, surah: Int = 0, ayah: Int = 0) {
+        setResult(Activity.RESULT_OK, Intent().putExtra(PAGE, page).putExtra(SURAH, surah).putExtra(AYAH, ayah))
         finish()
     }
 
     companion object {
         const val PAGE = "page"
+        private const val RESUME_TITLE_SP = 26f
+        const val SURAH = "surah"
+        const val AYAH = "ayah"
         private const val TAB = "tab"
     }
 }

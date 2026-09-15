@@ -12,10 +12,12 @@ class App : Application() {
         Settings.applyTheme(this)
         Settings.applyLanguage(this)
 
-        /* Build the ayah map in the background; it's needed before recitation starts. */
+        /* Build the ayah map in the background; it's needed before recitation starts.
+           The searchable text follows it: nothing waits on it but the search box. */
         Thread {
             Mushaf.load(this)
             Ayat.build(this)
+            Ayahs.load(this)
         }.apply { priority = Thread.MIN_PRIORITY }.start()
     }
 }

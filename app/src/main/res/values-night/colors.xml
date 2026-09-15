@@ -18,6 +18,8 @@
          reads as a tint on white all but disappears on the dark ground. -->
     <color name="accent_soft">#3D3F9BD1</color>
     <color name="surface">#181D22</color>
+    <!-- Lighter than the page at night, as raised things look on a dark screen. -->
+    <color name="reader_chrome">#232A31</color>
     <color name="surface_2">#1E242A</color>
     <color name="line">#2A3138</color>
     <color name="text">#A2A7AD</color>
@@ -25,6 +27,11 @@
     <color name="ornament">#D9B95F</color>
     <!-- Knocked out of the filled pill. Not pure white at night: it glares. -->
     <color name="on_dark">#0F1317</color>
-    <!-- The same red, lifted: the daytime dark red goes muddy on dark paper. -->
-    <color name="ink_lit">#E5484D</color>
+    <!-- The lit word at night: a quiet blue. Red on dark paper glowed; this sits with
+         the ayah markers as one cool family and still stands clear of the grey ink.
+         Chosen in the reading style screen and kept as the dark theme's default. -->
+    <color name="ink_lit">#4386B5</color>
+    <!-- The ayah markers at night: a lighter blue than the lit word, so a marker and
+         the word being recited never read as the same thing. -->
+    <color name="ayah_mark">#579FD1</color>
 </resources>

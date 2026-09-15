@@ -17,36 +17,48 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layoutDirection="rtl"
-        android:paddingStart="14dp"
+        android:layoutDirection="locale"
+        android:paddingStart="@dimen/screen_margin"
         android:paddingEnd="6dp">
 
+        <!-- The surah's number, in the same figures the page and running head use. -->
         <TextView
             android:id="@+id/num"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:gravity="center"
             android:background="@drawable/num_circle"
             android:textColor="@color/accent"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:includeFontPadding="false" />
 
-        <!-- Vertical padding lives here so buttons can use match_parent on the full row height. -->
+        <!--
+          Vertical padding lives here so buttons can use match_parent on the full
+          row height.
+
+          The title leads, large, in the surah-name face: «سورة» and the name, as the
+          head of a surah is written in the mushaf. Under it, quietly, what a reader
+          choosing a surah weighs: its English name, and how long it is.
+        -->
         <LinearLayout
             android:id="@+id/name_area"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="6dp"
+            android:paddingTop="@dimen/row_pad_v"
+            android:paddingBottom="@dimen/row_pad_v">
 
+            <!-- Baseline-aligned, so the two glyphs sit on one line of writing; always read right to left. -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="bottom">
+                android:layoutDirection="rtl"
+                android:baselineAligned="true">
 
                 <TextView
                     android:id="@+id/word"
@@ -54,25 +66,28 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/text"
                     android:includeFontPadding="false"
-                    android:textSize="20sp" />
+                    android:textSize="26sp" />
 
                 <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
+                    android:layout_marginStart="4dp"
                     android:textColor="@color/text"
                     android:includeFontPadding="false"
-                    android:textSize="20sp" />
+                    android:textSize="26sp" />
             </LinearLayout>
 
             <TextView
-                android:id="@+id/english"
-                android:layout_width="wrap_content"
+                android:id="@+id/meta"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginTop="5dp"
                 android:textColor="@color/text_mute"
-                android:textSize="13sp" />
+                android:includeFontPadding="false"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <!-- Play -->
@@ -85,16 +100,31 @@
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:id="@+id/play"
+            <!-- The disc, with a spinner laid over it while this surah's audio is on its way. -->
+            <FrameLayout
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:duplicateParentState="true"
-                android:background="@drawable/chip_soft"
-                android:padding="4dp"
-                android:tint="@color/accent"
-                android:src="@drawable/ic_play"
-                android:contentDescription="@null" />
+                android:duplicateParentState="true">
+
+                <ImageView
+                    android:id="@+id/play"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:duplicateParentState="true"
+                    android:background="@drawable/chip_soft"
+                    android:padding="4dp"
+                    android:tint="@color/accent"
+                    android:src="@drawable/ic_play"
+                    android:contentDescription="@null" />
+
+                <ProgressBar
+                    android:id="@+id/play_wait"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+            </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -137,35 +167,6 @@
                 android:maxLines="1" />
         </LinearLayout>
 
-        <!-- Download -->
-        <LinearLayout
-            android:id="@+id/btn_get"
-            android:layout_width="44dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:id="@+id/get"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:duplicateParentState="true"
-                android:tint="@color/icon_btn"
-                android:src="@drawable/ic_download"
-                android:contentDescription="@null" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:duplicateParentState="true"
-                android:text="@string/download"
-                android:textColor="@color/icon_btn"
-                android:textSize="9sp"
-                android:maxLines="1" />
-        </LinearLayout>
     </LinearLayout>
 
     <!-- Separator line between rows. -->

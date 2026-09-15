@@ -32,6 +32,20 @@ class RecitationController(
     var until = 0
     var startedAt = 0
 
+    /* The ayahs page repeat loops over, or null until the next tick anchors it on
+       the page the ayah then playing opens on. */
+    private var loop: IntRange? = null
+
+    /* Whether the player was waiting for audio at the last tick. The player reports
+       its own changes too, but the follower is already watching every 50ms, so a
+       flip it sees is passed on — the spinner cannot outlast the sound starting. */
+    private var wasWaiting = false
+
+    /** Let page repeat settle on wherever recitation now is, rather than where it was. */
+    fun reanchor() {
+        loop = null
+    }
+
     /** Call on resume: re-sync if the reciter or surah changed while in the background. */
     fun syncWithRecite() {
         val nowSurah = Recite.playing
@@ -43,6 +57,7 @@ class RecitationController(
             litAyah = 0
             litWord = -1
             until = 0
+            loop = null
         }
     }
 
@@ -50,6 +65,7 @@ class RecitationController(
     fun start(surah: Int, from: Int, andPlay: Boolean = true) {
         if (!Ayat.ready) Ayat.build(context)
         startedAt = from
+        loop = null
         readingSurah = surah
         reading = Recite.chosen(context)?.id?.let { Timing.of(context, surah, it) }
         Recite.start(context, surah, from, andPlay)
@@ -66,8 +82,28 @@ class RecitationController(
         litAyah = 0
         litWord = -1
         until = 0
+        loop = null
         onLight(-1, -1, -1)
         onChanged()
+    }
+
+    /* The page being repeated, as a range of this surah's ayahs: every ayah that
+       opens on the page the current one opens on. A page that sits wholly inside
+       one long ayah opens none of its own, so it is that ayah alone. The player
+       is told the loop's start in case the surah's audio runs out first. */
+    private fun pageLoop(timing: Timing): IntRange {
+        loop?.let { return it }
+        val surah = readingSurah
+        val page = Ayat.pageOf(surah, litAyah)
+        val count = Surahs.list().firstOrNull { it.id == surah }?.ayahs ?: litAyah
+        var first = litAyah
+        var last = litAyah
+        if (page > 0) {
+            while (first > 1 && Ayat.pageOf(surah, first - 1) == page) first--
+            while (last < count && Ayat.pageOf(surah, last + 1) == page) last++
+        }
+        Recite.loopFrom = timing.startOf(first)
+        return (first..last).also { loop = it }
     }
 
     private val follower = object : Runnable {
@@ -88,6 +124,13 @@ class RecitationController(
                 litWord = -1
                 until = 0
                 startedAt = 0
+                loop = null
+                onChanged()
+            }
+
+            val waiting = Recite.waiting()
+            if (waiting != wasWaiting) {
+                wasWaiting = waiting
                 onChanged()
             }
 
@@ -105,8 +148,15 @@ class RecitationController(
                     Recite.seek(startedAt)
                 }
 
+                /* Past the end of what is being repeated: back to its start. An end of
+                   0 is a timing that was never recorded, and must not read as passed. */
+                val span = if (Recite.repeat == Recite.PAGE && litAyah > 0) pageLoop(timing) else null
+                val lastEnd = span?.let { timing.endOf(it.last) } ?: 0
+
                 if (Recite.repeat == Recite.AYAH && litAyah > 0 && at > timing.endOf(litAyah)) {
                     Recite.seek(timing.startOf(litAyah))
+                } else if (span != null && lastEnd > 0 && at > lastEnd) {
+                    Recite.seek(timing.startOf(span.first))
                 } else {
                     val ayah = timing.ayahAt(at, litAyah)
                     if (ayah > 0) {

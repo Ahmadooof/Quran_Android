@@ -4,9 +4,13 @@ import android.content.Context
 import android.graphics.Typeface
 import android.os.Build
 import org.json.JSONObject
+import java.util.concurrent.ConcurrentHashMap
 
 /** The mushaf: 604 pages of lines and a per-page font. */
 object Mushaf {
+
+    /** Pages in the mushaf. */
+    const val PAGES = 604
 
     /** A word is a list because some Arabic words contain an internal space (two glyphs). */
     data class Line(val kind: String, val words: List<List<String>>, val surah: Int = 0)
@@ -32,19 +36,31 @@ object Mushaf {
 
     private var pages: JSONObject? = null
     private var marks: JSONObject? = null
-    private val faces = HashMap<Int, Typeface>()
-    private val tables = HashMap<Int, Glyphs>()
+    /*
+      Concurrent maps, not plain ones. Pages are loaded ahead on a background thread
+      (warm), and at startup the ayah map walks every page on another (Ayat.build),
+      while the pager reads them on the main thread and keepOnly prunes them there.
+      A plain HashMap written and read, or pruned mid-write, across threads can load
+      a font twice, lose an entry, or break outright — part of a page turn's stutter.
+    */
+    private val faces = ConcurrentHashMap<Int, Typeface>()
+    private val tables = ConcurrentHashMap<Int, Glyphs>()
     private var nameTable: Glyphs? = null
     private var nameFont: android.graphics.fonts.Font? = null
     private var nameFamily: Typeface? = null
-    private val fonts = HashMap<Int, android.graphics.fonts.Font>()
+    private val fonts = ConcurrentHashMap<Int, android.graphics.fonts.Font>()
 
     /* Parsed lines cached to avoid re-parsing on every page turn. */
-    private val parsed = HashMap<Int, List<Line>>()
+    private val parsed = ConcurrentHashMap<Int, List<Line>>()
 
+    /* Below normal, so it never competes with drawing, but not the lowest: at the
+       lowest it could lag a quick run of swipes and leave the page arriving unloaded. */
     private val ahead = java.util.concurrent.Executors.newSingleThreadExecutor { r ->
-        Thread(r, "mushaf-ahead").apply { priority = Thread.MIN_PRIORITY }
+        Thread(r, "mushaf-ahead").apply { priority = Thread.NORM_PRIORITY - 2 }
     }
+
+    /** How many pages either side of the one in view are loaded ahead. */
+    const val AHEAD = 3
 
     fun load(context: Context) {
         if (pages != null) return
@@ -95,10 +111,17 @@ object Mushaf {
     }
 
     /** Pre-load pages around the current one on a background thread to avoid jank. */
+    /*
+      Load the pages around [page] off the main thread, nearest first, so the page a
+      swipe brings in is already loaded when it binds. A page loaded on the main
+      thread mid-swipe means its TTF parsed twice and its glyph table read, all
+      inside the animation. Each loader returns at once for a page already cached,
+      so warming the same neighbourhood again costs almost nothing.
+    */
     fun warm(context: Context, page: Int) {
         val ctx = context.applicationContext
         ahead.execute {
-            for (p in (page - 2)..(page + 2)) {
+            for (p in nearestFirst(page)) {
                 if (p in 1..604) {
                     lines(p)
                     face(ctx, p)
@@ -107,6 +130,18 @@ object Mushaf {
                 }
             }
         }
+    }
+
+    /* page, page+1, page-1, page+2, ... out to AHEAD either side: the next page to
+       arrive, whichever way the reader is going, is loaded before the far ones. */
+    private fun nearestFirst(page: Int): List<Int> {
+        val out = ArrayList<Int>(AHEAD * 2 + 1)
+        out.add(page)
+        for (d in 1..AHEAD) {
+            out.add(page + d)
+            out.add(page - d)
+        }
+        return out
     }
 
     @Synchronized

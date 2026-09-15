@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A settings line that leads to a screen of its own. It carries the two colours
+  that screen sets, so the row says what is behind it without being opened, and
+  a chevron, so it reads as a way somewhere rather than a switch.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layoutDirection="locale"
+    android:background="@drawable/row_flat"
+    android:clickable="true"
+    android:focusable="true"
+    android:minHeight="52dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="12dp">
+
+    <TextView
+        android:id="@+id/set_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/text"
+        android:textSize="15sp" />
+
+    <ImageView
+        android:id="@+id/set_dot"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="@drawable/dot_edge"
+        android:src="@drawable/ic_circle"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/set_dot_2"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="@drawable/dot_edge"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_circle"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/set_go"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/ic_chevron"
+        android:contentDescription="@null" />
+</LinearLayout>

@@ -13,7 +13,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:layoutDirection="rtl"
+    android:layoutDirection="locale"
     android:background="@drawable/card"
     android:elevation="1dp"
     android:clickable="true"

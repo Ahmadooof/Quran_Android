@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nothing matched. Centred and quiet: it is an answer, not a warning. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/paper"
+    android:text="@string/search_none"
+    android:textColor="@color/text_mute"
+    android:textSize="12sp"
+    android:gravity="center"
+    android:includeFontPadding="false"
+    android:paddingTop="36dp"
+    android:paddingBottom="36dp" />

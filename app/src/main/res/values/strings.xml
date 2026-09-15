@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">القرآن الكريم</string>
+    <string name="app_name">القرآن العظيم</string>
     <string name="index_title">السور</string>
     <!-- "surah <name>", as a printed index names them. -->
     <string name="surah_named">سورة %1$s</string>
@@ -13,19 +13,42 @@
     <!-- The way back into the page the reader was left on. -->
     <string name="resume">متابعة القراءة</string>
     <!-- The surah and page the reader was left on, under the label above. -->
-    <string name="resume_where">سورة %1$s · صفحة %2$d</string>
     <string name="to_menu">القائمة</string>
+    <!-- Two parts of a place joined, e.g. the juz and the page in the reader's top bar. -->
+    <string name="bar_place">%1$s %2$s</string>
+    <string name="place_line">%1$s · %2$s</string>
+
+    <!-- Search results. A number could be a page or a surah, so the section that
+         holds both is named for what they have in common: somewhere to go. -->
+    <string name="search_jump">الانتقال إلى</string>
+    <string name="search_surahs">السور</string>
+    <string name="search_ayahs">الآيات</string>
+    <string name="search_none">لا نتائج</string>
+    <!-- A page result, with the surah it falls in so the number is recognisable. -->
+    <string name="search_page">صفحة %1$s</string>
+    <string name="search_page_in">سورة %1$s</string>
+    <!-- An ayah result: which surah and which ayah the line came from. -->
+    <string name="search_ayah_ref">%1$s · آية %2$s</string>
+
+    <!-- The quiet line under a surah's name: its English name, then its length. -->
+    <string name="surah_meta_juz">%1$s %2$s</string>
+    <string name="surah_meta">%1$s · %2$s</string>
+    <!-- Arabic counts change the noun with the number: آيتان for two, آيات from
+         three to ten, the singular آية again from eleven. The figure arrives as a
+         string already written in Arabic numerals. -->
 
     <!-- Bottom nav tabs. -->
     <string name="tab_index">السور</string>
     <string name="tab_marks">المواضع</string>
     <string name="tab_settings">الإعدادات</string>
-    <string name="search_hint">بحث في السور…</string>
+    <string name="search_hint">سورة، صفحة، أو آية…</string>
 
     <!-- Listening. -->
     <string name="reciter">القارئ</string>
     <string name="play">تشغيل</string>
     <string name="stop">إيقاف</string>
+    <!-- Under the play button while the audio is still on its way. -->
+    <string name="loading">تحميل…</string>
     <string name="download">تنزيل</string>
     <string name="downloaded">محفوظ · اضغط للحذف</string>
     <string name="repeat">التكرار</string>
@@ -37,6 +60,7 @@
     <string name="listen_word">استماع الكلمة</string>
     <string name="repeat_off">بدون تكرار</string>
     <string name="repeat_ayah">تكرار الآية</string>
+    <string name="repeat_page">تكرار الصفحة</string>
     <string name="repeat_surah">تكرار السورة</string>
     <string name="ayah_of">الآية %1$s</string>
     <string name="no_timing">لا يوجد توقيت لهذا القارئ في هذه السورة</string>
@@ -50,8 +74,13 @@
     <string name="marks_col_recent">آخر قراءة</string>
     <string name="marks_col_saved">المحفوظ</string>
     <string name="no_marks">لا توجد صفحات محفوظة</string>
+    <string name="no_recent">لم تُقرأ أي سورة بعد</string>
+    <!-- Read aloud for the progress bar on a recent surah: page 4 of its 48. -->
+    <string name="place_progress">الصفحة %1$s من %2$s في السورة</string>
+    <string name="remove_mark">إزالة من المحفوظ</string>
     <string name="page_named">صفحة %1$d</string>
     <string name="mark_page">حفظ الصفحة</string>
+    <string name="mark_short">حفظ</string>
     <string name="set_language">اللغة</string>
     <string name="lang_ar">العربية</string>
     <string name="lang_en">English</string>
@@ -59,4 +88,109 @@
     <string name="set_highlight_color">لون تظليل الكلمة</string>
     <string name="reset">إعادة تعيين</string>
     <string name="color_choose">اختر لوناً…</string>
+    <string name="set_preview">معاينة</string>
+    <!-- Settings groups. -->
+    <string name="set_group_general">عام</string>
+    <string name="set_group_reading">أسلوب القراءة</string>
+    <string name="set_group_word">الكلمة المظللة</string>
+    <string name="set_group_ayah">رقم الآية</string>
+    <string name="set_group_page">الصفحة</string>
+    <string name="set_paper_color">لون الخلفية</string>
+    <string name="set_ink_color">لون النص</string>
+    <string name="set_ink_weight">سماكة النص</string>
+    <string name="set_lit_weight">سماكة الكلمة المظللة</string>
+    <string name="set_ayah_weight">سماكة رقم الآية</string>
+    <string name="weight_regular">عادي</string>
+    <string name="weight_light">خفيف</string>
+    <string name="weight_medium">متوسط</string>
+    <string name="weight_bold">عريض</string>
+    <string name="reset_all">استعادة الإعدادات الافتراضية</string>
+    <string name="reset_all_ask">إعادة أسلوب القراءة للمظهر %1$s إلى الوضع الافتراضي؟</string>
+    <string name="reset_all_do">نعم، أعد التعيين</string>
+    <string name="done">تم</string>
+    <string name="cancel">إلغاء</string>
+    <!-- Above the colours a theme already uses, in the colour sheet. -->
+    <string name="color_in_use">مستخدمة في هذا المظهر</string>
+    <string name="color_hex">رمز اللون</string>
+    <!-- Downloads. -->
+    <string name="set_downloads">التنزيلات</string>
+    <string name="set_page_motion">حركة الصفحات</string>
+    <string name="motion_turn">تقليب</string>
+    <string name="motion_slide">سحب</string>
+    <string name="dl_group_space">المساحة</string>
+    <string name="dl_group_actions">الإجراءات</string>
+    <string name="dl_kept">المنزّل</string>
+    <string name="dl_kept_value">%1$s من %2$s · %3$s</string>
+    <string name="dl_whole">المصحف كاملًا</string>
+    <!-- A total still being added up: the figure so far, marked as not final. -->
+    <string name="dl_counting">%1$s+ …</string>
+    <string name="dl_get_all">تنزيل الكل</string>
+    <string name="dl_stop_all">إيقاف التنزيل</string>
+    <string name="dl_save_all">حفظ الكل في الهاتف</string>
+    <string name="dl_delete_all">حذف التنزيلات</string>
+    <string name="dl_get_all_ask">تنزيل %1$s سورة بحجم %2$s؟</string>
+    <string name="dl_get_all_do">تنزيل</string>
+    <string name="dl_delete_all_ask">حذف %1$s سورة (%2$s) من التطبيق؟ النسخ المحفوظة في الهاتف تبقى.</string>
+    <string name="dl_delete_do">حذف</string>
+    <string name="dl_size_unknown">…</string>
+    <string name="dl_waiting">في الانتظار</string>
+    <!-- Progress of one download: percent done, then the file size. -->
+    <string name="dl_progress">%1$s٪ · %2$s</string>
+    <string name="dl_get_one">تنزيل</string>
+    <string name="dl_stop_one">إيقاف</string>
+    <string name="dl_saved_one">حُفظت في الهاتف في مجلد ⁦Download/⁠Quran⁩</string>
+    <string name="dl_saved_all">حُفظت %1$s سورة في الهاتف في مجلد ⁦Download/⁠Quran⁩</string>
+    <string name="dl_about_download">التنزيل: يحفظ التلاوة داخل التطبيق لتستمع إليها دون إنترنت.</string>
+    <string name="dl_about_save">الحفظ في الهاتف: ينسخ السور المنزّلة إلى مجلد ⁦Download/⁠Quran⁩ في الهاتف لتستمع إليها في أي تطبيق، للاستخدام الشخصي.</string>
+    <string name="dl_save_done">كل السور المنزّلة محفوظة في الهاتف</string>
+    <string name="dl_done_short">منزّل</string>
+    <string name="dl_save_short">حفظ بالهاتف</string>
+    <string name="dl_share">مشاركة</string>
+    <string name="dl_share_all">مشاركة كل المحفوظ</string>
+    <string name="dl_open_folder">فتح المجلد في الهاتف</string>
+    <string name="dl_kept_saved">محفوظ في الهاتف · %1$s</string>
+    <string name="dl_share_all_ask">مشاركة %1$s سورة بحجم %2$s؟ بعض التطبيقات لا تقبل ملفات كثيرة أو كبيرة.</string>
+    <string name="dl_share_missing">لم يُعثر على الملف في الهاتف، احفظه مرة أخرى</string>
+    <string name="dl_folder_failed">تعذّر فتح المجلد، افتح مدير الملفات ثم Download ثم Quran</string>
+    <string name="dl_save_queued">بعد التنزيل</string>
+    <string name="dl_save_all_ask">سيتم تنزيل %1$s سورة (%2$s) ثم حفظ الكل في الهاتف تلقائيًا. متابعة؟</string>
+    <string name="dl_save_all_do">تنزيل وحفظ</string>
+    <string name="dl_save_failed">تعذّر الحفظ في الهاتف</string>
+    <string name="dl_save_denied">يلزم إذن التخزين للحفظ في الهاتف</string>
+    <string name="set_group_help">المساعدة</string>
+    <string name="set_report">الإبلاغ عن مشكلة أو اقتراح</string>
+    <string name="report_subject">مشكلة في تطبيق %1$s</string>
+    <string name="report_details">
+
+اكتب المشكلة أعلاه، وإن أمكن أرفق صورة للشاشة.
+
+---
+إصدار التطبيق: %1$s
+أندرويد: %2$s (SDK %3$d)
+الهاتف: %4$s
+اللغة: %5$s</string>
+    <string name="report_no_mail">لا يوجد تطبيق بريد على الهاتف</string>
+    <string name="report_email" translatable="false">readqurantoday@outlook.com</string>
+    <string name="fb_kind">النوع</string>
+    <string name="fb_kind_bug">مشكلة</string>
+    <string name="fb_kind_suggestion">اقتراح</string>
+    <string name="fb_kind_feature">طلب ميزة جديدة</string>
+    <string name="fb_kind_other">أخرى</string>
+    <string name="fb_severity">مدى تأثير المشكلة (اختياري)</string>
+    <string name="fb_severity_none">غير متأكد</string>
+    <string name="fb_severity_low">بسيطة</string>
+    <string name="fb_severity_medium">متوسطة</string>
+    <string name="fb_severity_high">كبيرة</string>
+    <string name="fb_message">الرسالة</string>
+    <string name="fb_message_hint">اكتب ما حدث أو ما تقترحه…</string>
+    <string name="fb_email">بريدك للرد (اختياري)</string>
+    <string name="fb_email_hint">name@example.com</string>
+    <string name="fb_details_note">يُرسل مع رسالتك: إصدار التطبيق، وإصدار أندرويد، ونوع الهاتف، واللغة، والمظهر، وطريقة تقليب الصفحات، والقارئ، واتجاه الشاشة، وآخر صفحة قرأتها.</string>
+    <string name="fb_send">إرسال</string>
+    <string name="fb_by_email">الإرسال بالبريد الإلكتروني بدلًا من ذلك</string>
+    <string name="fb_too_short">اكتب رسالة أطول قليلًا</string>
+    <string name="fb_bad_email">البريد الإلكتروني غير صحيح</string>
+    <string name="fb_thanks">شكرًا لك، وصلت رسالتك</string>
+    <string name="fb_too_many">أرسلت رسائل كثيرة، حاول لاحقًا</string>
+    <string name="fb_failed">تعذّر الإرسال الآن. هل تريد إرسالها بالبريد الإلكتروني؟</string>
 </resources>

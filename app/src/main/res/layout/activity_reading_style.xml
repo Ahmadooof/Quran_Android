@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Reading style, on a screen of its own. The head strip is the one the surah
+  pane wears — surface, seam below — with the way back at its start and the
+  screen's name beside it, so arriving here looks like going one step further
+  into the same place rather than somewhere else.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/style_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layoutDirection="locale"
+    android:fitsSystemWindows="true"
+    android:background="@color/surface_2">
+
+    <LinearLayout
+        android:id="@+id/style_head"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/strip_head">
+
+        <!-- Full height, so the whole start of the strip is the way back. -->
+        <FrameLayout
+            android:id="@+id/style_back"
+            android:layout_width="52dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/row_flat"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/to_menu">
+
+            <ImageView
+                android:id="@+id/style_back_icon"
+                android:layout_width="@dimen/icon_nav"
+                android:layout_height="@dimen/icon_nav"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_back"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/set_group_reading"
+            android:textColor="@color/text"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/style_groups"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp" />
+    </ScrollView>
+</LinearLayout>

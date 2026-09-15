@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/index_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layoutDirection="rtl"
+    android:layoutDirection="locale"
     android:fitsSystemWindows="true"
     android:background="@color/surface_2">
 
@@ -21,19 +22,28 @@
             android:orientation="vertical"
             android:background="@color/paper">
 
-            <!-- Search bar: elevated pill, no stroke, shadow separates it. -->
+            <!--
+              Head strip: the surface the bottom nav wears, seam on its lower edge,
+              so the search sits in a white band that answers the one at the foot.
+              It is the pane's first child, which is what paintBars reads to colour
+              the status bar above it.
+            -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/strip_head"
+                android:paddingStart="@dimen/screen_margin"
+                android:paddingEnd="@dimen/screen_margin"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+            <!-- Search pill: outlined, since it is white on white. -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:background="@drawable/search_bg"
-                android:elevation="3dp"
-                android:stateListAnimator="@null"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="6dp"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp">
 
@@ -53,100 +63,48 @@
                     android:hint="@string/search_hint"
                     android:textColor="@color/text"
                     android:textColorHint="@color/text_mute"
-                    android:textSize="14sp"
+                    android:textSize="13sp"
                     android:background="@null"
-                    android:paddingTop="13dp"
-                    android:paddingBottom="13dp"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp"
                     android:inputType="text"
                     android:imeOptions="actionSearch"
                     android:maxLines="1" />
             </LinearLayout>
+            </FrameLayout>
 
+            <!--
+              Weighted, not match_parent: below the search bar, match_parent asks
+              for the whole pane's height and hangs its last stretch off the bottom
+              where nothing can scroll it back into view. The ayah results, being
+              last in the list, were sitting in exactly that dead band.
+            -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:clipToPadding="false"
                 android:paddingBottom="8dp" />
         </LinearLayout>
 
-        <!-- Pane 1: bookmarks — two columns side by side. -->
-        <LinearLayout
+        <!--
+          Pane 1: places to return to — surahs read lately, and saved pages — as titled
+          cards, the way settings are laid out. Filled by PlacesPane.
+        -->
+        <ScrollView
             android:id="@+id/pane_marks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layoutDirection="rtl"
             android:visibility="gone">
 
-            <!-- Right column (RTL-first = right side): last read page. -->
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/marks_col_recent"
-                    android:textColor="@color/text_mute"
-                    android:textSize="11sp"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="6dp" />
-
-                <ScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <LinearLayout
-                        android:id="@+id/marks_recent"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="16dp" />
-                </ScrollView>
-            </LinearLayout>
-
-            <!-- Column divider. -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/line" />
-
-            <!-- Left column: saved bookmarks. -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/marks_col_saved"
-                    android:textColor="@color/text_mute"
-                    android:textSize="11sp"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="6dp" />
-
-                <ScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <LinearLayout
-                        android:id="@+id/marks_saved"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="16dp" />
-                </ScrollView>
-            </LinearLayout>
-        </LinearLayout>
+                android:id="@+id/places_groups"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp" />
+        </ScrollView>
 
         <!-- Pane 2: settings. -->
         <ScrollView
@@ -159,11 +117,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp">
+                android:paddingTop="2dp"
+                android:paddingBottom="24dp">
 
+                <!-- Filled by SettingsPane: titled groups of rows. -->
                 <LinearLayout
-                    android:id="@+id/row_theme"
+                    android:id="@+id/settings_groups"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
@@ -171,58 +130,84 @@
         </ScrollView>
     </FrameLayout>
 
-    <!-- Continue reading: full-width strip, no card styling. -->
+    <!--
+      Continue reading. The accent is spent on the disc alone; the ground is the
+      plain surface, so the strip sits with the nav below it instead of cutting a
+      coloured band across the screen.
+
+      The label is the quiet half and the place is the loud one: what a reader
+      wants off this strip is which surah and which page, not to be told again
+      that the app can resume.
+    -->
     <LinearLayout
         android:id="@+id/card_resume"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layoutDirection="rtl"
-        android:background="@drawable/strip_surface"
-        android:foreground="?selectableItemBackground"
-        android:paddingStart="16dp"
-        android:paddingEnd="14dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:layoutDirection="locale"
+        android:background="@drawable/strip_resume"
+        android:paddingStart="@dimen/screen_margin"
+        android:paddingEnd="@dimen/screen_margin"
+        android:paddingTop="@dimen/card_pad_v"
+        android:paddingBottom="@dimen/card_pad_v"
         android:clickable="true"
         android:focusable="true"
         android:visibility="gone">
 
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:src="@drawable/ic_bookmark"
-            android:tint="@color/accent"
-            android:contentDescription="@null" />
+        <!-- A soft disc, so the icon is held rather than loose on the surface. -->
+        <FrameLayout
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/chip_soft">
 
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_bookmark"
+                android:tint="@color/accent"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <!-- The label, then the surah as the list writes it; the page sits apart at the end. -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/resume"
-                android:textColor="@color/text"
+                android:textColor="@color/accent"
                 android:includeFontPadding="false"
                 android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/resume_detail"
+            <include
+                android:id="@+id/resume_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_mute"
-                android:includeFontPadding="false"
-                android:textSize="10sp" />
+                android:layout_marginTop="3dp"
+                layout="@layout/part_surah_title" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/resume_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/text_mute"
+            android:includeFontPadding="false"
+            android:textSize="13sp"
+            android:maxLines="1" />
+
         <ImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:src="@drawable/ic_chevron"
             android:tint="@color/text_mute"
             android:contentDescription="@null" />

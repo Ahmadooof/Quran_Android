@@ -4,6 +4,11 @@
     <!-- The mushaf is in the package and needs nothing. This is for the
          recitations, which live on the CDN and are gigabytes. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Only to save audio to the phone's Download folder on Android 9 and below. From 10
+         on the app writes there through MediaStore, which needs no permission. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <!-- Player notification in the shade while a recitation is running. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -13,6 +18,8 @@
     <application
         android:name=".App"
         android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Quran">
@@ -27,10 +34,41 @@
             </intent-filter>
         </activity>
 
+        <!-- adjustResize so the keyboard reports itself as an inset and the list
+             keeps the room the footers give up, rather than being panned. -->
         <activity
             android:name=".SurahListActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Quran.Index" />
+
+        <!-- Downloads: a step further into settings, like reading style. -->
+        <activity
+            android:name=".DownloadsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Quran.Index" />
+
+        <!-- Report an issue or suggest something: a step further into settings. -->
+        <activity
+            android:name=".FeedbackActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Quran.Index" />
+
+        <!-- Reading style: a step further into settings, so it wears the index's theme. -->
+        <activity
+            android:name=".ReadingStyleActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Quran.Index" />
+
+        <!-- Sent by the system's download service, so it must be exported to arrive. -->
+        <receiver
+            android:name=".DownloadDone"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".PlayerService"

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Report an issue or suggest something: the same head strip and titled cards as downloads. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fb_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layoutDirection="locale"
+    android:fitsSystemWindows="true"
+    android:background="@color/surface_2">
+
+    <LinearLayout
+        android:id="@+id/fb_head"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/strip_head">
+
+        <FrameLayout
+            android:id="@+id/fb_back"
+            android:layout_width="52dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/row_flat"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/to_menu">
+
+            <ImageView
+                android:id="@+id/fb_back_icon"
+                android:layout_width="@dimen/icon_nav"
+                android:layout_height="@dimen/icon_nav"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_back"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/set_report"
+            android:textColor="@color/text"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/fb_groups"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp" />
+    </ScrollView>
+</LinearLayout>
