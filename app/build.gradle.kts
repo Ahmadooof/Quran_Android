@@ -10,6 +10,13 @@ val keystore = rootProject.file("keystore.properties").takeIf { it.exists() }?.l
     Properties().apply { file.inputStream().use { load(it) } }
 }
 
+// The one number to change for a release; Play's version code follows it (1.2.3 -> 10203)
+val appVersion = "1.0.5"
+
+fun versionCodeOf(name: String): Int {
+    val (major, minor, patch) = name.split(".").map { it.toInt() }
+    return major * 10000 + minor * 100 + patch
+}
 
 android {
     namespace = "com.readqurantoday.quran"
@@ -19,8 +26,8 @@ android {
         applicationId = "com.readqurantoday.quran"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.0.1"
+        versionName = appVersion
+        versionCode = versionCodeOf(appVersion)
     }
 
     // Page fonts packaged at the root of assets

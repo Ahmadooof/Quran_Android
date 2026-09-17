@@ -44,6 +44,8 @@
     <string name="loading">تحميل…</string>
     <string name="repeat">التكرار</string>
     <string name="close">إغلاق</string>
+    <string name="previous_ayah">الآية السابقة</string>
+    <string name="next_ayah">الآية التالية</string>
     <string name="label_locate">تتبع</string>
     <string name="label_repeat">تكرار</string>
     <string name="repeat_off">بدون تكرار</string>
@@ -201,6 +203,8 @@
     <string name="fb_thanks">شكرًا لك، وصلت رسالتك</string>
     <string name="fb_too_many">أرسلت رسائل كثيرة، حاول لاحقًا</string>
     <string name="fb_failed">تعذّر الإرسال الآن. هل تريد إرسالها بالبريد الإلكتروني؟</string>
+    <string name="set_website">الموقع الإلكتروني</string>
+    <string name="site_host" translatable="false">readqurantoday.com</string>
     <string name="set_privacy">سياسة الخصوصية</string>
     <string name="set_credits">المصادر والتراخيص</string>
     <string name="credits_text">نص القرآن المستخدم في البحث: مشروع تنزيل (Tanzil Project)، tanzil.net، برخصة المشاع الإبداعي نسب المصنف 3.0، دون أي تعديل.

@@ -1,4 +1,4 @@
-"""Render Play Store art from the launcher icon's vector paths: a 512px icon and a 1024x500 feature graphic.
+"""Render Play Store art from the launcher icon's vector paths: the 512px icon, the 1024x500 feature graphic and the developer page header.
 
     python tools/render_store_art.py
 
@@ -17,6 +17,7 @@ OUT = os.path.join(ROOT, 'store')
 GROUND = (0x1A, 0x6F, 0xA3)
 INK = (0xFF, 0xFD, 0xF7)
 SS = 4  # supersampling factor
+ICON_SEEN = 80  # of the 108dp icon canvas, the part shown on Play; launchers show about 72
 
 
 def contours(path_data):
@@ -115,8 +116,10 @@ def main():
     ys = [y for p in polys for _, y in p]
     minx, maxx, miny, maxy = min(xs), max(xs), min(ys), max(ys)
 
-    # Icon: the launcher composition (108dp viewport) scaled to 512px
-    paint(512, 512, transformed(polys, 512 / 108, 0, 0)).save(os.path.join(OUT, 'icon-512.png'))
+    # Icon: launchers show only the middle of the 108dp canvas, so Play gets that middle too, or the name looks small
+    seen = ICON_SEEN
+    edge = (108 - seen) / 2
+    paint(512, 512, transformed(polys, 512 / seen, -edge * 512 / seen, -edge * 512 / seen)).save(os.path.join(OUT, 'icon-512.png'))
 
     # Feature graphic: the words large on the left, the English name on the right
     scale = 380 / (maxy - miny)
@@ -130,6 +133,20 @@ def main():
     draw.text((x, 170), 'The Great Quran', font=font, fill=INK)
     draw.text((x, 262), 'Madinah Mushaf · recitation', font=small, fill=(0xD6, 0xE6, 0xF1))
     art.save(os.path.join(OUT, 'feature-graphic-1024x500.png'))
+
+    # Developer page header: the name centred, since phones crop the sides
+    W, H = 4096, 2304
+    scale = 1150 / (maxy - miny)
+    words_w = (maxx - minx) * scale
+    left = (W - words_w) / 2
+    top = 330
+    header = paint(W, H, transformed(polys, scale, left - minx * scale, top - miny * scale))
+    draw = ImageDraw.Draw(header)
+    big = ImageFont.truetype(os.path.join(MAIN, 'res', 'font', 'cairo.ttf'), 150)
+    line = 'Read Quran Today'
+    width = draw.textlength(line, font=big)
+    draw.text(((W - width) / 2, top + 1150 + 130), line, font=big, fill=(0xD6, 0xE6, 0xF1))
+    header.save(os.path.join(OUT, 'developer-header-4096x2304.png'), optimize=True)
     print('wrote', os.listdir(OUT))
 
 

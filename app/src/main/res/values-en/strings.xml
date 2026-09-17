@@ -31,6 +31,8 @@
     <string name="loading">Loading…</string>
     <string name="repeat">Repeat</string>
     <string name="close">Close</string>
+    <string name="previous_ayah">Previous ayah</string>
+    <string name="next_ayah">Next ayah</string>
     <string name="repeat_off">No repeat</string>
     <string name="repeat_ayah">Repeat ayah</string>
     <string name="repeat_page">Repeat page</string>
@@ -168,6 +170,7 @@ Language: %5$s</string>
     <string name="fb_thanks">Thank you, your message was sent</string>
     <string name="fb_too_many">Too many messages sent, please try later</string>
     <string name="fb_failed">Could not send right now. Send it by email instead?</string>
+    <string name="set_website">Website</string>
     <string name="set_privacy">Privacy policy</string>
     <string name="set_credits">Sources and licences</string>
     <string name="credits_text">Quran text used for search: Tanzil Project, tanzil.net, under Creative Commons Attribution 3.0, unmodified.

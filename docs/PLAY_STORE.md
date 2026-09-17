@@ -109,17 +109,4 @@ Before publishing confirm, and be ready to show if Play asks:
 
 ## Releasing
 
-1. Bump `versionCode` (and `versionName`) in `app/build.gradle.kts`.
-2. Build: `./gradlew bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`.
-3. Upload the `.aab` in Play Console (start with *Internal testing*, then *Production*).
-
-First release: enrol in **Play App Signing** (default). Google keeps the app signing key; our key is only the upload key.
-
-### Upload key
-
-- Keystore: `C:\Users\ahmad\AndroidKeys\readqurantoday-upload.jks` (backup in OneDrive `AndroidKeys\`)
-- Alias: `upload`
-- SHA-256: `74:16:17:19:3C:03:E8:86:19:E4:CD:7A:13:AC:0C:A3:D4:9E:77:2C:69:13:5F:93:45:7F:91:B5:93:AA:E5:55`
-- Password: in the password manager, and in the gitignored `keystore.properties`. Never commit either.
-
-If the upload key is lost, Play support can reset it (the app itself stays safe under Play App Signing).
+Build and upload steps, versioning and the upload key: see [RELEASE.md](RELEASE.md).

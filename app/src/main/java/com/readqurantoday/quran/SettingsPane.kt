@@ -50,10 +50,20 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
         }
 
         group(R.string.set_group_help) { rows ->
+            rows.add(siteRow())
             rows.add(linkRow(R.string.set_report, { host.startActivity(android.content.Intent(host, FeedbackActivity::class.java)) }, emptyList()))
             rows.add(linkRow(R.string.set_privacy, { openLink(PRIVACY_URL) }, emptyList()))
             rows.add(linkRow(R.string.set_credits, { host.notice(host.getString(R.string.credits_text)) }, emptyList()))
         }
+    }
+
+    // The address itself is the value, so the row reads as a link to the website
+    private fun siteRow(): View {
+        val row = blow.inflate(R.layout.row_setting, into, false)
+        row.findViewById<TextView>(R.id.set_label).setText(R.string.set_website)
+        row.findViewById<TextView>(R.id.set_value).setText(R.string.site_host)
+        row.setOnClickListener { openLink(SITE_URL) }
+        return row
     }
 
     private fun openLink(url: String) {
@@ -312,6 +322,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
 
     private companion object {
         private const val PRIVACY_URL = "https://readqurantoday.com/privacy/"
+        private const val SITE_URL = "https://readqurantoday.com/"
 
         /* In the order of Settings.WEIGHT_*, lightest first. */
         val WEIGHT_NAMES = listOf(

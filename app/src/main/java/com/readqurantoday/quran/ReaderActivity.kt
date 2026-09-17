@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.abs
 
 /** Full-screen mushaf reader: 604 pages, edge-to-edge, chrome hidden while reading. */
 class ReaderActivity : LanguageActivity() {
@@ -57,6 +58,8 @@ class ReaderActivity : LanguageActivity() {
     private var bars: WindowInsetsControllerCompat? = null
     private var chrome = false
     private var fromBarEdge = false
+    private var edgeDownX = 0f
+    private var edgeDownY = 0f
 
     /* Status-bar height, settled once; everything about page layout follows from it. */
     private var band = 0
@@ -221,11 +224,17 @@ class ReaderActivity : LanguageActivity() {
                 Mushaf.warm(this@ReaderActivity, entering)
             }
 
+            private var dragFrom = 0
+
             override fun onScrollStateChanged(view: RecyclerView, state: Int) {
+                if (state == RecyclerView.SCROLL_STATE_DRAGGING) dragFrom = page()
                 if (state != RecyclerView.SCROLL_STATE_IDLE) return
                 val at = lanes.findFirstCompletelyVisibleItemPosition()
                 if (at == RecyclerView.NO_POSITION) return
                 arrived(at + 1)
+                // A page swiped to is reading resumed; a page the recitation moved to is not
+                if (dragFrom != 0 && dragFrom != at + 1) closeChrome()
+                dragFrom = 0
             }
         })
     }
@@ -251,6 +260,7 @@ class ReaderActivity : LanguageActivity() {
             val v = MushafPageView(parent.context)
             v.shots = shots::get
             v.turner = turner
+            v.onCloseLook = { closeChrome() }
             v.layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -363,7 +373,10 @@ class ReaderActivity : LanguageActivity() {
             val complete = !cancelled && (curl.progress() > PageCurlView.PAST || flung)
             val id = turnId
             curl.settle(complete) { turned ->
-                if (turned) go(target)
+                if (turned) {
+                    go(target)
+                    closeChrome()
+                }
                 curl.postOnAnimation { curl.postOnAnimation { if (id == turnId) curl.clear() } }
             }
         }
@@ -394,6 +407,15 @@ class ReaderActivity : LanguageActivity() {
     /* Edge-to-edge: system bars hidden while reading, shown on tap. Player is independent. */
     private fun dressWindow() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        // The system and AppCompat layers around the page may still pad for the bars (some devices, or after a theme change), which made the page jump
+        var layer = findViewById<View>(R.id.root).parent
+        while (layer is View && layer !== window.decorView) {
+            ViewCompat.setOnApplyWindowInsetsListener(layer) { v, insets ->
+                v.setPadding(0, 0, 0, 0)
+                insets
+            }
+            layer = layer.parent
+        }
 
         /* Measure the status-bar height once; never recompute on inset change. */
         if (!bandSet) {
@@ -447,6 +469,32 @@ class ReaderActivity : LanguageActivity() {
         if (seat.bottomMargin == foot) return
         seat.bottomMargin = foot
         player.requestLayout()
+    }
+
+    private fun closeChrome() {
+        if (chrome) showChrome(false)
+    }
+
+    // Once Play is pressed the controls leave a moment after the sound starts, unless the reader touches the screen first
+    private val autoClose = Runnable { if (Recite.wantsToPlay()) closeChrome() }
+    private var closeWhenHeard = false
+
+    private fun closeSoon() {
+        pager.removeCallbacks(autoClose)
+        closeWhenHeard = true
+        armClose()
+    }
+
+    // Called on every player change, so the count starts when loading ends
+    private fun armClose() {
+        if (!closeWhenHeard || !Recite.isPlaying()) return
+        closeWhenHeard = false
+        pager.postDelayed(autoClose, AUTO_CLOSE_MS)
+    }
+
+    private fun keepOpen() {
+        closeWhenHeard = false
+        pager.removeCallbacks(autoClose)
     }
 
     /* One tap hides/shows all controls together: top bar and player bar. */
@@ -555,6 +603,7 @@ class ReaderActivity : LanguageActivity() {
     }
 
     private fun sayPlayer() {
+        armClose()
         val isPlaying = Recite.wantsToPlay()
         // A spinner while audio is on its way, so the silence does not look like a dead button
         val waiting = Recite.waiting()
@@ -592,11 +641,15 @@ class ReaderActivity : LanguageActivity() {
                     pendingSurah = 0
                     showPlayer()
                     sayPlayer()
+                    closeSoon()
                 }
                 return@setOnClickListener
             }
             Recite.toggle()
-            if (Recite.wantsToPlay()) rc.follow()
+            if (Recite.wantsToPlay()) {
+                rc.follow()
+                closeSoon()
+            }
             sayPlayer()
         }
 
@@ -725,9 +778,21 @@ class ReaderActivity : LanguageActivity() {
         if (hasFocus) showChrome(chrome)
     }
 
-    // A swipe that pulls the hidden bars in starts on their edge; it must not also turn or scroll the page
+    // A swipe that pulls the hidden bars in starts on their edge; it must not turn or scroll the page, but a tap there still shows the controls
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (ev.actionMasked == MotionEvent.ACTION_DOWN) fromBarEdge = !chrome && onBarEdge(ev.rawY)
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                keepOpen()
+                fromBarEdge = !chrome && onBarEdge(ev.rawY)
+                edgeDownX = ev.rawX
+                edgeDownY = ev.rawY
+            }
+            MotionEvent.ACTION_UP -> if (fromBarEdge) {
+                val slop = android.view.ViewConfiguration.get(this).scaledTouchSlop
+                val still = abs(ev.rawX - edgeDownX) < slop && abs(ev.rawY - edgeDownY) < slop
+                if (still) showChrome(true)
+            }
+        }
         return fromBarEdge || super.dispatchTouchEvent(ev)
     }
 
@@ -743,5 +808,6 @@ class ReaderActivity : LanguageActivity() {
     companion object {
         private const val CHROME = "chrome"
         private const val TURN_FLING_DP = 400f
+        private const val AUTO_CLOSE_MS = 3000L
     }
 }

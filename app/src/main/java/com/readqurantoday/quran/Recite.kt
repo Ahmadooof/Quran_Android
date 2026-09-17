@@ -70,7 +70,48 @@ object Recite {
     fun seek(ms: Int) {
         wanted = ms.coerceAtLeast(0)
         player?.seekTo(wanted.toLong())
+        PlayerService.refresh()
     }
+
+    // The screen and the system media controls both follow every change
+    private fun changed() {
+        onChange?.invoke()
+        PlayerService.refresh()
+    }
+
+    /** Length of the loaded surah in ms, or 0 while unknown. */
+    fun length(): Int = player?.duration?.takeIf { it > 0 }?.toInt() ?: 0
+
+    fun play() {
+        if (!wantsToPlay()) toggle()
+    }
+
+    fun pause() {
+        if (wantsToPlay()) toggle()
+    }
+
+    /** Jump to the next ayah, or back to the start of this one (the previous one if just begun). */
+    fun skipAyah(forward: Boolean) {
+        val where = app ?: return
+        val voice = chosen(where) ?: return
+        val timing = Timing.of(where, playing, voice.id) ?: return
+        val at = at()
+        val now = timing.ayahAt(at)
+        if (forward && now >= timing.count) {
+            if (playing < 114) start(where, playing + 1, 0, wantsToPlay())
+            return
+        }
+        val target = when {
+            forward -> now + 1
+            at - timing.startOf(now) > RESTART_WITHIN -> now
+            else -> now - 1
+        }.coerceIn(1, timing.count)
+        seek(timing.startOf(target))
+        changed()
+    }
+
+    // Past this far into an ayah, "previous" restarts it rather than going back one
+    private const val RESTART_WITHIN = 2000
 
     fun load(context: Context) {
         if (all.isNotEmpty()) return
@@ -142,7 +183,7 @@ object Recite {
                             seekTo(back.toLong())
                             play()
                             wanted = back
-                            onChange?.invoke()
+                            changed()
                             return
                         }
                         val next = playing + 1
@@ -154,7 +195,7 @@ object Recite {
                         }
                         return
                     }
-                    onChange?.invoke()
+                    changed()
                 }
 
                 override fun onPlayerError(error: PlaybackException) {
@@ -163,7 +204,7 @@ object Recite {
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     app?.let { PlayerService.show(it, playing) }
-                    onChange?.invoke()
+                    changed()
                 }
             })
 
@@ -175,14 +216,14 @@ object Recite {
             if (andPlay) play()
         }
         app?.let { PlayerService.show(it, surah) }
-        onChange?.invoke()
+        changed()
     }
 
     fun toggle() {
         val p = player ?: return
         /* Check playWhenReady, not isPlaying — isPlaying is false while buffering. */
         if (wantsToPlay()) p.pause() else p.play()
-        onChange?.invoke()
+        changed()
     }
 
     fun isPlaying() = player?.isPlaying == true
@@ -198,6 +239,6 @@ object Recite {
         wanted = -1
         p?.release()
         ctx?.let { PlayerService.dismiss(it) }
-        onChange?.invoke()
+        changed()
     }
 }

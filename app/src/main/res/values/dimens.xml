@@ -16,7 +16,7 @@
 
 
     <!-- Chrome bar button row height (icon 22dp + 3dp gap + ~14dp label + padding) -->
-    <dimen name="chrome_row_height">52dp</dimen>
+    <dimen name="chrome_row_height">60dp</dimen>
 
     <!-- Gap between icon and its text label in chrome / nav buttons -->
     <dimen name="icon_label_gap">3dp</dimen>

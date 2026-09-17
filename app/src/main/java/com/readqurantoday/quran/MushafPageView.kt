@@ -1,5 +1,6 @@
 package com.readqurantoday.quran
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
@@ -15,6 +16,7 @@ import android.view.ScaleGestureDetector
 import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
+import android.view.animation.DecelerateInterpolator
 import android.widget.OverScroller
 import kotlin.math.abs
 
@@ -80,6 +82,9 @@ class MushafPageView @JvmOverloads constructor(
 
     /* Set when pages turn; null when they slide, and the pager takes sideways drags. */
     var turner: Turner? = null
+
+    /** Called when a pinch or a pan of the zoomed page begins: the reader is looking closely. */
+    var onCloseLook: (() -> Unit)? = null
     private var turning = false
 
     /** This page runs taller than the screen and scrolls, so sideways drags must stay the pager's. */
@@ -144,8 +149,17 @@ class MushafPageView @JvmOverloads constructor(
     private var downY = 0f
     private val slop = ViewConfiguration.get(context).scaledTouchSlop
 
+    // Zoom when the pinch began, so letting go can tell a pinch in from a pinch out
+    private var pinchFrom = 1f
+    private var settle: ValueAnimator? = null
+
     private val scaleDetector = ScaleGestureDetector(context,
         object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScaleBegin(d: ScaleGestureDetector): Boolean {
+                settle?.cancel()
+                pinchFrom = zoom
+                return true
+            }
             override fun onScale(d: ScaleGestureDetector): Boolean {
                 val newZoom = (zoom * d.scaleFactor).coerceIn(1f, MAX_ZOOM)
                 val dF = newZoom / zoom          // actual factor after clamping
@@ -157,11 +171,33 @@ class MushafPageView @JvmOverloads constructor(
                 invalidate()
                 return true
             }
+            // A pinch in that stops short of full size still means the whole page
             override fun onScaleEnd(d: ScaleGestureDetector) {
-                if (zoom < 1.05f) { zoom = 1f; panX = 0f; panY = 0f; invalidate() }
+                val shrinking = zoom < pinchFrom
+                if (zoom < SNAP_EXACT || (shrinking && zoom < SNAP_BACK_ZOOM)) settleToFull()
             }
         }
     )
+
+    private fun settleToFull() {
+        settle?.cancel()
+        if (zoom == 1f) return
+        val fromZoom = zoom
+        val fromX = panX
+        val fromY = panY
+        settle = ValueAnimator.ofFloat(1f, 0f).apply {
+            duration = SETTLE_MS
+            interpolator = DecelerateInterpolator()
+            addUpdateListener {
+                val left = it.animatedValue as Float
+                zoom = 1f + (fromZoom - 1f) * left
+                panX = fromX * left
+                panY = fromY * left
+                invalidate()
+            }
+            start()
+        }
+    }
 
     private fun clampPan() {
         val maxX = (zoom - 1f) * width  / 2f
@@ -178,7 +214,7 @@ class MushafPageView @JvmOverloads constructor(
     // The shot stands in at rest unzoomed and mid-gesture; never with a lit word, a scrolling page, or zoomed at rest
     private fun shotToDraw(): Bitmap? {
         if (forceLive || litWord >= 0 || flashAyah > 0 || maxScroll > 0f || scrollTop != 0f) return null
-        if (zoom != 1f && !fingers) return null
+        if (zoom != 1f && !fingers && settle?.isRunning != true) return null
         return shots?.invoke(pageNo, width, height)
     }
 
@@ -220,6 +256,8 @@ class MushafPageView @JvmOverloads constructor(
 
         when (e.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                // A new touch finishes a running glide at once; end() on a finished one would replay it
+                settle?.takeIf { it.isRunning }?.end()
                 fingers = true
                 pinching = false
                 panning = false
@@ -239,6 +277,7 @@ class MushafPageView @JvmOverloads constructor(
                     turning = false
                 }
                 pinching = true
+                onCloseLook?.invoke()
                 scrolling = false
                 dropPress(e)
             }
@@ -262,6 +301,7 @@ class MushafPageView @JvmOverloads constructor(
                         /* Only past the slop, so a steady finger is still a press. */
                         if (!panning && (abs(e.x - downX) > slop || abs(e.y - downY) > slop)) {
                             panning = true
+                            onCloseLook?.invoke()
                             dropPress(e)
                         }
                         if (panning) {
@@ -554,6 +594,7 @@ class MushafPageView @JvmOverloads constructor(
     fun show(page: Int) {
         dress()
         /* A recycled view arrives still holding the last reader's zoom. */
+        settle?.cancel()
         zoom = 1f; panX = 0f; panY = 0f
         pageNo = page
         lines = Mushaf.lines(page)
@@ -566,7 +607,9 @@ class MushafPageView @JvmOverloads constructor(
         val juz = Surahs.juzOfPage(page)
         headJuz = if (juz > 0) context.getString(R.string.head_juz, figures(juz, resources)) else ""
         headPage = context.getString(R.string.head_page, figures(page, resources))
-        headSurah = Surahs.headOfPage(page)?.id ?: 0
+        // A page that opens with a surah's own title needs no name above it
+        val opensWithTitle = lines.firstOrNull { it.kind == "surah" || it.kind == "ayah" }?.kind == "surah"
+        headSurah = if (opensWithTitle) 0 else Surahs.headOfPage(page)?.id ?: 0
         folioText = figures(page, resources)
         laidOut = false
 
@@ -1077,6 +1120,12 @@ class MushafPageView @JvmOverloads constructor(
 
         /** Furthest the page may be pinched. Past 3x the glyphs gain nothing. */
         const val MAX_ZOOM = 3f
+
+        // Letting go of a pinch in below this zoom returns to the whole page
+        const val SNAP_BACK_ZOOM = 1.4f
+        // Below this any pinch ends at the whole page
+        const val SNAP_EXACT = 1.05f
+        const val SETTLE_MS = 200L
 
         // On-screen type size where glyph seams start to show
         const val SEAM_FROM_PX = 76f
