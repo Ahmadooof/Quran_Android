@@ -4,14 +4,6 @@ The Madinah Mushaf on Android, drawn page by page as it is printed, with recitat
 
 Native Kotlin and Android Views, no web view. The pages are drawn from the mushaf's own fonts, so the type is as sharp as the screen allows and nothing reflows. A companion of [readqurantoday.com](https://readqurantoday.com).
 
-<p>
-  <img src="store/screenshots/ar-1-surahs.png" width="180" alt="Surah list">
-  <img src="store/screenshots/ar-2-page.png" width="180" alt="A mushaf page">
-  <img src="store/screenshots/ar-3-recitation.png" width="180" alt="Recitation with the word highlighted">
-  <img src="store/screenshots/ar-4-dark.png" width="180" alt="Dark mode">
-  <img src="store/screenshots/ar-5-style.png" width="180" alt="Reading style">
-</p>
-
 ## What it does
 
 **Reading**
