@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.LinearGradient
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
@@ -46,6 +47,7 @@ class PageCurlView @JvmOverloads constructor(
     private val picture = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
     private val paper = Paint()
     private val shade = Paint()
+    private val shadeAt = Matrix()
     private var paperTex: Bitmap? = null
 
     private var travelPx = 0f
@@ -191,7 +193,13 @@ class PageCurlView @JvmOverloads constructor(
         place(0f, 0f, w, h, dir, moved)
         val edge = outX
         val reach = SHADOW_DP * resources.displayMetrics.density * minOf(1f, moved / w * 3f)
-        shade.shader = LinearGradient(edge, 0f, edge - dir * reach, 0f, SHADOW_COLOR, 0, Shader.TileMode.CLAMP)
+        // One gradient, moved by a matrix: a new shader every frame allocates through the whole turn
+        if (shade.shader == null) {
+            shade.shader = LinearGradient(0f, 0f, 1f, 0f, SHADOW_COLOR, 0, Shader.TileMode.CLAMP)
+        }
+        shadeAt.setScale(-dir * reach, 1f)
+        shadeAt.postTranslate(edge, 0f)
+        shade.shader.setLocalMatrix(shadeAt)
         canvas.drawRect(minOf(edge, edge - dir * reach), 0f, maxOf(edge, edge - dir * reach), h, shade)
 
         mesh(sheetVerts, 0f, 0f, w, h, w, h, dir, moved)

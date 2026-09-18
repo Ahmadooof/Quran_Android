@@ -3,6 +3,7 @@ package com.readqurantoday.quran
 import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import java.util.Locale
 
@@ -39,7 +40,7 @@ object Settings {
     fun theme(context: Context) = store(context).getInt(THEME, BY_SYSTEM)
 
     fun setTheme(context: Context, mode: Int) {
-        store(context).edit().putInt(THEME, mode).apply()
+        store(context).edit { putInt(THEME, mode) }
         apply(mode)
     }
 
@@ -69,7 +70,7 @@ object Settings {
         val kept = marks(context).toMutableSet()
         val on = kept.add(page)
         if (!on) kept.remove(page)
-        store(context).edit().putStringSet(MARKS, kept.map { it.toString() }.toSet()).apply()
+        store(context).edit { putStringSet(MARKS, kept.map { it.toString() }.toSet()) }
         return on
     }
 
@@ -78,7 +79,7 @@ object Settings {
     fun language(context: Context): String = store(context).getString(LANG, "ar") ?: "ar"
 
     fun setLanguage(context: Context, tag: String) {
-        store(context).edit().putString(LANG, tag).apply()
+        store(context).edit { putString(LANG, tag) }
         speak(tag)
     }
 
@@ -103,7 +104,7 @@ object Settings {
     fun reciter(context: Context): String? = store(context).getString(RECITER, null)
 
     fun setReciter(context: Context, id: String) {
-        store(context).edit().putString(RECITER, id).apply()
+        store(context).edit { putString(RECITER, id) }
     }
 
     // --- last page ---
@@ -111,7 +112,7 @@ object Settings {
     fun lastPage(context: Context) = store(context).getInt(LAST_PAGE, 0)
 
     fun setLastPage(context: Context, page: Int) {
-        store(context).edit().putInt(LAST_PAGE, page).apply()
+        store(context).edit { putInt(LAST_PAGE, page) }
     }
 
     // --- notifications ---
@@ -121,7 +122,7 @@ object Settings {
     fun notificationsAsked(context: Context) = store(context).getBoolean(NOTIFICATIONS_ASKED, false)
 
     fun setNotificationsAsked(context: Context) {
-        store(context).edit().putBoolean(NOTIFICATIONS_ASKED, true).apply()
+        store(context).edit { putBoolean(NOTIFICATIONS_ASKED, true) }
     }
 
     // --- page motion ---
@@ -132,7 +133,7 @@ object Settings {
     fun pageTurn(context: Context) = store(context).getBoolean(PAGE_TURN, false)
 
     fun setPageTurn(context: Context, on: Boolean) {
-        store(context).edit().putBoolean(PAGE_TURN, on).apply()
+        store(context).edit { putBoolean(PAGE_TURN, on) }
     }
 
     // --- recently read ---
@@ -162,9 +163,7 @@ object Settings {
         if (surah <= 0 || page <= 0) return
         val now = Read(surah, page, System.currentTimeMillis())
         val kept = (listOf(now) + recent(ctx).filter { it.surah != surah }).take(RECENT_KEEP)
-        store(ctx).edit()
-            .putString(RECENT, kept.joinToString(";") { "${it.surah}:${it.page}:${it.at}" })
-            .apply()
+        store(ctx).edit { putString(RECENT, kept.joinToString(";") { "${it.surah}:${it.page}:${it.at}" }) }
     }
 
     // --- page style ---
@@ -197,16 +196,16 @@ object Settings {
     }
 
     private fun setColour(ctx: Context, key: String, color: Int) {
-        store(ctx).edit().putInt(themed(ctx, key), color).apply()
+        store(ctx).edit { putInt(themed(ctx, key), color) }
         restyled()
     }
 
     // Clears the old shared key too, or it would outrank the restored default
     private fun resetColour(ctx: Context, key: String, shared: String?) {
-        store(ctx).edit().apply {
+        store(ctx).edit {
             remove(themed(ctx, key))
             if (shared != null) remove(shared)
-        }.apply()
+        }
         restyled()
     }
 
@@ -250,7 +249,7 @@ object Settings {
     }
 
     private fun setWeight(ctx: Context, key: String, weight: Int) {
-        store(ctx).edit().putInt(themed(ctx, key), weight).apply()
+        store(ctx).edit { putInt(themed(ctx, key), weight) }
         restyled()
     }
 
@@ -265,14 +264,14 @@ object Settings {
 
     // Removes pre-per-theme keys too, or they would outrank the restored defaults
     fun resetStyle(ctx: Context) {
-        store(ctx).edit().apply {
+        store(ctx).edit {
             for (key in listOf(HL_COLOR, AYAH_COLOR, INK_COLOR, PAPER_COLOR, INK_WEIGHT, LIT_WEIGHT, AYAH_WEIGHT)) {
                 remove(themed(ctx, key))
             }
             for (old in listOf(HL_COLOR, AYAH_COLOR, INK_WEIGHT, LIT_WEIGHT, AYAH_WEIGHT, BOLD_LIT, BOLD_AYAH, BOLD_INK)) {
                 remove(old)
             }
-        }.apply()
+        }
         restyled()
     }
 }

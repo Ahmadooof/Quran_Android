@@ -64,7 +64,7 @@ class DownloadsPane(
 
         blow.card(into, R.string.search_surahs, Surahs.list().map { s ->
             blow.inflate(R.layout.row_download, into, false).also { row ->
-                fillSurahTitle(row.findViewById(R.id.dl_title), s.id, TITLE_SP)
+                fillSurahTitle(row.findViewById(R.id.dl_title), s.id, R.dimen.surah_title_row)
                 rows[s.id] = row
             }
         })
@@ -382,6 +382,5 @@ class DownloadsPane(
     private fun bytes(n: Long): String = Formatter.formatShortFileSize(host, n)
 
     private companion object {
-        const val TITLE_SP = 22f
     }
 }

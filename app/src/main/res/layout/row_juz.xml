@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Surah row: full width, separated by a 1dp line -->
+<!-- Juz row: the number, the surah it begins in, and where; seamed like the surah list -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,7 +8,6 @@
     android:clickable="true"
     android:focusable="true">
 
-    <!-- Horizontal content row. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,21 +17,19 @@
         android:paddingStart="@dimen/screen_margin"
         android:paddingEnd="6dp">
 
-        <!-- The surah's number, in the same figures the page and running head use. -->
         <TextView
-            android:id="@+id/num"
+            android:id="@+id/juz_num"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:gravity="center"
             android:background="@drawable/num_circle"
-            android:textColor="@color/accent"
+            android:textColor="@color/on_dark"
             android:textSize="12sp"
             android:textStyle="bold"
             android:includeFontPadding="false" />
 
         <!-- Padding here so the buttons can match the full row height -->
         <LinearLayout
-            android:id="@+id/name_area"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -42,47 +39,25 @@
             android:paddingTop="@dimen/row_pad_v"
             android:paddingBottom="@dimen/row_pad_v">
 
-            <!-- Baseline-aligned, so the two glyphs sit on one line of writing; always read right to left. -->
-            <LinearLayout
+            <TextView
+                android:id="@+id/juz_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layoutDirection="rtl"
-                android:baselineAligned="true">
-
-                <TextView
-                    android:id="@+id/word"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text"
-                    android:includeFontPadding="false"
-                    android:textSize="@dimen/surah_title" />
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:textColor="@color/text"
-                    android:includeFontPadding="false"
-                    android:textSize="@dimen/surah_title" />
-            </LinearLayout>
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/meta"
+                android:id="@+id/juz_where"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="2dp"
                 android:textColor="@color/text_mute"
-                android:includeFontPadding="false"
-                android:textSize="@dimen/row_meta"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:textSize="@dimen/row_meta" />
         </LinearLayout>
 
+        <!-- Play starts the recitation at this juz; the reciter is chosen for the whole app -->
         <include layout="@layout/part_row_actions" />
-
-
     </LinearLayout>
 
     <!-- Separator line between rows. -->

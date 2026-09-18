@@ -27,6 +27,7 @@ class SurahRow(v: View, names: Typeface?) : RecyclerView.ViewHolder(v) {
     val play: ImageView?     = v.findViewById(R.id.play)
     val playWait: ProgressBar? = v.findViewById(R.id.play_wait)
     val reciter: ImageView?  = v.findViewById(R.id.reciter)
+    val playLabel: TextView? = v.findViewById(R.id.play_label)
 
     fun fill(s: Surahs.Surah) {
         val res = itemView.resources

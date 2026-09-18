@@ -150,5 +150,7 @@ class SurahAdapter(
             indeterminateTintList = ColorStateList.valueOf(onDisc)
             visibility = if (waiting) android.view.View.VISIBLE else android.view.View.GONE
         }
+        // The label says what the button does now, as the juz rows and the reader's player do
+        holder.playLabel?.setText(if (active) R.string.stop else R.string.play)
     }
 }

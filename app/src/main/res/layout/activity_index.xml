@@ -68,6 +68,41 @@
             </LinearLayout>
             </FrameLayout>
 
+            <!-- What the list holds: the surahs or the thirty juz -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layoutDirection="locale"
+                android:paddingStart="@dimen/screen_margin"
+                android:paddingEnd="@dimen/screen_margin"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp">
+
+                <TextView
+                    android:id="@+id/seg_surahs"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="@string/tab_index"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/seg_juz"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="@string/tab_juz"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
             <!-- Weighted, not match_parent, or the last results hang below the screen out of reach -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list"
@@ -159,6 +194,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/resume_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/resume"
@@ -218,6 +254,7 @@
 
                 <ImageView
                     android:id="@+id/nav_icon_surahs"
+                    android:contentDescription="@null"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_gravity="center"
@@ -255,6 +292,7 @@
 
                 <ImageView
                     android:id="@+id/nav_icon_marks"
+                    android:contentDescription="@null"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_gravity="center"
@@ -292,6 +330,7 @@
 
                 <ImageView
                     android:id="@+id/nav_icon_settings"
+                    android:contentDescription="@null"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_gravity="center"

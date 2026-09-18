@@ -3,6 +3,7 @@ package com.readqurantoday.quran
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
+import androidx.core.content.edit
 import androidx.core.net.toUri
 import java.io.File
 import java.net.HttpURLConnection
@@ -191,7 +192,7 @@ object Downloads {
                     -1L
                 }
                 if (length > 0) {
-                    store.edit().putLong("$reciter/$s", length).apply()
+                    store.edit { putLong("$reciter/$s", length) }
                     if (++fresh % 10 == 0) main.post(landed)
                 }
             }

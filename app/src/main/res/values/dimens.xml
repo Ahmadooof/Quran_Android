@@ -34,4 +34,9 @@
     <dimen name="elevation_chrome">6dp</dimen>
     <dimen name="elevation_player">8dp</dimen>
 
+    <!-- A surah's name in the mushaf hand: the index lists, then rows inside other screens -->
+    <dimen name="surah_title">26sp</dimen>
+    <dimen name="surah_title_row">22sp</dimen>
+    <!-- The quiet line under a row's title -->
+    <dimen name="row_meta">11sp</dimen>
 </resources>

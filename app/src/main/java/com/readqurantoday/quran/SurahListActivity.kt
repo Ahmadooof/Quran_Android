@@ -40,11 +40,21 @@ class SurahListActivity : LanguageActivity() {
     private var tab = 0
 
     /* This screen's player listener, kept so it can clear only itself from Recite's slot. */
-    private val heard: () -> Unit = { runOnUiThread { surahAdapter?.notifyDataSetChanged() } }
+    private val heard: () -> Unit = { runOnUiThread { refreshLists() } }
+
+    /* The juz being recited changes as the recitation moves, which no state change announces. */
+    private val follow = object : Runnable {
+        override fun run() {
+            if (byJuz && Recite.playing != 0) juzAdapter?.notifyDataSetChanged()
+            if (Recite.playing != 0) window.decorView.postDelayed(this, FOLLOW_MS)
+        }
+    }
 
     // Read before restyling so weight changes keep the theme's font family
     private val labelFace by lazy { navLabels[0].typeface }
     private var surahAdapter: SurahAdapter? = null
+    private var byJuz = false
+    private var juzAdapter: JuzAdapter? = null
 
     /* The keyboard is up. */
     private var typing = false
@@ -145,6 +155,7 @@ class SurahListActivity : LanguageActivity() {
     override fun onResume() {
         super.onResume()
         Recite.onChange = heard
+        refreshLists()
         /* Refresh resume card in case the last page changed while in the reader. */
         wireResume()
         /* Built on every return, so the reading style row shows colours just changed. */
@@ -161,6 +172,7 @@ class SurahListActivity : LanguageActivity() {
     override fun onPause() {
         super.onPause()
         if (Recite.onChange === heard) Recite.onChange = null
+        window.decorView.removeCallbacks(follow)
     }
 
     private fun buildSurahList() {
@@ -175,9 +187,8 @@ class SurahListActivity : LanguageActivity() {
             onPage     = { page -> answer(page) },
             onVerse    = { surah, ayah -> answer(pageOfAyah(surah, ayah), surah, ayah) },
             onPlay     = { s ->
-                if (Recite.playing == s.id) Recite.toggle()
-                else Recite.start(this, s.id)
-                surahAdapter?.notifyDataSetChanged()
+                if (Recite.playing == s.id) Recite.toggle() else Recite.start(this, s.id)
+                refreshLists()
             },
             onReciter  = { s -> pickReciter(s) },
             playingId  = { Recite.playing }
@@ -186,6 +197,70 @@ class SurahListActivity : LanguageActivity() {
         list.layoutManager = LinearLayoutManager(this)
         list.adapter = adapter
         surahAdapter = adapter
+        wireListKind()
+    }
+
+    // The list holds the surahs or the thirty juz; searching is about surahs, so typing brings them back
+    private fun wireListKind() {
+        val surahs = findViewById<TextView>(R.id.seg_surahs)
+        val juz = findViewById<TextView>(R.id.seg_juz)
+        surahs.setOnClickListener { showJuz(false) }
+        juz.setOnClickListener { showJuz(true) }
+        showJuz(byJuz)
+    }
+
+    private fun refreshLists() {
+        surahAdapter?.notifyDataSetChanged()
+        juzAdapter?.notifyDataSetChanged()
+        wireResume()
+        // Only follows while there is something to follow
+        window.decorView.removeCallbacks(follow)
+        if (Recite.playing != 0) window.decorView.postDelayed(follow, FOLLOW_MS)
+    }
+
+    private fun juzList(): JuzAdapter {
+        val made = juzAdapter ?: JuzAdapter(
+            onOpen     = { page -> answer(page) },
+            onPlay     = { page -> playJuz(page) },
+            onReciter  = { page -> pickReciter(Surahs.ofPage(page)) },
+            // Read from where the recitation actually is, so both lists agree wherever it was started
+            playingJuz = { Surahs.juzOfPage(Recite.playingPage(this)) }
+        )
+        juzAdapter = made
+        return made
+    }
+
+    // A juz is part of a surah's recording, so it plays from its first ayah rather than the surah's
+    private fun playJuz(page: Int) {
+        val juz = Surahs.juzOfPage(page)
+        // Already reciting this juz: the button is a pause, as it is on a surah row
+        if (juz != 0 && juz == Surahs.juzOfPage(Recite.playingPage(this))) {
+            Recite.toggle()
+            refreshLists()
+            return
+        }
+        val surah = if (Ayat.ready) Ayat.surahAt(page) else Surahs.ofPage(page)?.id ?: 0
+        if (surah <= 0) return
+        val ayah = if (Ayat.ready) Ayat.ayahAt(page).coerceAtLeast(1) else 1
+        val voice = Recite.chosen(this)?.id
+        val from = voice?.let { Timing.of(this, surah, it)?.startOf(ayah) } ?: 0
+        Recite.start(this, surah, from)
+        refreshLists()
+    }
+
+    private fun showJuz(on: Boolean) {
+        byJuz = on
+        val list = findViewById<RecyclerView>(R.id.list)
+        list.adapter = if (on) juzList() else surahAdapter
+        for ((seg, isOn) in listOf(R.id.seg_surahs to !on, R.id.seg_juz to on)) {
+            findViewById<TextView>(seg).apply {
+                setBackgroundResource(if (isOn) R.drawable.seg_on else R.drawable.row_flat)
+                setTextColor(getColor(if (isOn) R.color.accent else R.color.text_mute))
+                typeface = android.graphics.Typeface.defaultFromStyle(
+                    if (isOn) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL
+                )
+            }
+        }
     }
 
     // Exact once Ayat has walked the pages; until then the surah's first page
@@ -200,25 +275,34 @@ class SurahListActivity : LanguageActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
             override fun afterTextChanged(s: Editable?) {
+                if (byJuz && !s.isNullOrEmpty()) showJuz(false)
                 surahAdapter?.submit(s?.toString().orEmpty())
             }
         })
     }
 
+    // While a recitation runs the card leads to it instead, and says so
     private fun wireResume() {
         val card = findViewById<View>(R.id.card_resume)
-        val page = Settings.lastPage(this)
+        val reciting = Recite.playing != 0
+        val page = if (reciting) Recite.playingPage(this) else Settings.lastPage(this)
         canResume = page in 1..604
         sayFooters()
         if (!canResume) return
+
+        findViewById<TextView>(R.id.resume_label)
+            .setText(if (reciting) R.string.resume_reciter else R.string.resume)
+
         val surah = Surahs.ofPage(page)
-        surah?.let { fillSurahTitle(findViewById(R.id.resume_title), it.id, RESUME_TITLE_SP) }
+        surah?.let { fillSurahTitle(findViewById(R.id.resume_title), it.id, R.dimen.surah_title) }
         val at = getString(R.string.head_page, figures(page, resources))
         // English name isolated so it does not pull the separator into its run on an Arabic line
         findViewById<TextView>(R.id.resume_detail).text = surah?.let {
             getString(R.string.surah_meta, android.text.BidiFormatter.getInstance().unicodeWrap(it.english), at)
         } ?: at
-        card.setOnClickListener { answer(page) }
+
+        // Page 0 tells the reader to follow the live recitation rather than open a fixed page
+        card.setOnClickListener { answer(if (reciting) 0 else page) }
     }
 
     /* Open the reciter sheet. s is the surah whose row was tapped (null = settings row). */
@@ -263,8 +347,10 @@ class SurahListActivity : LanguageActivity() {
     }
 
     companion object {
+        // The juz rows follow the recitation across juz boundaries
+        private const val FOLLOW_MS = 1000L
+
         const val PAGE = "page"
-        private const val RESUME_TITLE_SP = 26f
         const val SURAH = "surah"
         const val AYAH = "ayah"
         private const val TAB = "tab"

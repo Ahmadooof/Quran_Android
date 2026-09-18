@@ -6,6 +6,7 @@
     <string name="head_juz">Juz %1$s</string>
     <string name="head_page">Page %1$s</string>
     <string name="resume">Continue reading</string>
+    <string name="resume_reciter">Follow the reciter</string>
     <string name="to_menu">Menu</string>
 
     <!-- Search results. -->
@@ -21,6 +22,7 @@
     <string name="surah_meta">%1$s · %2$s</string>
 
     <string name="tab_index">Surahs</string>
+    <string name="tab_juz">Juz</string>
     <string name="tab_marks">Bookmarks</string>
     <string name="tab_settings">Settings</string>
     <string name="search_hint">Surah, page, or ayah…</string>

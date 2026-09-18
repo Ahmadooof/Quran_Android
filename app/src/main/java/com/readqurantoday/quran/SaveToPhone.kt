@@ -6,12 +6,14 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import java.io.File
 
 // Copies kept downloads to Download/Quran/<reciter>/, which survives uninstall; never downloads
@@ -75,7 +77,7 @@ fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean 
         null
     }
 
-    if (copy != null) saved(context).edit().putString("${reciter.id}/$surah", copy).apply()
+    if (copy != null) saved(context).edit { putString("${reciter.id}/$surah", copy) }
     return copy != null
 }
 
@@ -92,7 +94,7 @@ fun phoneUri(context: Context, surah: Int, reciter: Recite.Reciter): Uri? {
     val copy = saved(context).getString(key, null) ?: return null
     val uri = try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val stored = Uri.parse(copy)
+            val stored = copy.toUri()
             context.contentResolver.query(stored, arrayOf(MediaStore.Downloads._ID), null, null, null)
                 ?.use { c -> if (c.moveToFirst()) stored else null }
         } else {
@@ -107,7 +109,7 @@ fun phoneUri(context: Context, surah: Int, reciter: Recite.Reciter): Uri? {
         null
     }
     // Deleted from the phone: the surah can be saved again
-    if (uri == null) saved(context).edit().remove(key).apply()
+    if (uri == null) saved(context).edit { remove(key) }
     return uri
 }
 
@@ -162,9 +164,9 @@ fun savesAfterDownload(context: Context, surah: Int, reciter: String) =
     waiting(context).getBoolean("$reciter/$surah", false)
 
 fun saveAfterDownload(context: Context, surah: Int, reciter: String, on: Boolean) {
-    val edit = waiting(context).edit()
-    if (on) edit.putBoolean("$reciter/$surah", true) else edit.remove("$reciter/$surah")
-    edit.apply()
+    waiting(context).edit {
+        if (on) putBoolean("$reciter/$surah", true) else remove("$reciter/$surah")
+    }
 }
 
 /** Save every waiting surah whose download has finished. Blocking: call off the main thread. Returns how many were saved. */

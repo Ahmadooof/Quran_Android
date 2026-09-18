@@ -30,6 +30,14 @@
 - All chrome/nav icons use the same style: `strokeColor`, `strokeWidth`, `fillColor="#00000000"` (no fill). Filled icon = active state only.
 - Icon tint is always set from code (`imageTintList`), never hardcoded in the drawable XML.
 
+### Shared parts
+- A row or control that appears on more than one screen lives in one layout part, included by both — never copied. Copies drift: the same button ends up a different colour or size in each list.
+- Type sizes that repeat are `@dimen` tokens (`surah_title`, `surah_title_row`, `row_meta`), never numbers typed into a second layout or a `const` in a second file.
+
+### Surah names
+- A surah named as a row's own title is written in the mushaf's own hand: include `@layout/part_surah_title` and fill it with `fillSurahTitle()`.
+- A surah mentioned inside a quiet meta line (a juz row, a search result) is plain text in the UI font — the calligraphy is for titles, not for asides.
+
 ### Dimensions
 - Hardcoded dp/sp values that appear in more than one layout belong in `res/values/dimens.xml`.
 - Use `@dimen/name` in XML. Key tokens already defined: `screen_margin`, `row_pad_v`, `card_pad_v`, `icon_nav`, `icon_row`, `chrome_row_height`, `icon_label_gap`, `nav_bar_height`, elevation levels.
@@ -37,4 +45,8 @@
 
 ## Modern
 - Follow modern APIs in design and code — do not use deprecated APIs.
-- `android:tint` on `<ImageView>` is valid for this project (minSdk / target ≥ API 31). The AppCompat lint warning about `app:tint` only applies to API < 21 compatibility which this project does not need — ignore it.
+- `android:tint` on `<ImageView>` is what this project uses; it works from API 21 and minSdk is 24. AppCompat prefers `app:tint`, so its `UseAppTint` check is turned off in `app/build.gradle.kts` — lint should stay clean, and a lint error should mean a real problem.
+
+## Versions and releases
+- The version lives in one place: `appVersion` in `app/build.gradle.kts`. Play's `versionCode` is worked out from it.
+- Release and upload steps: `docs/RELEASE.md`. Play Console answers: `docs/PLAY_STORE.md`.

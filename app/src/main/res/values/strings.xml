@@ -8,6 +8,7 @@
     <string name="head_page">صفحة %1$s</string>
     <!-- The way back into the page the reader was left on. -->
     <string name="resume">متابعة القراءة</string>
+    <string name="resume_reciter">متابعة القارئ</string>
     <!-- The surah and page the reader was left on, under the label above. -->
     <string name="to_menu">القائمة</string>
     <!-- Two parts of a place joined, e.g. the juz and the page in the reader's top bar. -->
@@ -32,6 +33,7 @@
 
     <!-- Bottom nav tabs. -->
     <string name="tab_index">السور</string>
+    <string name="tab_juz">الأجزاء</string>
     <string name="tab_marks">المواضع</string>
     <string name="tab_settings">الإعدادات</string>
     <string name="search_hint">سورة، صفحة، أو آية…</string>

@@ -42,7 +42,7 @@ class PlacesPane(
     private fun recentRow(read: Settings.Read): View {
         val row = place(R.drawable.ic_surahs, read.page)
         val surah = Surahs.list().firstOrNull { it.id == read.surah }
-        fillSurahTitle(row.findViewById(R.id.place_title), read.surah, TITLE_SP)
+        fillSurahTitle(row.findViewById(R.id.place_title), read.surah, R.dimen.surah_title_row)
 
         // Progress as a bar only; a second page number in words read as a contradiction
         row.findViewById<TextView>(R.id.place_detail).text = where(read.page)
@@ -71,7 +71,7 @@ class PlacesPane(
 
     private fun savedRow(page: Int): View {
         val row = place(R.drawable.ic_bookmark, page)
-        Surahs.ofPage(page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, TITLE_SP) }
+        Surahs.ofPage(page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title_row) }
         row.findViewById<TextView>(R.id.place_detail).text = where(page)
         row.findViewById<ImageView>(R.id.place_remove).apply {
             imageTintList = ColorStateList.valueOf(host.getColor(R.color.text_mute))
@@ -110,9 +110,5 @@ class PlacesPane(
 
     private fun weigh(v: View, weight: Float) {
         v.layoutParams = (v.layoutParams as LinearLayout.LayoutParams).apply { this.weight = weight }
-    }
-
-    private companion object {
-        const val TITLE_SP = 22f
     }
 }

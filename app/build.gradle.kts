@@ -11,7 +11,7 @@ val keystore = rootProject.file("keystore.properties").takeIf { it.exists() }?.l
 }
 
 // The one number to change for a release; Play's version code follows it (1.2.3 -> 10203)
-val appVersion = "1.0.5"
+val appVersion = "1.0.7"
 
 fun versionCodeOf(name: String): Int {
     val (major, minor, patch) = name.split(".").map { it.toInt() }
@@ -69,6 +69,11 @@ android {
             isMinifyEnabled = false
             if (keystore != null) signingConfig = signingConfigs.getByName("upload")
         }
+    }
+
+    // Tints are set with android:tint; AppCompat would rather they were app:tint
+    lint {
+        disable += "UseAppTint"
     }
 
     compileOptions {

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Play and reciter, as every list that offers them draws them -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Play -->
+    <LinearLayout
+        android:id="@+id/btn_play"
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- The disc, with a spinner laid over it while this surah's audio is on its way. -->
+        <FrameLayout
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:duplicateParentState="true">
+
+            <ImageView
+                android:id="@+id/play"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:duplicateParentState="true"
+                android:background="@drawable/chip_soft"
+                android:padding="4dp"
+                android:tint="@color/accent"
+                android:src="@drawable/ic_play"
+                android:contentDescription="@null" />
+
+            <ProgressBar
+                android:id="@+id/play_wait"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/play_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:duplicateParentState="true"
+            android:text="@string/play"
+            android:textColor="@color/accent"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <!-- Reciter -->
+    <LinearLayout
+        android:id="@+id/btn_reciter"
+        android:layout_width="44dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/reciter"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:duplicateParentState="true"
+            android:tint="@color/icon_btn"
+            android:src="@drawable/ic_reciter"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:duplicateParentState="true"
+            android:text="@string/reciter"
+            android:textColor="@color/icon_btn"
+            android:textSize="9sp"
+            android:maxLines="1" />
+    </LinearLayout>
+</merge>

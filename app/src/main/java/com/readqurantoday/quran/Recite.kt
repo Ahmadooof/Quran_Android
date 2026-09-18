@@ -228,6 +228,17 @@ object Recite {
 
     fun isPlaying() = player?.isPlaying == true
 
+    /** The mushaf page the recitation is on, or 0 when nothing is playing. */
+    fun playingPage(context: Context): Int {
+        val surah = playing
+        if (surah == 0) return 0
+        val voice = chosen(context)?.id
+        val timing = voice?.let { Timing.of(context, surah, it) }
+        val ayah = timing?.ayahAt(at())?.coerceAtLeast(1) ?: 1
+        val page = if (Ayat.ready) Ayat.pageOf(surah, ayah) else 0
+        return if (page > 0) page else Surahs.list().firstOrNull { it.id == surah }?.from ?: 0
+    }
+
     // Play pressed but no sound yet; shows the spinner
     fun waiting() = wantsToPlay() && !isPlaying()
 

@@ -51,7 +51,7 @@ class PlayerService : Service() {
 
     companion object {
         private const val CHANNEL  = "quran_player"
-        const val NOTIF_ID = 1001
+        private const val NOTIF_ID = 1001
 
         private const val ACTION_TOGGLE = "com.readqurantoday.quran.player.TOGGLE"
         private const val ACTION_NEXT   = "com.readqurantoday.quran.player.NEXT"

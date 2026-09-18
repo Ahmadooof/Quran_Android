@@ -65,6 +65,9 @@ object Surahs {
         return all.firstOrNull { it.id == if (opensWithTitle) title.surah else title.surah - 1 }
     }
 
+    /** First page of each juz, in order; empty until loaded. */
+    fun juzStarts(): IntArray = juz
+
     /** Which juz this page is in (1–30), or 0 if not yet loaded. */
     fun juzOfPage(page: Int): Int {
         var n = 0

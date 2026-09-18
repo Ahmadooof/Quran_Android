@@ -1,7 +1,9 @@
 package com.readqurantoday.quran
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Typeface
@@ -10,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.net.toUri
 
 // Settings screens built as titled cards: general, and reading style with a live page preview
 class SettingsPane(private val host: Activity, private val into: LinearLayout) {
@@ -51,7 +54,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
 
         group(R.string.set_group_help) { rows ->
             rows.add(siteRow())
-            rows.add(linkRow(R.string.set_report, { host.startActivity(android.content.Intent(host, FeedbackActivity::class.java)) }, emptyList()))
+            rows.add(linkRow(R.string.set_report, { host.startActivity(Intent(host, FeedbackActivity::class.java)) }, emptyList()))
             rows.add(linkRow(R.string.set_privacy, { openLink(PRIVACY_URL) }, emptyList()))
             rows.add(linkRow(R.string.set_credits, { host.notice(host.getString(R.string.credits_text)) }, emptyList()))
         }
@@ -68,8 +71,8 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
 
     private fun openLink(url: String) {
         try {
-            host.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
-        } catch (_: android.content.ActivityNotFoundException) {
+            host.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        } catch (_: ActivityNotFoundException) {
             host.notice(url)
         }
     }
