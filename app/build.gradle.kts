@@ -11,7 +11,7 @@ val keystore = rootProject.file("keystore.properties").takeIf { it.exists() }?.l
 }
 
 // The one number to change for a release; Play's version code follows it (1.2.3 -> 10203)
-val appVersion = "1.0.7"
+val appVersion = "1.0.8"
 
 fun versionCodeOf(name: String): Int {
     val (major, minor, patch) = name.split(".").map { it.toInt() }
