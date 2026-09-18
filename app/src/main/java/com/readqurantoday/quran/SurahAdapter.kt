@@ -1,6 +1,5 @@
 package com.readqurantoday.quran
 
-import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableString
@@ -138,19 +137,6 @@ class SurahAdapter(
         holder.num.setBackgroundResource(R.drawable.num_circle)
         holder.num.setTextColor(ctx.getColor(R.color.on_dark))
 
-        val waiting = playing && Recite.waiting()
-        val onDisc = ctx.getColor(R.color.accent)
-        holder.play?.apply {
-            setImageResource(if (active) R.drawable.ic_pause else R.drawable.ic_play)
-            setBackgroundResource(R.drawable.chip_soft)
-            imageTintList = ColorStateList.valueOf(onDisc)
-            imageAlpha = if (waiting) 0 else 255
-        }
-        holder.playWait?.apply {
-            indeterminateTintList = ColorStateList.valueOf(onDisc)
-            visibility = if (waiting) android.view.View.VISIBLE else android.view.View.GONE
-        }
-        // The label says what the button does now, as the juz rows and the reader's player do
-        holder.playLabel?.setText(if (active) R.string.stop else R.string.play)
+        sayPlayButton(holder.itemView, playing = active, waiting = playing && Recite.waiting())
     }
 }

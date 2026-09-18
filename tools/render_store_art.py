@@ -17,7 +17,7 @@ OUT = os.path.join(ROOT, 'store')
 GROUND = (0x1A, 0x6F, 0xA3)
 INK = (0xFF, 0xFD, 0xF7)
 SS = 4  # supersampling factor
-ICON_SEEN = 80  # of the 108dp icon canvas, the part shown on Play; launchers show about 72
+ICON_FILL = 0.84  # of the icon's width the name takes; the rest is the margin Play's rounded corners need
 
 
 def contours(path_data):
@@ -116,10 +116,12 @@ def main():
     ys = [y for p in polys for _, y in p]
     minx, maxx, miny, maxy = min(xs), max(xs), min(ys), max(ys)
 
-    # Icon: launchers show only the middle of the 108dp canvas, so Play gets that middle too, or the name looks small
-    seen = ICON_SEEN
-    edge = (108 - seen) / 2
-    paint(512, 512, transformed(polys, 512 / seen, -edge * 512 / seen, -edge * 512 / seen)).save(os.path.join(OUT, 'icon-512.png'))
+    # Icon: the name fills the square, since Play draws the whole picture rather than cropping to a launcher's mask
+    box = 512 * ICON_FILL
+    scale = box / max(maxx - minx, maxy - miny)
+    dx = (512 - (maxx - minx) * scale) / 2 - minx * scale
+    dy = (512 - (maxy - miny) * scale) / 2 - miny * scale
+    paint(512, 512, transformed(polys, scale, dx, dy)).save(os.path.join(OUT, 'icon-512.png'))
 
     # Feature graphic: the words large on the left, the English name on the right
     scale = 380 / (maxy - miny)

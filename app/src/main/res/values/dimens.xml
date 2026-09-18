@@ -25,7 +25,8 @@
     <dimen name="hairline">1dp</dimen>
 
     <!-- The one line of a real page used to preview reading style. -->
-    <dimen name="preview_line">56dp</dimen>
+    <!-- Tall enough to hold the head and folio figures either side of the line -->
+    <dimen name="preview_line">84dp</dimen>
 
     <!-- The space above a settings card that has no title of its own. -->
     <dimen name="group_gap">12dp</dimen>
@@ -37,6 +38,8 @@
     <!-- A surah's name in the mushaf hand: the index lists, then rows inside other screens -->
     <dimen name="surah_title">26sp</dimen>
     <dimen name="surah_title_row">22sp</dimen>
-    <!-- The quiet line under a row's title -->
+    <!-- A row's own title, the quiet line under it, and the label under an icon -->
+    <dimen name="row_title">15sp</dimen>
     <dimen name="row_meta">11sp</dimen>
+    <dimen name="icon_label">9sp</dimen>
 </resources>

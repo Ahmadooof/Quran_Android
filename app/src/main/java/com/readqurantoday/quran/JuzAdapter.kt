@@ -3,7 +3,6 @@ package com.readqurantoday.quran
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -54,14 +53,6 @@ class JuzAdapter(
     // Only the juz being recited shows pause, and only its own button waits for the audio
     private fun sayPlay(row: View, juz: Int) {
         val here = playingJuz() == juz
-        val playing = here && Recite.wantsToPlay()
-        val waiting = here && Recite.waiting()
-
-        row.findViewById<ImageView>(R.id.play).apply {
-            setImageResource(if (playing) R.drawable.ic_pause else R.drawable.ic_play)
-            visibility = if (waiting) View.INVISIBLE else View.VISIBLE
-        }
-        row.findViewById<View>(R.id.play_wait).visibility = if (waiting) View.VISIBLE else View.GONE
-        row.findViewById<TextView>(R.id.play_label).setText(if (playing) R.string.stop else R.string.play)
+        sayPlayButton(row, playing = here && Recite.wantsToPlay(), waiting = here && Recite.waiting())
     }
 }

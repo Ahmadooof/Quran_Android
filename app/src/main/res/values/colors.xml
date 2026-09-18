@@ -11,16 +11,15 @@
     <color name="icon_ink">#FFFDF7</color>
     <color name="accent_soft">#4D1A6FA3</color>
     <color name="surface">#FFFFFF</color>
-    <!-- Reader bars over the page: white by day, lifted above the page by a shadow. -->
-    <color name="reader_chrome">#FFFFFF</color>
+    <!-- Reader bars over the page: a cool tint, since white on warm paper read as the same sheet -->
+    <color name="reader_chrome">#F1F6FC</color>
     <color name="surface_2">#F5F9FD</color>
     <color name="line">#DCE8F2</color>
     <color name="text">#16283A</color>
-    <color name="text_mute">#6A869B</color>
+    <!-- Dark enough for the 9-11sp labels under the icons to hold 5:1 on white -->
+    <color name="text_mute">#577284</color>
     <color name="on_dark">#FFFFFF</color>
 
-    <!-- Surah names and Basmalah: blue by day, gold at night -->
-    <color name="ornament">#1A6FA3</color>
     <!-- Highlighted word ink, and what the reset in settings returns to. -->
     <color name="ink_lit">#A4161A</color>
     <!-- The ayah markers on the page, until the reader picks a colour: the accent. -->

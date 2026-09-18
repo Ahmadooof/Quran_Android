@@ -68,14 +68,14 @@
     <string name="set_language">Language</string>
     <string name="lang_ar">العربية</string>
     <string name="lang_en">English</string>
-    <string name="set_ayah_color">Ayah number colour</string>
+    <string name="set_ayah_color">Ayah and page number colour</string>
     <string name="set_highlight_color">Word highlight colour</string>
     <string name="reset">Reset</string>
     <string name="set_preview">Preview</string>
     <string name="set_group_general">General</string>
     <string name="set_group_reading">Reading style</string>
     <string name="set_group_word">Highlighted word</string>
-    <string name="set_group_ayah">Ayah number</string>
+    <string name="set_group_ayah">Numbers</string>
     <string name="set_group_page">Page</string>
     <string name="set_paper_color">Page colour</string>
     <string name="set_ink_color">Text colour</string>

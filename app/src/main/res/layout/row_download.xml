@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@color/text_mute"
-            android:textSize="11sp"
+            android:textSize="@dimen/row_meta"
             android:includeFontPadding="false"
             android:maxLines="1" />
     </LinearLayout>
@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:textSize="9sp"
+            android:textSize="@dimen/icon_label"
             android:includeFontPadding="false"
             android:maxLines="1" />
     </LinearLayout>
@@ -86,7 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:textSize="9sp"
+            android:textSize="@dimen/icon_label"
             android:includeFontPadding="false"
             android:maxLines="1" />
     </LinearLayout>

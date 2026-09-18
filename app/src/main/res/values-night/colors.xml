@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Night palette, matching the website's dark mode; ornament turns gold -->
+<!-- Night palette, matching the website's dark mode -->
 <resources>
     <color name="paper">#1A1F25</color>
-    <color name="ink">#A2A7AD</color>
+    <!-- The page reads a step brighter than the interface text around it -->
+    <color name="ink">#B0B6BD</color>
 
     <color name="accent">#3F9BD1</color>
     <!-- Soft fills need more alpha on a dark ground to stay visible -->
@@ -14,11 +15,10 @@
     <color name="line">#2A3138</color>
     <color name="text">#A2A7AD</color>
     <color name="text_mute">#8B939C</color>
-    <color name="ornament">#D9B95F</color>
     <!-- Knocked out of the filled pill. Not pure white at night: it glares. -->
     <color name="on_dark">#0F1317</color>
-    <!-- Lit word at night: a quiet blue, since red glowed on dark paper -->
-    <color name="ink_lit">#4386B5</color>
-    <!-- Lighter than the lit word so markers and the recited word never look alike -->
+    <!-- Lit word at night: blue, since red glowed on dark paper, and brighter than the words around it -->
+    <color name="ink_lit">#9BD3F6</color>
+    <!-- Quieter than the lit word, so the markers never read as the recited one -->
     <color name="ayah_mark">#579FD1</color>
 </resources>

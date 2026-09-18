@@ -476,9 +476,11 @@ class MushafPageView @JvmOverloads constructor(
         dressedAt = Settings.styleVersion
         setBackgroundColor(paperTrial ?: Settings.paperColor(context))
         paint.color = inkTrial ?: Settings.inkColor(context)
-        label.color = context.getColor(R.color.accent)
+        // The juz and page numbers are the page's own figures, so they take the ayah number's colour
+        label.color = markTrial ?: Settings.resolvedAyahColor(context)
         markPaint.color = markTrial ?: Settings.resolvedAyahColor(context)
-        titlePaint.color = context.getColor(R.color.ornament)
+        // Surah titles and the Basmalah are the page's own words, so they take the page's ink
+        titlePaint.color = inkTrial ?: Settings.inkColor(context)
         litPaint.color = litTrial ?: Settings.highlightColor(context)
         inkSpread = spread(Settings.inkWeight(context))
         markSpread = spread(Settings.ayahWeight(context))
@@ -721,6 +723,9 @@ class MushafPageView @JvmOverloads constructor(
         val centreOffset = -(paint.ascent() + paint.descent()) / 2f
         val y = height / 2f + centreOffset
 
+        // The head and the folio are in the preview too, since they take the same colour as the ayah numbers
+        previewLabels(canvas, left, measure)
+
         atSurah = Ayat.surahAt(pageNo)
         atAyah  = Ayat.ayahAt(pageNo)
         atWord  = Ayat.wordAt(pageNo)
@@ -742,6 +747,17 @@ class MushafPageView @JvmOverloads constructor(
                 }
             }
         }
+    }
+
+    // A page's figures, drawn small at the edges of the preview
+    private fun previewLabels(canvas: Canvas, left: Float, measure: Float) {
+        val edge = label.textSize * 0.9f
+        label.textAlign = Paint.Align.RIGHT
+        canvas.drawText(headJuz, left + measure, edge, label)
+        label.textAlign = Paint.Align.LEFT
+        canvas.drawText(headPage, left, edge, label)
+        label.textAlign = Paint.Align.CENTER
+        canvas.drawText(folioText, left + measure / 2f, height - edge * 0.4f, label)
     }
 
     /* One line fitted to the measure, right to left. Short lines are centred. */

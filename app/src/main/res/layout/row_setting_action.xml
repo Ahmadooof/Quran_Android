@@ -12,4 +12,4 @@
     android:paddingStart="14dp"
     android:paddingEnd="14dp"
     android:textColor="@color/accent"
-    android:textSize="15sp" />
+    android:textSize="@dimen/row_title" />
