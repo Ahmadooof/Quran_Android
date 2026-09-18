@@ -1,80 +1,68 @@
-# The Android app
+# القرآن العظيم · The Great Quran
 
-A native shell around the reader. Right now it is one activity holding one
-WebView; the surah list, the player and the settings will be built natively
-around it, and the WebView will be left with the one thing it is genuinely good
-at — drawing the mushaf.
+The Madinah Mushaf on Android, drawn page by page as it is printed, with recitation that follows the words.
 
-## Why a WebView at all
+Native Kotlin and Android Views, no web view. The pages are drawn from the mushaf's own fonts, so the type is as sharp as the screen allows and nothing reflows. A companion of [readqurantoday.com](https://readqurantoday.com).
 
-The page is drawn from 604 QCF fonts whose glyphs are private-use codepoints,
-laid out line by line and fitted to the sheet, with a word-level highlight
-following the recitation. That is solved, in `public/js/mushaf.js`, and it is
-the most expensive thing in this repository. Rewriting it in Kotlin and again
-in Swift would be solving it twice more; neither can load a woff2 face, so it
-would also mean converting all 604 fonts and carrying them 30-50% larger.
+<p>
+  <img src="store/screenshots/ar-1-surahs.png" width="180" alt="Surah list">
+  <img src="store/screenshots/ar-2-page.png" width="180" alt="A mushaf page">
+  <img src="store/screenshots/ar-3-recitation.png" width="180" alt="Recitation with the word highlighted">
+  <img src="store/screenshots/ar-4-dark.png" width="180" alt="Dark mode">
+  <img src="store/screenshots/ar-5-style.png" width="180" alt="Reading style">
+</p>
 
-## Why it works with no network
+## What it does
 
-Everything the reader reads is inside the app: the fonts, `mushaf.json`, the
-stylesheet and the scripts, copied into `app/src/main/assets/` at build time.
-There is no first-run download and no cache — offline is not a mode, it is the
-only way a page is ever loaded. A correction to the text ships as an app
-update, which is the honest way round.
+**Reading**
+- All 604 pages exactly as printed, one page per screen.
+- Turn by sliding the page, or by tipping it over like paper — your choice in settings.
+- Pinch to zoom in on a line; let go part-way back and the page settles to full size.
+- Tap once for the menus, tap again to send them away; they also leave when you turn the page.
+- Saved pages, recently read surahs, and a card that takes you back where you left off.
 
-The recitations are not bundled: five of them come to 5.7 GB against a 95 MB
-mushaf. They stream from the CDN, and a reader who wants one keeps it on the
-device.
+**Recitation**
+- Five reciters, with the word being recited lit on the page as it is read.
+- Hold a word to start from it, or play a whole surah or juz.
+- Repeat an ayah, a page, or a surah.
+- Keeps playing with the screen off, with full controls in the notification shade and on the lock screen: previous and next ayah, seek, pause, close.
 
-## Build
+**Finding your place**
+- Search by surah name, page number, or a word from an ayah.
+- The full surah list, and the thirty juz, each opening — or reciting — from its first ayah.
 
-Open `android/` in Android Studio and run. Nothing to do first: copying the
-reader into the app is a build task, `syncWebAssets`, which every build depends
-on. It runs when `public/` has changed and reports UP-TO-DATE when it has not,
-so a build after an edit takes about twenty seconds and one after no edit takes
-one.
+**Making it yours**
+- Light and dark, or follow the phone.
+- Page colour, text colour, and the colour of the ayah and page numbers.
+- Text weight for the words, the numbers and the highlight.
+- Arabic and English interface.
 
-`npm run sync:android` still exists and does the same thing by hand. You should
-not need it.
+**Offline**
+- The whole mushaf is inside the app: no download on first open, and no network to read.
+- Recitations stream, or download for listening offline, and can be copied to the phone's Download folder to play anywhere.
 
-## Working on the look of the app
+## Built from
 
-Every build being correct is not the same as every build being quick: 95 MB is
-copied and the app reinstalled for a one-line change to a stylesheet. So a
-build can be pointed at the site as it is being served instead:
+- **Text and glyph layout**: the KFGQPC Madinah Mushaf fonts, one per page, laid out line by line and fitted to the sheet.
+- **Ayah text and search**: the Tanzil Quran text (CC BY 3.0), used unmodified.
+- **Audio**: recitations served from the project's own CDN, with word timings per reciter.
+- **Libraries**: AndroidX, Media3 (ExoPlayer) for playback, and a colour picker. No analytics, no ads, no accounts.
 
-    npm start                 # in the repository root
-    ./gradlew installDebug -PdevServer=http://10.0.2.2:3000
+## Building
 
-`10.0.2.2` is the emulator's route to this machine's localhost; on a real
-device use this machine's address on the network. Now a change to the CSS is a
-reload away.
+Open the project in Android Studio and run. Everything the app reads is in `app/src/main/assets`, so there is nothing to fetch first.
 
-That build does **not** work offline — it is fetching the site. It is a tool
-for designing, not something to hand to anyone. A build with no `-PdevServer`
-is the real app: the package, offline, always.
+- minSdk 24, target 36.
+- Release steps, signing and versioning: [docs/RELEASE.md](docs/RELEASE.md).
+- Play Console answers and store text: [docs/PLAY_STORE.md](docs/PLAY_STORE.md).
+- House rules for the code and the design: [CLAUDE.md](CLAUDE.md).
 
-## Styling the app differently from the site
+Store art is generated from the app's own icon paths:
 
-The shell adds `QuranShell/android` to the user agent, and the reader turns
-that into `data-shell="android"` on `<body>`. So an app-only rule is:
+```bash
+python tools/render_store_art.py
+```
 
-    body[data-shell="android"] .drawer-tabs { … }
+## Privacy
 
-in the same stylesheet as everything else. Not a second copy of the CSS: one
-that has to be kept in step by hand always stops being kept in step.
-
-The assets are ignored by git — they are derived from `public/`, which already
-holds them. Run the sync again after any change to the web app, or the app will
-build with the copy it had.
-
-There is no Gradle wrapper committed. Android Studio writes one on first open;
-from the command line, `gradle wrapper` once.
-
-## Next
-
-- The bridge: `renderPage(n)`, `highlight(word)`, and a tap on a word coming
-  back out, so the native side can drive the page and the player.
-- A native surah list and player, replacing the drawer and the floating window
-  that the web layout uses.
-- Downloads written to app storage rather than through the browser.
+Nothing leaves the phone unless you send it. Reading position, bookmarks and settings stay on the device; a report you choose to send from Settings carries your message and the app and device details, and nothing else. Full text: [readqurantoday.com/privacy](https://readqurantoday.com/privacy/).
