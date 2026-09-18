@@ -248,6 +248,9 @@ class SurahListActivity : LanguageActivity() {
         refreshLists()
     }
 
+    /* The switch's own face, read before the first bolding, so the app font survives it. */
+    private val segFace by lazy { findViewById<TextView>(R.id.seg_surahs).typeface }
+
     private fun showJuz(on: Boolean) {
         byJuz = on
         val list = findViewById<RecyclerView>(R.id.list)
@@ -256,9 +259,8 @@ class SurahListActivity : LanguageActivity() {
             findViewById<TextView>(seg).apply {
                 setBackgroundResource(if (isOn) R.drawable.seg_on else R.drawable.row_flat)
                 setTextColor(getColor(if (isOn) R.color.accent else R.color.text_mute))
-                typeface = android.graphics.Typeface.defaultFromStyle(
-                    if (isOn) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL
-                )
+                // Built from the theme's own face: defaultFromStyle would put the system font here
+                typeface = Typeface.create(segFace, if (isOn) Typeface.BOLD else Typeface.NORMAL)
             }
         }
     }
