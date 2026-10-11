@@ -87,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textColor="@color/text_mute"
-                    android:textSize="@dimen/row_meta" />
+                    android:textSize="@dimen/part_meta" />
             </LinearLayout>
 
             <!-- A hizb's start, quarter, half and three-quarters, each a pie and the page it begins on -->

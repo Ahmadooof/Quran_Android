@@ -139,6 +139,8 @@
     <dimen name="quarter_chip_radius">18dp</dimen>
     <!-- Between a juz or hizb row's name and its surah beside it -->
     <dimen name="part_surah_gap">8dp</dimen>
+    <!-- A juz or page row's juz or page beside its surah, sized to sit level with the names -->
+    <dimen name="part_meta">14sp</dimen>
     <!-- The bubble beside a held list handle, naming where the drag has reached -->
     <dimen name="scroll_bubble_gap">12dp</dimen>
     <dimen name="scroll_bubble_pad_x">16dp</dimen>
