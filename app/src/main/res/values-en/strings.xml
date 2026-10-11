@@ -368,7 +368,6 @@
     <string name="no_recent_pages">No pages read yet</string>
     <string name="places_pages_head">Latest pages you’ve read</string>
     <string name="places_surahs_head">Latest you’ve read in each surah</string>
-    <string name="range">%1$s–%2$s</string>
     <string name="heard_each">Your listening, surah by surah</string>
     <string name="dl_about">Downloading keeps a recitation in the app so you can listen without internet. Once downloaded, you can share a surah or save a copy to your phone\'s Download/Quran folder.</string>
     <string name="dl_get_first">Download the surah first</string>

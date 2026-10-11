@@ -439,7 +439,6 @@
     <string name="no_recent_pages">لم تُقرأ أي صفحة بعد</string>
     <string name="places_pages_head">آخر الصفحات التي قرأتها</string>
     <string name="places_surahs_head">آخر ما قرأته من كل سورة</string>
-    <string name="range">%1$s–%2$s</string>
     <string name="heard_each">استماعك لكل سورة</string>
     <string name="dl_about">التنزيل يحفظ التلاوة داخل التطبيق لتستمع إليها دون إنترنت. وبعد التنزيل يمكنك مشاركة السورة، أو حفظ نسخة منها في مجلد ⁦Download/⁠Quran⁩ في الهاتف.</string>
     <string name="dl_get_first">نزّل السورة أولًا</string>
