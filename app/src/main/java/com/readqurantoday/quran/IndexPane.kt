@@ -123,8 +123,6 @@ class IndexPane(
                 keepToColumn()
                 addHandle(dragLabel(viewType))
                 if (viewType == PAGES) addPinnedHead(part = { pageJuz[it] }, said = ::juzHead)
-                // Two hizb to a juz: the hizb list is grouped under its juz as the pages are
-                if (viewType == HIZB) addPinnedHead(part = { it / 2 + 1 }, said = { host.getString(R.string.head_juz, figures(it, res)) })
             }
         )
 

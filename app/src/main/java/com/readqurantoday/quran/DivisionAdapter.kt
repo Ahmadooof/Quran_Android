@@ -38,7 +38,13 @@ class DivisionAdapter(
         val surah = surahOf?.invoke(number)
         row.findViewById<View>(R.id.div_surah).apply {
             visibility = if (surah != null) View.VISIBLE else View.GONE
-            if (surah != null) fillSurahTitle(this, surah, R.dimen.surah_title)
+            if (surah != null) {
+                fillSurahTitle(this, surah, R.dimen.surah_title)
+                // Part of the quiet line beneath the title, so in its grey
+                val grey = context.getColor(R.color.text_mute)
+                findViewById<TextView>(R.id.surah_word).setTextColor(grey)
+                findViewById<TextView>(R.id.surah_name).setTextColor(grey)
+            }
         }
         fillQuarters(row, quarters?.invoke(number).orEmpty())
 
