@@ -87,16 +87,6 @@ object Surahs {
     /** The surahs on [page], in order: one, or more where a surah ends or begins partway down it. */
     fun onPage(page: Int): List<Surah> = all.filter { page in it.from..it.to }
 
-    // Juz that begin partway down their first page, which therefore opens in the juz before;
-    // checked against every page's own top
-    private val JUZ_PARTWAY = setOf(4, 7, 11, 26)
-
-    /** The juz [page] opens in, through the juz it ends in; one juz unless a juz begins partway down it. */
-    fun juzSpanOf(page: Int): IntRange {
-        val j = juzOfPage(page)
-        return if (j in JUZ_PARTWAY && juz.getOrNull(j - 1) == page) j - 1..j else j..j
-    }
-
     /** Which hizb this page is in (1–60), or 0 if not yet loaded. */
     fun hizbOfPage(page: Int): Int = countUpTo(hizb, page)
 

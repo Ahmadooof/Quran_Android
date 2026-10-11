@@ -52,11 +52,8 @@ class IndexPane(
     // Where a hizb, its quarter, half and three-quarters begin, by page; the chips say it, so no line under the title
     private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb)
 
-    private fun juzSaid(page: Int): String {
-        val span = Surahs.juzSpanOf(page)
-        return if (span.first == span.last) host.getString(R.string.head_juz, figures(span.first, res))
-        else host.getString(R.string.head_juz, host.getString(R.string.range, figures(span.first, res), figures(span.last, res)))
-    }
+    // The juz the page's own head names, so the list and the page agree
+    private fun juzSaid(page: Int): String = host.getString(R.string.head_juz, figures(Surahs.juzOfPage(page), res))
 
     // --- finding one's way down a long list ---
 
