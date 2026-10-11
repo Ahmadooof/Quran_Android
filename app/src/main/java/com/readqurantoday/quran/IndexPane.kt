@@ -16,9 +16,9 @@ class IndexPane(
 
     private val res = host.resources
     private val juz = division(Surahs.juzStarts(), { host.getString(R.string.head_juz, figures(it, res)) },
-        { partWhere(Openings.ofJuz(host, it), Surahs.juzStarts()[it - 1]) }, { listOfNotNull(Openings.ofJuz(host, it)?.surah) }, false, null, Surahs::juzOfPage)
+        { host.getString(R.string.head_page, figures(Surahs.juzStarts()[it - 1], res)) }, { listOfNotNull(Openings.ofJuz(host, it)) }, true, null, Surahs::juzOfPage)
     private val hizb = division(Surahs.hizbStarts(), { host.getString(R.string.head_hizb, figures(it, res)) },
-        { "" }, { listOfNotNull(Openings.ofHizb(host, it)?.surah) }, false, ::quarters, Surahs::hizbOfPage)
+        { "" }, { listOfNotNull(Openings.ofHizb(host, it)) }, false, ::quarters, Surahs::hizbOfPage)
     private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, { host.getString(R.string.head_page, figures(it, res)) },
         ::juzSaid, { page -> Surahs.onPage(page).map { it.id } }, true, null) { it }
 
@@ -52,13 +52,6 @@ class IndexPane(
     // Where a hizb, its quarter, half and three-quarters begin, by page; the chips say it, so no line under the title
     private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb)
 
-    // Beside its surah, the ayah it begins at and its page; a surah's first ayah needs no number
-    private fun partWhere(at: Openings.Opening?, page: Int): String {
-        val onPage = host.getString(R.string.head_page, figures(page, res))
-        if (at == null || at.ayah == 1) return onPage
-        return host.getString(R.string.place_line, host.getString(R.string.ayah_at, figures(at.ayah, res)), onPage)
-    }
-
     private fun juzSaid(page: Int): String {
         val span = Surahs.juzSpanOf(page)
         return if (span.first == span.last) host.getString(R.string.head_juz, figures(span.first, res))
@@ -87,8 +80,7 @@ class IndexPane(
 
     private inner class Lists : RecyclerView.Adapter<Lists.Page>() {
 
-        // The list sits in a holder that keeps a slanted scroll from turning to the next list
-        inner class Page(val list: RecyclerView) : RecyclerView.ViewHolder(UpDownFirst(list.context, list))
+        inner class Page(val list: RecyclerView) : RecyclerView.ViewHolder(list)
 
         override fun getItemCount() = lists.size
 

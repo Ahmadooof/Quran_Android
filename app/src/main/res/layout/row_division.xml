@@ -64,7 +64,7 @@
                     android:layoutDirection="rtl" />
             </LinearLayout>
 
-            <!-- The quiet line: on a page row its surahs first, then the rest well apart from them -->
+            <!-- The quiet line: on a juz or page row its surahs first, then the rest -->
             <LinearLayout
                 android:id="@+id/div_under"
                 android:layout_width="match_parent"
@@ -77,7 +77,7 @@
                     android:id="@+id/div_surahs_under"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/part_meta_gap"
+                    android:layout_marginEnd="@dimen/part_surah_gap"
                     android:orientation="horizontal"
                     android:layoutDirection="rtl" />
 

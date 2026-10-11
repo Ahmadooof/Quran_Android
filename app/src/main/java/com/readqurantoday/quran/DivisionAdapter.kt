@@ -13,7 +13,7 @@ class DivisionAdapter(
     private val title: (Int) -> String,
     private val where: (Int) -> String,
     private val surahsOf: (Int) -> List<Int>,
-    // Pages name their surahs on the quiet line, the page number alone above; juz and hizb beside the title
+    // Juz and pages name their surahs on the quiet line, the number alone above; hizb beside the title
     private val surahsUnder: Boolean,
     private val quarters: ((Int) -> List<Int>)?,
     private val onOpen: (Int) -> Unit,

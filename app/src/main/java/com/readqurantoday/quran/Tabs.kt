@@ -1,7 +1,6 @@
 package com.readqurantoday.quran
 
 import android.graphics.Typeface
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -45,20 +44,7 @@ class SwipeTabs(
             }
         })
         mark(pager.currentItem)
-        landOnTouch()
     }
-
-    // A touch while a page still slides in finishes the slide there, or the pager catches it and falls back
-    private fun landOnTouch() = (pager.getChildAt(0) as RecyclerView).addOnItemTouchListener(
-        object : RecyclerView.SimpleOnItemTouchListener() {
-            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                if (e.actionMasked == MotionEvent.ACTION_DOWN && rv.scrollState == RecyclerView.SCROLL_STATE_SETTLING) {
-                    pager.setCurrentItem(pager.currentItem, false)
-                }
-                return false
-            }
-        }
-    )
 
     val current: Int get() = pager.currentItem
 
@@ -88,8 +74,9 @@ class ViewPages(private val views: List<View>) : RecyclerView.Adapter<ViewPages.
     // One view type a page, so each made view is handed out once and only once
     override fun getItemViewType(position: Int) = position
 
-    // Each page kept to its own up-and-down scroll until a drag is clearly sideways
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Page(UpDownFirst(parent.context, views[viewType]))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Page(views[viewType].apply {
+        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    })
 
     override fun onBindViewHolder(holder: Page, position: Int) = Unit
 }
