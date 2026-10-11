@@ -12,6 +12,7 @@ class DivisionAdapter(
     private val starts: IntArray,
     private val title: (Int) -> String,
     private val where: (Int) -> String,
+    private val surahOf: ((Int) -> Int?)?,
     private val quarters: ((Int) -> List<Int>)?,
     private val onOpen: (Int) -> Unit,
     private val onPlay: (Int) -> Unit,
@@ -34,6 +35,11 @@ class DivisionAdapter(
         row.findViewById<TextView>(R.id.div_num).text = figures(number, row.resources)
         row.findViewById<TextView>(R.id.div_title).text = title(number)
         row.findViewById<TextView>(R.id.div_where).text = where(number)
+        val surah = surahOf?.invoke(number)
+        row.findViewById<View>(R.id.div_surah).apply {
+            visibility = if (surah != null) View.VISIBLE else View.GONE
+            if (surah != null) fillSurahTitle(this, surah, R.dimen.surah_title)
+        }
         fillQuarters(row, quarters?.invoke(number).orEmpty())
 
         // The seam belongs between two rows, not under the last one

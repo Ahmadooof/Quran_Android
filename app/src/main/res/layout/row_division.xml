@@ -47,13 +47,30 @@
                 android:textSize="@dimen/part_title"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/div_where"
+            <!-- Where it begins: the surah as the surah list writes it, then the ayah and page -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/text_mute"
-                android:textSize="@dimen/row_meta" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <include
+                    android:id="@+id/div_surah"
+                    layout="@layout/part_surah_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/icon_label_gap"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/div_where"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/text_mute"
+                    android:textSize="@dimen/row_meta" />
+            </LinearLayout>
 
             <!-- A hizb's quarter, half and three-quarters, each a pie and the page it begins on -->
             <LinearLayout

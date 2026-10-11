@@ -40,9 +40,13 @@ class UpDownFirst(context: Context, page: View) : FrameLayout(context) {
             MotionEvent.ACTION_MOVE -> if (!decided) {
                 val across = abs(e.x - fromX)
                 val down = abs(e.y - fromY)
-                if (across > slop || down > slop) {
+                // Up or down wins as soon as it shows; sideways must go further, as a thumb's first pixels wander
+                val sideways = across > down * SIDEWAYS
+                if (down > slop && !sideways) {
                     decided = true
-                    parent?.requestDisallowInterceptTouchEvent(across <= down * SIDEWAYS)
+                } else if (across > slop * SIDEWAYS_SLOPS && sideways) {
+                    decided = true
+                    parent?.requestDisallowInterceptTouchEvent(false)
                 }
             }
         }
@@ -52,5 +56,7 @@ class UpDownFirst(context: Context, page: View) : FrameLayout(context) {
     private companion object {
         // How much more sideways than up or down a drag must be before it turns the page
         const val SIDEWAYS = 1.5f
+        // How many touch slops sideways before the page turns
+        const val SIDEWAYS_SLOPS = 2
     }
 }
