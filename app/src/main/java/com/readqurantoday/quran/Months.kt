@@ -1,12 +1,12 @@
 package com.readqurantoday.quran
 
 import android.content.Context
-import android.text.format.DateUtils
 import android.icu.util.Calendar
 import android.icu.util.GregorianCalendar
 import android.icu.util.IslamicCalendar
 import android.icu.util.TimeZone
 import android.icu.util.ULocale
+import android.text.format.DateUtils
 
 // Months by the Hijri (Umm al-Qura, as the Saudi calendar counts it) or the Gregorian calendar
 

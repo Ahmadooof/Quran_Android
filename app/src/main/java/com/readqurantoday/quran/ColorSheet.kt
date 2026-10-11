@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -12,6 +13,10 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.jaredrummler.android.colorpicker.ColorPickerView
 import java.util.Locale
 
@@ -144,7 +149,20 @@ fun Activity.colorSheet(
     land(initial)
 
     /* The sheet rises with the keyboard, so the code box is never under it. */
-    dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        // Laid out under the keyboard, and lifted by the keyboard's own height
+        dialog.window?.let { WindowCompat.setDecorFitsSystemWindows(it, false) }
+        val rest = view.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val below = insets.getInsets(WindowInsetsCompat.Type.ime() or WindowInsetsCompat.Type.navigationBars()).bottom
+            v.updatePadding(bottom = rest + below)
+            insets
+        }
+    } else {
+        // Before Android 11 the window resizing for the keyboard is the only way
+        @Suppress("DEPRECATION")
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+    }
 
     view.findViewById<View>(R.id.color_done).setOnClickListener {
         keep(chosen)

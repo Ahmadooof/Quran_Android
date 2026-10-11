@@ -25,8 +25,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import java.io.File
-import java.util.concurrent.Executors
 import java.util.Locale
+import java.util.concurrent.Executors
 
 // One word said on its own, from the word-by-word recordings; apart from Recite so a surah keeps its place
 @OptIn(UnstableApi::class)

@@ -79,15 +79,6 @@
             android:exported="false"
             android:theme="@style/Theme.Quran.Index" />
 
-        <!-- Sent by the system's download service, so it must be exported to arrive. -->
-        <receiver
-            android:name=".DownloadDone"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
-            </intent-filter>
-        </receiver>
-
         <!-- Downloaded recitations handed to other apps from the app's own storage -->
         <provider
             android:name=".AudioShare"

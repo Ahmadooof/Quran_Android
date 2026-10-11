@@ -20,8 +20,10 @@ import androidx.core.view.WindowInsetsControllerCompat
 fun Activity.paintBars(roof: Int?, floor: Int?) {
     val under = floor ?: roof
     // Every screen is edge-to-edge, so the bars are see-through and coloured strips sit behind them
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        window.isNavigationBarContrastEnforced = false
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
+    // From Android 15 the status bar is never given a contrast scrim, and the switch is retired
+    if (Build.VERSION.SDK_INT in Build.VERSION_CODES.Q until Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+        @Suppress("DEPRECATION")
         window.isStatusBarContrastEnforced = false
     }
     val content = findViewById<ViewGroup>(android.R.id.content)

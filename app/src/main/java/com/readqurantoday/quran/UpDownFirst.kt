@@ -1,5 +1,6 @@
 package com.readqurantoday.quran
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.MotionEvent
 import android.view.View
@@ -13,6 +14,8 @@ import kotlin.math.abs
  * the page's to scroll; only a clearly sideways one is let through to turn the page, so a slanted scroll never
  * slips into the next tab.
  */
+// Made only in code, around a page it is handed; never from a layout
+@SuppressLint("ViewConstructor")
 class UpDownFirst(context: Context, page: View) : FrameLayout(context) {
 
     private val slop = ViewConfiguration.get(context).scaledTouchSlop

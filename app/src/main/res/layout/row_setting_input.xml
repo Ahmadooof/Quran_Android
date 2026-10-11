@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A text field inside a settings card: the card is its ground, no underline of its own. -->
+<!-- A text field inside a settings card: the card is its ground, no underline of its own. Its hint names it;
+     autofill is off unless the field asks for it, as the email one does -->
 <EditText xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:importantForAutofill="no"
+    tools:ignore="LabelFor"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="52dp"

@@ -4,10 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Picture
 import android.os.Build
-import androidx.annotation.RequiresApi
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import androidx.annotation.RequiresApi
 import java.util.concurrent.Executors
 
 // Pages pre-rendered to hardware bitmaps so swipes and zoom move images instead of stroked glyphs

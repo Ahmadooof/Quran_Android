@@ -56,7 +56,6 @@ class DownloadsPane(
                 refresh()
             }.also { getAll = it },
             action(R.string.dl_stop_all) {
-                for (s in Downloads.inFlight(host, reciter.id).keys) saveAfterDownload(host, s, reciter.id, false)
                 Downloads.stopAll(host, reciter.id)
                 refresh()
             }.also { stopAll = it },
@@ -127,7 +126,6 @@ class DownloadsPane(
         for ((surah, row) in rows) sayRow(surah, row, surah in kept, flying[surah])
 
         if (flying.isNotEmpty()) tick()
-        catchUpSaves()
     }
 
     // Every row has the same three buttons: save to phone and share wait, greyed, until the surah is downloaded
@@ -152,7 +150,6 @@ class DownloadsPane(
                 say(actButton, act, actLabel, R.string.dl_stop_one, ready = true)
                 actButton.setOnClickListener {
                     Downloads.stop(host, surah, reciter.id)
-                    saveAfterDownload(host, surah, reciter.id, false)
                     refresh()
                 }
             }
@@ -284,21 +281,6 @@ class DownloadsPane(
                 saving = false
                 refresh()
                 if (kept.isNotEmpty()) host.notice(host.getString(R.string.dl_saved_all, figures(done, host.resources)))
-            }
-        }.start()
-    }
-
-    /* Saves the download receiver has not got to yet, done here too while the screen is open. */
-    private var catchingUp = false
-
-    private fun catchUpSaves() {
-        if (catchingUp || saving) return
-        catchingUp = true
-        Thread {
-            val done = saveFinishedDownloads(host)
-            host.runOnUiThread {
-                catchingUp = false
-                if (done > 0 && !host.isFinishing) refresh()
             }
         }.start()
     }

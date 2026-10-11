@@ -12,11 +12,11 @@ import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.PathInterpolator
+import androidx.core.graphics.createBitmap
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
-import androidx.core.graphics.createBitmap
 
 /** Play Books style turn: the far edge stays frozen, the page humps near it and lifts toward the eye as it flips. */
 class PageCurlView @JvmOverloads constructor(

@@ -9,8 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.content.res.ResourcesCompat
-import kotlin.random.Random
 import androidx.core.graphics.withRotation
+import kotlin.random.Random
 
 /** A short burst of confetti over [this] with [message] above it; with the phone's animations off, nothing is shown. */
 fun ViewGroup.celebrate(message: String) {

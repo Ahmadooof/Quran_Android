@@ -127,32 +127,3 @@ fun Activity.openPhoneFolder(reciter: Recite.Reciter) {
     }
     notice(getString(R.string.dl_folder_failed))
 }
-
-// --- save once downloaded ---
-
-private fun waiting(context: Context) =
-    context.getSharedPreferences("save-after-download", Context.MODE_PRIVATE)
-
-fun saveAfterDownload(context: Context, surah: Int, reciter: String, on: Boolean) {
-    waiting(context).edit {
-        if (on) putBoolean("$reciter/$surah", true) else remove("$reciter/$surah")
-    }
-}
-
-/** Save every waiting surah whose download has finished. Blocking: call off the main thread. Returns how many were saved. */
-// The receiver and the open downloads screen may both run this; one at a time, so no surah is copied twice
-private val finishing = Any()
-
-fun saveFinishedDownloads(context: Context): Int = synchronized(finishing) {
-    var saved = 0
-    for (key in waiting(context).all.keys) {
-        val reciterId = key.substringBefore('/')
-        val surah = key.substringAfter('/').toIntOrNull() ?: continue
-        val voice = Recite.reciters().firstOrNull { it.id == reciterId }
-        if (voice == null) { saveAfterDownload(context, surah, reciterId, false); continue }
-        if (!Downloads.has(context, surah, reciterId)) continue
-        if (saveToPhone(context, surah, voice)) saved++
-        saveAfterDownload(context, surah, reciterId, false)
-    }
-    saved
-}

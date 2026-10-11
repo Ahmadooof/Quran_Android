@@ -1,5 +1,6 @@
 package com.readqurantoday.quran
 
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -49,7 +50,13 @@ class FeedbackActivity : CardsActivity(R.string.set_report) {
         }
         blow.card(into, R.string.fb_message, listOf(message))
 
-        email = input(R.string.fb_email_hint, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+        email = input(R.string.fb_email_hint, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS).apply {
+            // The one field the phone may fill: the reader's own address
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
+                setAutofillHints(View.AUTOFILL_HINT_EMAIL_ADDRESS)
+            }
+        }
         blow.card(into, R.string.fb_email, listOf(email, note(R.string.fb_details_note)))
 
         send = action(R.string.fb_send) { submit() }
