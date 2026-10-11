@@ -34,7 +34,7 @@ class SurahRow(v: View, names: Typeface?) : RecyclerView.ViewHolder(v) {
         name.text = String(Character.toChars(Mushaf.nameCode(s.id)))
         name.contentDescription = res.getString(R.string.surah_named, s.name)
 
-        english.text = s.english
+        english.text = res.getString(R.string.surah_english, s.english)
 
         // Where it lies: its juz, then the pages it spans
         val from = Surahs.juzOfPage(s.from)

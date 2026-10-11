@@ -3,6 +3,8 @@
     <string name="app_name">القرآن العظيم</string>
     <!-- "surah <name>", as a printed index names them. -->
     <string name="surah_named">سورة %1$s</string>
+    <!-- The surah's English name, read the same in either language -->
+    <string name="surah_english" translatable="false">Surah %1$s</string>
     <!-- Numbers arrive already written in Arabic figures, so these take strings -->
     <string name="head_juz">الجزء %1$s</string>
     <string name="head_page">الصفحة %1$s</string>
