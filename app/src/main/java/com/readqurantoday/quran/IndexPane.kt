@@ -15,9 +15,9 @@ class IndexPane(
 ) {
 
     private val res = host.resources
-    private val juz = division(Surahs.juzStarts(), R.string.head_juz, ::surahAndPage, null, Surahs::juzOfPage)
-    private val hizb = division(Surahs.hizbStarts(), R.string.head_hizb, ::surahAndPage, ::quarters, Surahs::hizbOfPage)
-    private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, R.string.head_page, ::surahAndJuz, null) { it }
+    private val juz = division(Surahs.juzStarts(), R.string.head_juz, ::pageOnly, ::surahStarting, null, Surahs::juzOfPage)
+    private val hizb = division(Surahs.hizbStarts(), R.string.head_hizb, ::pageOnly, ::surahStarting, ::quarters, Surahs::hizbOfPage)
+    private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, R.string.head_page, ::surahAndJuz, null, null) { it }
 
     private val lists: List<RecyclerView.Adapter<*>> = listOf(surahs, juz, hizb, pages)
 
@@ -31,11 +31,12 @@ class IndexPane(
     /** Rows show which part is being recited; called as the recitation moves or stops. */
     fun refresh() = lists.forEach { it.notifyDataSetChanged() }
 
-    private fun division(starts: IntArray, title: Int, where: (Int) -> String, quarters: ((Int) -> List<Int>)?, numberOf: (Int) -> Int) =
+    private fun division(starts: IntArray, title: Int, where: (Int) -> String, surahOf: ((Int) -> Int?)?, quarters: ((Int) -> List<Int>)?, numberOf: (Int) -> Int) =
         DivisionAdapter(
             starts = starts,
             title = { n -> host.getString(title, figures(n, res)) },
             where = where,
+            surahOf = surahOf,
             quarters = quarters,
             onOpen = open,
             onPlay = { page -> play(page, numberOf) },
@@ -47,8 +48,10 @@ class IndexPane(
     // Where a hizb's quarter, half and three-quarters begin, by page
     private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb).drop(1)
 
-    // The surah it begins in, then the page
-    private fun surahAndPage(page: Int): String = meta(page, host.getString(R.string.head_page, figures(page, res)))
+    // The surah it begins in is beside the title, so the line under it gives only the page
+    private fun pageOnly(page: Int): String = host.getString(R.string.head_page, figures(page, res))
+
+    private fun surahStarting(page: Int): Int? = Surahs.ofPage(page)?.id
 
     // Every surah on the page; its juz is the pinned heading's, said here only where a juz begins partway down it
     private fun surahAndJuz(page: Int): String {
@@ -89,11 +92,6 @@ class IndexPane(
         val last = pageJuz.indexOfLast { it == juz } + 1
         return host.getString(R.string.place_line, host.getString(R.string.head_juz, figures(juz, res)),
             host.getString(R.string.pages_range_short, figures(first, res), figures(last, res)))
-    }
-
-    private fun meta(page: Int, after: String): String {
-        val surah = Surahs.ofPage(page) ?: return after
-        return host.getString(R.string.place_line, host.getString(R.string.surah_named, surah.name), after)
     }
 
     private fun play(page: Int, numberOf: (Int) -> Int) {
