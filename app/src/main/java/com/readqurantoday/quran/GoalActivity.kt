@@ -32,13 +32,13 @@ class GoalActivity : CardsActivity(R.string.goal_title) {
     private fun presets(): List<Pair<Goal, String>> =
         if (hifz) listOf(pages(1) to "", pages(2) to "")
         else listOf(
-            Goal.DEFAULT to getString(R.string.stats_goal_month),
+            Goal.DEFAULT to "",
             withKahf(BAQARAH) to "",
-            withKahf(BAQARAH, AL_IMRAN) to ""
+            Goal(Goal.Kind.JUZ, 1, emptyList(), Goal.ALL_DAYS, kahf = true) to getString(R.string.stats_goal_month)
         )
 
     private fun pages(n: Int) = Goal(Goal.Kind.PAGES, n, emptyList(), Goal.ALL_DAYS, kahf = false)
-    private fun withKahf(vararg surahs: Int) = Goal(Goal.Kind.SURAHS, 0, surahs.toList(), Goal.ALL_DAYS, kahf = true)
+    private fun withKahf(surah: Int) = Goal(Goal.Kind.SURAHS, 0, listOf(surah), Goal.ALL_DAYS, kahf = true)
 
     // A kind's own starting amount, keeping the days already chosen
     private fun startOf(kind: Goal.Kind): Goal = when (kind) {
@@ -210,7 +210,6 @@ class GoalActivity : CardsActivity(R.string.goal_title) {
         private const val HIFZ = "hifz"
         private const val KHATMA = "khatma"
         private const val BAQARAH = 2
-        private const val AL_IMRAN = 3
         private const val JUZ = 30
         private const val KHATMA_MONTH = 30
         private const val KHATMA_LONGEST = 365

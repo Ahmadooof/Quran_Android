@@ -49,7 +49,7 @@ class DivisionAdapter(
         sayPlayButton(row, playing = here && Recite.wantsToPlay(), waiting = here && Recite.waiting())
     }
 
-    // A pie for each quarter in, with its page; heard whole as one sentence
+    // A chip for each quarter in, a pie and its page, that opens there
     private fun fillQuarters(row: View, pages: List<Int>) {
         val line = row.findViewById<View>(R.id.div_quarters)
         if (pages.size < QUARTERS.size) {
@@ -63,6 +63,8 @@ class DivisionAdapter(
         QUARTERS.forEachIndexed { i, (id, icon) ->
             row.findViewById<TextView>(id).apply {
                 text = figures(pages[i], res)
+                contentDescription = res.getString(R.string.hizb_quarter_at, res.getString(SAID[i]), figures(pages[i], res))
+                setOnClickListener { onOpen(pages[i]) }
                 val pie = AppCompatResources.getDrawable(context, icon)?.mutate()?.apply {
                     setBounds(0, 0, size, size)
                     setTint(tint)
@@ -70,11 +72,10 @@ class DivisionAdapter(
                 setCompoundDrawablesRelative(pie, null, null, null)
             }
         }
-        line.contentDescription = res.getString(R.string.hizb_quarters,
-            figures(pages[0], res), figures(pages[1], res), figures(pages[2], res))
     }
 
     private companion object {
+        val SAID = intArrayOf(R.string.quarter_1, R.string.quarter_2, R.string.quarter_3)
         val QUARTERS = listOf(
             R.id.div_q1 to R.drawable.ic_quarter_1,
             R.id.div_q2 to R.drawable.ic_quarter_2,

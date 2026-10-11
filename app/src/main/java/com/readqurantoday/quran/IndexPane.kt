@@ -50,8 +50,7 @@ class IndexPane(
     // The surah it begins in, then the page
     private fun surahAndPage(page: Int): String = meta(page, host.getString(R.string.head_page, figures(page, res)))
 
-    // A page names its own number already, so its surahs and juz stand in: every surah on it, and both juz
-    // where one begins partway down, so the row never names only what the page ends in
+    // Every surah on the page; its juz is the pinned heading's, said here only where a juz begins partway down it
     private fun surahAndJuz(page: Int): String {
         val surahs = Surahs.onPage(page)
         val named = when (surahs.size) {
@@ -59,8 +58,9 @@ class IndexPane(
             1 -> host.getString(R.string.surah_named, surahs[0].name)
             else -> surahs.joinToString(host.getString(R.string.list_join)) { it.name }
         }
-        val juz = juzSaid(page)
-        return if (named.isEmpty()) juz else host.getString(R.string.place_line, named, juz)
+        val span = Surahs.juzSpanOf(page)
+        if (span.first == span.last) return named
+        return if (named.isEmpty()) juzSaid(page) else host.getString(R.string.place_line, named, juzSaid(page))
     }
 
     private fun juzSaid(page: Int): String {
@@ -88,7 +88,7 @@ class IndexPane(
         val first = pageJuz.indexOfFirst { it == juz } + 1
         val last = pageJuz.indexOfLast { it == juz } + 1
         return host.getString(R.string.place_line, host.getString(R.string.head_juz, figures(juz, res)),
-            host.getString(R.string.pages_range, figures(first, res), figures(last, res)))
+            host.getString(R.string.pages_range_short, figures(first, res), figures(last, res)))
     }
 
     private fun meta(page: Int, after: String): String {
@@ -106,7 +106,8 @@ class IndexPane(
 
     private inner class Lists : RecyclerView.Adapter<Lists.Page>() {
 
-        inner class Page(val list: RecyclerView) : RecyclerView.ViewHolder(list)
+        // The list sits in a holder that keeps a slanted scroll from turning to the next list
+        inner class Page(val list: RecyclerView) : RecyclerView.ViewHolder(UpDownFirst(list.context, list))
 
         override fun getItemCount() = lists.size
 

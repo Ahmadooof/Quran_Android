@@ -248,7 +248,7 @@ object Settings {
     fun setInkColor(ctx: Context, color: Int) = setColour(ctx, INK_COLOR, color)
     fun resetInkColor(ctx: Context) = resetColour(ctx, INK_COLOR, null)
 
-    fun paperColor(ctx: Context) = colour(ctx, PAPER_COLOR, null, R.color.paper)
+    fun paperColor(ctx: Context) = colour(ctx, PAPER_COLOR, null, R.color.page_paper)
     fun setPaperColor(ctx: Context, color: Int) = setColour(ctx, PAPER_COLOR, color)
     fun resetPaperColor(ctx: Context) = resetColour(ctx, PAPER_COLOR, null)
 

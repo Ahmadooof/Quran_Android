@@ -60,8 +60,8 @@ data class Goal(val kind: Kind, val amount: Int, val surahs: List<Int>, val days
         const val ALL_DAYS = 0b1111111
         private const val KAHF = 18
 
-        /** A juz every day, and Al-Kahf on Friday as the Sunnah has it. */
-        val DEFAULT = Goal(Kind.JUZ, 1, emptyList(), ALL_DAYS, kahf = true)
+        /** Al-Baqarah and Al-Imran every day, and Al-Kahf on Friday as the Sunnah has it. */
+        val DEFAULT = Goal(Kind.SURAHS, 0, listOf(2, 3), ALL_DAYS, kahf = true)
 
         /** Saturday first, the week as it is lived where Friday is the day of gathering. */
         val WEEK = listOf(

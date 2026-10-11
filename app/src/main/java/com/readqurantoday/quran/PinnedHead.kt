@@ -2,8 +2,8 @@ package com.readqurantoday.quran
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.Typeface
-import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 
@@ -26,14 +26,22 @@ private class PinnedHead(
 
     private val res = list.resources
     val tall = res.getDimension(R.dimen.pinned_head_height)
-    private val margin = res.getDimension(R.dimen.screen_margin)
 
-    private val ground = Paint().apply { color = list.context.getColor(R.color.surface) }
-    private val seam = Paint().apply { color = list.context.getColor(R.color.line) }
+    // A pill floating at the top, as a chat's day is marked, solid so the rows never show through it
+    private val pillTall = res.getDimension(R.dimen.pinned_pill_height)
+    private val pillPad = res.getDimension(R.dimen.pinned_pill_pad)
+    private val pill = RectF()
+    private val ground = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = list.context.getColor(R.color.reader_chrome) }
+    private val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = list.context.getColor(R.color.line)
+        style = Paint.Style.STROKE
+        strokeWidth = res.displayMetrics.density
+    }
     private val words = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = list.context.getColor(R.color.text_mute)
+        color = list.context.getColor(R.color.text)
         textSize = res.getDimension(R.dimen.row_meta)
         typeface = Typeface.create(ResourcesCompat.getFont(list.context, R.font.cairo), Typeface.BOLD)
+        textAlign = Paint.Align.CENTER
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -57,16 +65,12 @@ private class PinnedHead(
         }
         if (now < 0) return
 
-        val head = foot - tall + push
-        c.drawRect(0f, head, list.width.toFloat(), head + tall, ground)
-        c.drawRect(0f, head + tall - SEAM_PX, list.width.toFloat(), head + tall, seam)
-        val rtl = list.layoutDirection == View.LAYOUT_DIRECTION_RTL
-        words.textAlign = if (rtl) Paint.Align.RIGHT else Paint.Align.LEFT
-        val x = if (rtl) list.width - margin else margin
-        c.drawText(said(now), x, head + tall / 2f - (words.descent() + words.ascent()) / 2f, words)
-    }
-
-    private companion object {
-        const val SEAM_PX = 1f
+        val text = said(now)
+        val centre = (foot - tall + push) + tall / 2f
+        val half = words.measureText(text) / 2f + pillPad
+        pill.set(list.width / 2f - half, centre - pillTall / 2f, list.width / 2f + half, centre + pillTall / 2f)
+        c.drawRoundRect(pill, pillTall / 2f, pillTall / 2f, ground)
+        c.drawRoundRect(pill, pillTall / 2f, pillTall / 2f, edge)
+        c.drawText(text, pill.centerX(), centre - (words.descent() + words.ascent()) / 2f, words)
     }
 }

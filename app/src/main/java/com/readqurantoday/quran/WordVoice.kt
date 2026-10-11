@@ -13,6 +13,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSpec
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
@@ -71,10 +72,11 @@ object WordVoice {
         cache = held
         CacheDataSource.Factory()
             .setCache(held)
+            // Files as well as the network: a word kept on the phone plays from there
             .setUpstreamDataSourceFactory(
-                DefaultHttpDataSource.Factory()
+                DefaultDataSource.Factory(app, DefaultHttpDataSource.Factory()
                     .setConnectTimeoutMs(NET_TIMEOUT_MS)
-                    .setReadTimeoutMs(NET_TIMEOUT_MS)
+                    .setReadTimeoutMs(NET_TIMEOUT_MS))
             )
             .also { sources = it }
     }
@@ -114,6 +116,7 @@ object WordVoice {
     /** Fetches a word the reader is likely to ask for next, so Word has it before the tap. */
     fun warm(context: Context, surah: Int, ayah: Int, word: Int) {
         if (surah <= 0 || ayah <= 0 || word < 0 || held(context, surah, ayah, word)) return
+        if (WordPack.file(context, surah, ayah, word) != null) return
         val source = sources(context).createDataSource()
         val spec = DataSpec(uri(surah, ayah, word))
         ahead.execute {
@@ -136,7 +139,8 @@ object WordVoice {
         loading = true
         main.postDelayed(giveUp, GIVE_UP_MS)
         player(context).apply {
-            setMediaItem(MediaItem.fromUri(uri(surah, ayah, word)))
+            // From the phone when every word was fetched for offline, else from the recordings online
+            setMediaItem(MediaItem.fromUri(WordPack.file(context, surah, ayah, word)?.toUri() ?: uri(surah, ayah, word)))
             prepare()
             play()
         }

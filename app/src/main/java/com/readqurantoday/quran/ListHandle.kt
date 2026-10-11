@@ -31,6 +31,8 @@ private class ListHandle(
 
     private val res = list.resources
     private val wide = res.getDimension(R.dimen.scroll_handle)
+    // Held, it widens, so the thumb feels it has it
+    private val heldWide = res.getDimension(R.dimen.scroll_handle_held)
     private val tall = res.getDimension(R.dimen.scroll_handle_tall)
     private val inset = res.getDimension(R.dimen.scroll_handle_inset)
     // A little wider than it looks, but only at the edge, so a flick through the list never takes it
@@ -88,15 +90,16 @@ private class ListHandle(
         val y = top + travel * share.coerceIn(0f, 1f)
         // The side Android gives a scrollbar: left in Arabic, right in English
         val rtl = list.layoutDirection == View.LAYOUT_DIRECTION_RTL
-        val x = if (rtl) inset else list.width - inset - wide
-        box.set(x, y, x + wide, y + tall)
+        val w = if (dragging) heldWide else wide
+        val x = if (rtl) inset else list.width - inset - w
+        box.set(x, y, x + w, y + tall)
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (!shown) return
         place()
         pill.color = if (dragging) held else rest
-        c.drawRoundRect(box, wide / 2f, wide / 2f, pill)
+        c.drawRoundRect(box, box.width() / 2f, box.width() / 2f, pill)
         if (dragging) drawBubble(c)
         // The system leaves this strip to the handle, rather than taking it as a back swipe
         keepOut.set(edgeStart(), box.top.toInt(), edgeStart() + reach.toInt(), box.bottom.toInt())

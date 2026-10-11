@@ -2,6 +2,8 @@
 <resources>
     <!-- Mushaf paper; also the window background. Keep in step with the website's paper colour -->
     <color name="paper">#FFFDF7</color>
+    <!-- A mushaf page by default: warm enough to read as paper on a cool screen, not only on a warm one -->
+    <color name="page_paper">#FBF6EA</color>
     <color name="ink">#1A1A1A</color>
 
     <!-- Same palette as the website -->

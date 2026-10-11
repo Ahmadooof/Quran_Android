@@ -10,7 +10,6 @@
     <string name="head_hizb_quarter">ربع الحزب %1$s</string>
     <string name="head_hizb_half">نصف الحزب %1$s</string>
     <string name="head_hizb_three">ثلاثة أرباع الحزب %1$s</string>
-    <string name="hizb_quarters">الربع ص %1$s، النصف ص %2$s، ثلاثة الأرباع ص %3$s</string>
     <!-- The way back into the page the reader was left on. -->
     <string name="resume">متابعة القراءة</string>
     <string name="resume_reciter">متابعة القارئ</string>
@@ -33,7 +32,6 @@
 
     <!-- The quiet line under a surah's name: its English name, then its length. -->
     <string name="juz_range">الجزء %1$s–%2$s</string>
-    <string name="pages_range">الصفحات %1$s–%2$s</string>
     <!-- Arabic noun forms change with the count; the figure arrives as an Arabic-numeral string -->
 
     <!-- Bottom nav tabs. -->
@@ -46,7 +44,7 @@
     <string name="list_hizb">الأحزاب</string>
     <string name="list_pages">الصفحات</string>
     <string name="tab_juz">الأجزاء</string>
-    <string name="tab_marks">المواضع</string>
+    <string name="tab_marks">مصحفي</string>
     <string name="tab_settings">الإعدادات</string>
     <string name="search_hint">سورة، صفحة، أو آية…</string>
 
@@ -444,4 +442,16 @@
     <string name="dl_about">التنزيل يحفظ التلاوة داخل التطبيق لتستمع إليها دون إنترنت. وبعد التنزيل يمكنك مشاركة السورة، أو حفظ نسخة منها في مجلد ⁦Download/⁠Quran⁩ في الهاتف.</string>
     <string name="dl_get_first">نزّل السورة أولًا</string>
     <string name="dl_saved_short">محفوظة</string>
+    <string name="hizb_quarter_at">%1$s، الصفحة %2$s</string>
+    <string name="quarter_1">ربع الحزب</string>
+    <string name="quarter_2">نصف الحزب</string>
+    <string name="quarter_3">ثلاثة أرباع الحزب</string>
+    <string name="pages_range_short">ص %1$s–%2$s</string>
+    <string name="pages_range">الصفحات %1$s–%2$s</string>
+    <string name="words_title">الكلمات منفردة</string>
+    <string name="words_about">نزّل تسجيل كل كلمة، لتسمع أي كلمة وحدها بزر «كلمة» دون إنترنت.</string>
+    <string name="words_get">تنزيل كل الكلمات</string>
+    <string name="words_resume">متابعة التنزيل</string>
+    <string name="words_remove">حذف الكلمات من الهاتف</string>
+    <string name="words_remove_ask">حذف تسجيلات الكلمات (%1$s)؟ ستُنزّل الكلمة من جديد حين تسمعها.</string>
 </resources>

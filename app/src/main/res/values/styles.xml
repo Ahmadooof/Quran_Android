@@ -32,15 +32,22 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
     </style>
-    <!-- One of a hizb's quarters in its row: a pie of how far in, then the page -->
+    <!-- One of a hizb's quarters in its row: a chip with a pie of how far in and the page, a tap away -->
     <style name="QuarterMark">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/quarter_chip_height</item>
         <item name="android:layout_marginEnd">@dimen/quarter_gap</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:drawablePadding">4dp</item>
-        <item name="android:textColor">@color/text_mute</item>
-        <item name="android:textSize">@dimen/row_meta</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:background">@drawable/chip_quarter</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/quarter_text</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 </resources>

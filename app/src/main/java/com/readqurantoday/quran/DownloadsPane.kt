@@ -28,6 +28,7 @@ class DownloadsPane(
     private lateinit var deleteAll: TextView
     private lateinit var shareAll: TextView
     private lateinit var openFolder: TextView
+    private lateinit var wordsAction: TextView
     private val rows = HashMap<Int, View>(Downloads.SURAHS)
 
     private var ticking = false
@@ -64,6 +65,14 @@ class DownloadsPane(
             action(R.string.dl_open_folder) { host.openPhoneFolder(reciter) }.also { openFolder = it },
             action(R.string.dl_delete_all) { confirmDeleteAll() }.also { deleteAll = it }
         ))
+
+        // Every word on its own, for the Word button without internet: one button for all of them
+        blow.card(into, R.string.words_title, listOf(
+            note(R.string.words_about),
+            action(R.string.words_get) { pressWords() }.also { wordsAction = it }
+        ))
+        WordPack.changed = { if (!host.isFinishing) sayWords() }
+        sayWords()
 
         blow.card(into, R.string.search_surahs, Surahs.list().map { s ->
             blow.inflate(R.layout.row_download, into, false).also { row ->
@@ -180,6 +189,40 @@ class DownloadsPane(
                 else -> host.notice(host.getString(R.string.dl_get_first))
             }
         }
+    }
+
+    // --- words on their own ---
+
+    // Counted off the main thread: the words' folder holds tens of thousands of files
+    private fun sayWords() {
+        val all = WordPack.words(host)
+        Thread {
+            val have = WordPack.have(host)
+            host.runOnUiThread {
+                if (host.isFinishing) return@runOnUiThread
+                val of = host.getString(R.string.of_count, figures(have, host.resources), figures(all, host.resources))
+                wordsAction.text = when {
+                    WordPack.fetching -> host.getString(R.string.place_line, host.getString(R.string.dl_stop_one), of)
+                    have >= all -> host.getString(R.string.words_remove)
+                    have > 0 -> host.getString(R.string.place_line, host.getString(R.string.words_resume), of)
+                    else -> host.getString(R.string.place_line, host.getString(R.string.words_get), bytes(WordPack.bytes(host)))
+                }
+            }
+        }.start()
+    }
+
+    private fun pressWords() {
+        when {
+            WordPack.fetching -> WordPack.stop()
+            WordPack.have(host) >= WordPack.words(host) -> host.sheet(
+                host.getString(R.string.words_remove_ask, bytes(WordPack.bytes(host))),
+                listOf(Choice(host.getString(R.string.dl_delete_do)))
+            ) {
+                Thread { WordPack.remove(host); host.runOnUiThread { sayWords() } }.start()
+            }
+            else -> WordPack.start(host)
+        }
+        sayWords()
     }
 
     // --- actions ---

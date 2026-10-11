@@ -9,7 +9,6 @@
     <string name="head_hizb_quarter">¼ Hizb %1$s</string>
     <string name="head_hizb_half">½ Hizb %1$s</string>
     <string name="head_hizb_three">¾ Hizb %1$s</string>
-    <string name="hizb_quarters">¼ p. %1$s, ½ p. %2$s, ¾ p. %3$s</string>
     <string name="resume">Continue reading</string>
     <string name="resume_reciter">Follow the reciter</string>
     <string name="to_menu">Menu</string>
@@ -24,7 +23,6 @@
     <string name="search_ayah_ref">%1$s · ayah %2$s</string>
 
     <string name="juz_range">Juz %1$s–%2$s</string>
-    <string name="pages_range">Pages %1$s–%2$s</string>
 
     <string name="tab_index">Index</string>
     <string name="tab_search">Search</string>
@@ -34,7 +32,7 @@
     <string name="list_hizb">Hizb</string>
     <string name="list_pages">Pages</string>
     <string name="tab_juz">Juz</string>
-    <string name="tab_marks">Bookmarks</string>
+    <string name="tab_marks">My Quran</string>
     <string name="tab_settings">Settings</string>
     <string name="search_hint">Surah, page, or ayah…</string>
 
@@ -375,4 +373,16 @@
     <string name="dl_about">Downloading keeps a recitation in the app so you can listen without internet. Once downloaded, you can share a surah or save a copy to your phone\'s Download/Quran folder.</string>
     <string name="dl_get_first">Download the surah first</string>
     <string name="dl_saved_short">Saved</string>
+    <string name="hizb_quarter_at">%1$s, page %2$s</string>
+    <string name="quarter_1">A quarter into the hizb</string>
+    <string name="quarter_2">Half the hizb</string>
+    <string name="quarter_3">Three quarters into the hizb</string>
+    <string name="pages_range_short">pp. %1$s–%2$s</string>
+    <string name="pages_range">Pages %1$s–%2$s</string>
+    <string name="words_title">Single words</string>
+    <string name="words_about">Download every word\'s recording, to hear any word on its own with Word, without internet.</string>
+    <string name="words_get">Download all words</string>
+    <string name="words_resume">Continue downloading</string>
+    <string name="words_remove">Remove words from the phone</string>
+    <string name="words_remove_ask">Remove the word recordings (%1$s)? A word is fetched again when you hear it.</string>
 </resources>

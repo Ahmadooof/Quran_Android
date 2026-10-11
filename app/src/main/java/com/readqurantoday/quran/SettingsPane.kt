@@ -81,7 +81,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
             rows.add(colorRow(
                 label = R.string.set_paper_color,
                 current = { Settings.paperColor(look) },
-                fallback = { look.getColor(R.color.paper) },
+                fallback = { look.getColor(R.color.page_paper) },
                 picks = PAPER_PICKS,
                 trial = { line, c -> line.tryOn(paper = c) },
                 keep = { Settings.setPaperColor(look, it) },
