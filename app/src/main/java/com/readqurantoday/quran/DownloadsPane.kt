@@ -353,7 +353,8 @@ class DownloadsPane(
         v.imageTintList = ColorStateList.valueOf(host.getColor(colour))
     }
 
-    private fun bytes(n: Long): String = Formatter.formatShortFileSize(host, n)
+    // The phone writes sizes in its own digits; the screen's are the app's
+    private fun bytes(n: Long): String = localDigits(Formatter.formatShortFileSize(host, n), host.resources)
 
     private companion object {
         const val WAITING = 0.45f
