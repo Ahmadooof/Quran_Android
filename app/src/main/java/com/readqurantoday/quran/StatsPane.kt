@@ -58,7 +58,7 @@ class StatsPane(private val host: Activity, strip: View, pager: ViewPager2) {
     // The first look at the day's reached goal is met with a celebration; later looks are quiet
     private fun celebrateOnce() {
         val goal = Stats.goal(host)
-        if (goal == 0 || ReadingTab.readToday(Stats.day(host, Stats.today()), goal) < goal || Stats.celebrated(host)) return
+        if (goal == 0 || Stats.day(host, Stats.today()).counted(goal) < goal || Stats.celebrated(host)) return
         Stats.setCelebrated(host)
         val over = host.findViewById<ViewGroup>(android.R.id.content)
         over.postDelayed({ over.celebrate(host.getString(R.string.goal_done)) }, CELEBRATE_AFTER_MS)

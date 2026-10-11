@@ -22,7 +22,7 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         blow.card(into, 0, goalRows(today, goal, into))
         blow.card(into, R.string.stats_today, todayRows(today))
         val thisMonth = Stats.monthDays(host)
-        val monthPages = thisMonth.sumOf { it.pages.size }
+        val monthPages = thisMonth.withIndex().sumOf { (i, d) -> d.counted(goalOn(Stats.today() - (thisMonth.size - 1 - i), goal)) }
         into.addView(cards.pair(
             Tile(R.drawable.ic_calendar, if (monthPages == 0) none(res) else pagesSaid(monthPages, res), host.getString(R.string.stats_pages_month)),
             Tile(R.drawable.ic_clock, spent(thisMonth.sumOf { it.readSec }, res), host.getString(R.string.stats_read_month))
@@ -33,7 +33,7 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
     private fun goalRows(today: Stats.Day, goal: Int, into: LinearLayout): List<View> {
         val plan = Stats.goalPlan(host)
         // A khatma's pages a day are only known for today, so any reading counts toward it on other days
-        val view = rings.view(KEY, readToday(today, goal), goal, R.string.stats_none_today, R.string.chart_read,
+        val view = rings.view(KEY, today.counted(goal), goal, R.string.stats_none_today, R.string.chart_read,
             want = { _, weekday -> if (plan.kind == Goal.Kind.KHATMA) 1 else plan.pagesOn(weekday) },
             done = { day -> Stats.day(host, day).let { if (it.doneByHand) Int.MAX_VALUE else it.pages.size } })
         val rows = mutableListOf(view, cards.changeRow(khatmaNote(plan, goal).ifEmpty { plan.said(host) }) { GoalActivity.open(host) })
@@ -70,20 +70,10 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
             host.getString(R.string.speed_per_hour, pagesSaid(perHour.roundToInt(), res), juzSaid(perHour, res)))
     }
 
-    // The last seven days, each against its own goal; a khatma's pages a day are only known for today
+    // The last seven days, each against its own goal
     private fun weekRows(week: List<Stats.Day>, goal: Int): List<View> {
-        val plan = Stats.goalPlan(host)
-        val cal = Calendar.getInstance()
-        val goals = week.indices.map { i ->
-            val ago = week.size - 1 - i
-            cal.timeInMillis = Stats.noonOf(Stats.today() - ago)
-            when {
-                ago == 0 -> goal
-                plan.kind == Goal.Kind.KHATMA -> 0
-                else -> plan.pagesOn(cal.get(Calendar.DAY_OF_WEEK))
-            }
-        }
-        val counts = week.map { it.pages.size }
+        val goals = week.indices.map { i -> goalOn(Stats.today() - (week.size - 1 - i), goal) }
+        val counts = week.mapIndexed { i, d -> d.counted(goals[i]) }
         val pad = res.getDimensionPixelSize(R.dimen.tile_pad)
         val chart = DayBars(host).apply {
             setPadding(pad, pad, pad, pad)
@@ -99,6 +89,16 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         return listOf(withKey, cards.row(host.getString(R.string.chart_total), pagesSaid(counts.sum(), res)))
     }
 
+    // A day's goal by its weekday; a khatma's pages a day are only known for today
+    private fun goalOn(day: Long, todayGoal: Int): Int {
+        if (day == Stats.today()) return todayGoal
+        val plan = Stats.goalPlan(host)
+        if (plan.kind == Goal.Kind.KHATMA) return 0
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = Stats.noonOf(day)
+        return plan.pagesOn(cal.get(Calendar.DAY_OF_WEEK))
+    }
+
     // Today by name, the days before it by their weekday
     private fun dayName(ago: Int): String {
         if (ago == 0) return host.getString(R.string.chart_today)
@@ -107,11 +107,8 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         return res.getStringArray(R.array.weekdays_short)[cal.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY]
     }
 
-    companion object {
-        private const val KEY = "today"
-        private const val SWITCH_SETTLE_MS = 250L
-
-        /** Pages read today, or the whole goal once the reader says it was read elsewhere. */
-        fun readToday(today: Stats.Day, goal: Int) = if (today.doneByHand) maxOf(today.pages.size, goal) else today.pages.size
+    private companion object {
+        const val KEY = "today"
+        const val SWITCH_SETTLE_MS = 250L
     }
 }

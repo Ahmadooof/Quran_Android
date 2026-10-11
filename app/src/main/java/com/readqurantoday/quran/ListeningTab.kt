@@ -9,7 +9,7 @@ import com.readqurantoday.quran.StatCards.Companion.WEEK
 import com.readqurantoday.quran.StatCards.Tile
 import kotlin.math.abs
 
-/** The listening tab: time heard today and this week against the week before, and the surahs heard most. */
+/** The listening tab: time heard today and this week against the week before, and every surah with all its time. */
 class ListeningTab(private val cards: StatCards) {
 
     private val host = cards.host
@@ -24,18 +24,18 @@ class ListeningTab(private val cards: StatCards) {
                 showTrend(it, (weekSec + 30) / 60, (before.sumOf { d -> d.listenSec } + 30) / 60)
             }
         ))
-        mostHeard(week, into)?.let { cards.blow.card(into, host.getString(R.string.stats_most_heard, figures(WEEK, res)), it) }
+        heardRows(into)?.let { cards.blow.card(into, R.string.heard_each, it) }
     }
 
-    private fun mostHeard(week: List<Stats.Day>, into: LinearLayout): List<View>? {
-        val heard = HashMap<Int, Int>()
-        week.forEach { d -> d.surahSec.forEach { (s, sec) -> heard[s] = (heard[s] ?: 0) + sec } }
-        val top = heard.entries.sortedByDescending { it.value }.take(TOP_HEARD)
-        return top.map { (surah, sec) -> heardRow(surah, sec, into) }.ifEmpty { null }
+    // Every surah heard, most first, with all its time since statistics began; its bar against the most heard
+    private fun heardRows(into: LinearLayout): List<View>? {
+        val heard = Stats.heardInAll(host).filterValues { it > 0 }.entries.sortedByDescending { it.value }
+        val most = heard.firstOrNull()?.value ?: return null
+        return heard.map { (surah, sec) -> heardRow(surah, sec, most, into) }
     }
 
     // A surah heading its own row is written as the mushaf writes it
-    private fun heardRow(surah: Int, sec: Int, into: LinearLayout): View =
+    private fun heardRow(surah: Int, sec: Int, most: Int, into: LinearLayout): View =
         cards.blow.inflate(R.layout.row_place, into, false).apply {
             isClickable = false
             findViewById<ImageView>(R.id.place_icon).apply {
@@ -44,6 +44,7 @@ class ListeningTab(private val cards: StatCards) {
             }
             fillSurahTitle(findViewById(R.id.place_title), surah, R.dimen.surah_title_row)
             findViewById<TextView>(R.id.place_detail).text = spent(sec, res)
+            findViewById<View>(R.id.place_track).fillTrack(sec.toFloat(), most.toFloat())
         }
 
     // Up or down against the week before; nothing until there is a week before to compare with
@@ -67,9 +68,5 @@ class ListeningTab(private val cards: StatCards) {
             then == 0 -> host.getString(R.string.trend_new)
             else -> host.getString(if (up) R.string.trend_up else R.string.trend_down, pct)
         }
-    }
-
-    private companion object {
-        const val TOP_HEARD = 3
     }
 }

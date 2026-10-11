@@ -44,10 +44,23 @@ object Stats {
     private const val SINCE = "since"
     private const val HIJRI = "hijri"
     private const val CELEBRATED = "celebrated"
+    private const val HEARD = "heard"
 
-    /** One day: seconds on each page, seconds heard from each surah, and whether the reader said the goal was done. */
-    data class Day(val pageSec: Map<Int, Int>, val surahSec: Map<Int, Int>, val doneByHand: Boolean = false) {
+    /**
+     * One day: seconds on each page, seconds heard from each surah, and whether the reader said the goal was read
+     * elsewhere, with how many pages had been read here when they said so.
+     */
+    data class Day(
+        val pageSec: Map<Int, Int>,
+        val surahSec: Map<Int, Int>,
+        val doneByHand: Boolean = false,
+        val handFrom: Int = 0
+    ) {
         val pages: List<Int> get() = pageSec.filter { (page, sec) -> sec >= readFrom(page) }.keys.sorted()
+
+        /** Pages the day counts against [goal]: those read here, or the goal and every page read here after it was said done. */
+        fun counted(goal: Int): Int = if (doneByHand) goal + maxOf(0, pages.size - handFrom) else pages.size
+
         val readSec: Int get() = pageSec.values.sum()
         val listenSec: Int get() = surahSec.values.sum()
     }
@@ -85,6 +98,19 @@ object Stats {
         if (surah !in 1..114 || sec <= 0) return
         val day = day(ctx, today())
         save(ctx, today(), day.copy(surahSec = day.surahSec + (surah to (day.surahSec[surah] ?: 0) + sec)))
+        val total = heardInAll(ctx)
+        store(ctx).edit { putString(HEARD, JSONObject((total + (surah to (total[surah] ?: 0) + sec)).mapKeys { it.key.toString() }).toString()) }
+    }
+
+    /** Seconds heard of each surah since statistics began; before they were kept, the days still on the phone stand in. */
+    fun heardInAll(ctx: Context): Map<Int, Int> {
+        val prefs = store(ctx)
+        prefs.getString(HEARD, null)?.let { kept -> return counts(runCatching { JSONObject(kept) }.getOrNull()) }
+        val sum = HashMap<Int, Int>()
+        prefs.all.keys.filter { it.startsWith(DAY) }.mapNotNull { it.removePrefix(DAY).toLongOrNull() }.forEach { d ->
+            day(ctx, d).surahSec.forEach { (s, sec) -> sum[s] = (sum[s] ?: 0) + sec }
+        }
+        return sum
     }
 
     // A finished khatma is counted and the next one starts at once
@@ -110,11 +136,14 @@ object Stats {
     fun day(ctx: Context, day: Long): Day {
         val o = store(ctx).getString(DAY + day, null)?.let { runCatching { JSONObject(it) }.getOrNull() }
             ?: return Day(emptyMap(), emptyMap())
-        return Day(counts(o.optJSONObject("r")), counts(o.optJSONObject("l")), o.optBoolean("m"))
+        return Day(counts(o.optJSONObject("r")), counts(o.optJSONObject("l")), o.optBoolean("m"), o.optInt("h"))
     }
 
     /** Today's reading goal said done by the reader, for reading from a printed mushaf. */
-    fun setDoneByHand(ctx: Context, on: Boolean) = save(ctx, today(), day(ctx, today()).copy(doneByHand = on))
+    fun setDoneByHand(ctx: Context, on: Boolean) {
+        val now = day(ctx, today())
+        save(ctx, today(), now.copy(doneByHand = on, handFrom = if (on) now.pages.size else 0))
+    }
 
     /** The last [n] days, oldest first, today last. */
     fun lastDays(ctx: Context, n: Int): List<Day> {
@@ -228,7 +257,7 @@ object Stats {
         val o = JSONObject()
             .put("r", JSONObject(record.pageSec.mapKeys { it.key.toString() }))
             .put("l", JSONObject(record.surahSec.mapKeys { it.key.toString() }))
-        if (record.doneByHand) o.put("m", true)
+        if (record.doneByHand) o.put("m", true).put("h", record.handFrom)
         val prefs = store(ctx)
         prefs.edit {
             if (!prefs.contains(SINCE)) putLong(SINCE, day)

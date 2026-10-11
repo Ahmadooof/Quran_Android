@@ -250,7 +250,6 @@
     <string name="stats_new_khatma_do">ابدأ من جديد</string>
     <string name="stats_week">وقت الاستماع في آخر %1$s أيام</string>
     <string name="stats_chart_desc">الصفحات المقروءة في كل يوم من آخر %1$s أيام، وأكثرها في يوم %2$s</string>
-    <string name="stats_most_heard">الأكثر استماعًا في آخر %1$s أيام</string>
     <string name="stats_private">إحصاءات قراءتك وحفظك تبقى في هاتفك فقط، ولا تُرسل إلى أي مكان. تُحسب الصفحة مقروءة بعد بقائها على الشاشة عشر ثوانٍ، وخمسًا لصفحتي الفاتحة وأول البقرة لقِصَرهما.</string>
     <string name="percent">%1$s٪</string>
     <string name="time_under_minute">أقل من دقيقة</string>
@@ -450,4 +449,5 @@
     <string name="places_pages_head">آخر الصفحات التي قرأتها</string>
     <string name="places_surahs_head">آخر ما قرأته من كل سورة</string>
     <string name="range">%1$s–%2$s</string>
+    <string name="heard_each">استماعك لكل سورة</string>
 </resources>

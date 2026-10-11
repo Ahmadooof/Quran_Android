@@ -212,7 +212,6 @@
     <string name="stats_new_khatma_do">Start over</string>
     <string name="stats_week">Listening, last %1$s days</string>
     <string name="stats_chart_desc">Pages read on each of the last %1$s days, most on one day %2$s</string>
-    <string name="stats_most_heard">Most heard in the last %1$s days</string>
     <string name="stats_private">Your reading and memorising statistics stay on your phone and are never sent anywhere. A page counts as read after ten seconds on screen, or five for the two short opening pages, Al-Fatiha and the start of Al-Baqarah.</string>
     <string name="percent">%1$s%%</string>
     <string name="time_under_minute">Under a minute</string>
@@ -381,4 +380,5 @@
     <string name="places_pages_head">Latest pages you’ve read</string>
     <string name="places_surahs_head">Latest you’ve read in each surah</string>
     <string name="range">%1$s–%2$s</string>
+    <string name="heard_each">Your listening, surah by surah</string>
 </resources>
