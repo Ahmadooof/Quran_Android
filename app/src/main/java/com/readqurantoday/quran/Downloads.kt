@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import org.json.JSONObject
 import java.util.concurrent.Executors
 
 // Offline audio in app storage, one folder per reciter, via DownloadManager so it survives the app closing
@@ -168,8 +169,20 @@ object Downloads {
     private fun sizes(context: Context) =
         context.getSharedPreferences("download-sizes", Context.MODE_PRIVATE)
 
+    // Every surah's size for the reciters shipped, gathered by tools/audio_sizes.py, so the whole is known at once
+    @Volatile private var shipped: Map<String, LongArray>? = null
+
+    private fun shipped(context: Context): Map<String, LongArray> = shipped ?: run {
+        val text = context.resources.openRawResource(R.raw.audio_sizes).use { String(it.readBytes(), Charsets.UTF_8) }
+        val root = JSONObject(text)
+        root.keys().asSequence().associateWith { id ->
+            val list = root.getJSONArray(id)
+            LongArray(list.length()) { list.getLong(it) }
+        }.also { shipped = it }
+    }
+
     fun size(context: Context, surah: Int, reciter: String): Long =
-        sizes(context).getLong("$reciter/$surah", 0L)
+        shipped(context)[reciter]?.getOrNull(surah - 1) ?: sizes(context).getLong("$reciter/$surah", 0L)
 
     private val asking = Executors.newSingleThreadExecutor { r -> Thread(r, "download-sizes") }
 
@@ -181,7 +194,7 @@ object Downloads {
             val store = sizes(ctx)
             var fresh = 0
             for (s in 1..SURAHS) {
-                if (store.getLong("$reciter/$s", 0L) > 0L) continue
+                if (size(ctx, s, reciter) > 0L) continue
                 val length = try {
                     val c = URL(Recite.urlFor(ctx, s, reciter)).openConnection() as HttpURLConnection
                     c.requestMethod = "HEAD"
