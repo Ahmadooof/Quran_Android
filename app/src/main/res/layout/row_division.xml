@@ -39,29 +39,47 @@
             android:paddingTop="@dimen/row_pad_v"
             android:paddingBottom="@dimen/row_pad_v">
 
-            <TextView
-                android:id="@+id/div_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text"
-                android:textSize="@dimen/part_title"
-                android:textStyle="bold" />
-
-            <!-- Where it begins: the surah as the surah list writes it, then the ayah and page -->
+            <!-- The part, and beside it in grey its surahs, as the surah list writes them -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <include
-                    android:id="@+id/div_surah"
-                    layout="@layout/part_surah_title"
+                <TextView
+                    android:id="@+id/div_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/icon_label_gap"
-                    android:visibility="gone" />
+                    android:textColor="@color/text"
+                    android:textSize="@dimen/part_title"
+                    android:textStyle="bold" />
+
+                <!-- Filled from code: one surah title, or several names on a page that holds several -->
+                <LinearLayout
+                    android:id="@+id/div_surahs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/part_surah_gap"
+                    android:orientation="horizontal"
+                    android:layoutDirection="rtl" />
+            </LinearLayout>
+
+            <!-- The quiet line: on a page row its surahs first, then the rest well apart from them -->
+            <LinearLayout
+                android:id="@+id/div_under"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:id="@+id/div_surahs_under"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/part_meta_gap"
+                    android:orientation="horizontal"
+                    android:layoutDirection="rtl" />
 
                 <TextView
                     android:id="@+id/div_where"
@@ -72,7 +90,7 @@
                     android:textSize="@dimen/row_meta" />
             </LinearLayout>
 
-            <!-- A hizb's quarter, half and three-quarters, each a pie and the page it begins on -->
+            <!-- A hizb's start, quarter, half and three-quarters, each a pie and the page it begins on -->
             <LinearLayout
                 android:id="@+id/div_quarters"
                 android:layout_width="match_parent"
@@ -80,6 +98,9 @@
                 android:layout_marginTop="4dp"
                 android:orientation="horizontal"
                 android:visibility="gone">
+                <TextView
+                    android:id="@+id/div_q0"
+                    style="@style/QuarterMark" />
                 <TextView
                     android:id="@+id/div_q1"
                     style="@style/QuarterMark" />

@@ -374,10 +374,10 @@
     <string name="dl_get_first">Download the surah first</string>
     <string name="dl_saved_short">Saved</string>
     <string name="hizb_quarter_at">%1$s, page %2$s</string>
+    <string name="quarter_0">Start of the hizb</string>
     <string name="quarter_1">A quarter into the hizb</string>
     <string name="quarter_2">Half the hizb</string>
     <string name="quarter_3">Three quarters into the hizb</string>
-    <string name="pages_range_short">pp. %1$s–%2$s</string>
     <string name="pages_range">Pages %1$s–%2$s</string>
     <string name="words_title">Single words</string>
     <string name="words_about">Download every word\'s recording, to hear any word on its own with Word, without internet.</string>

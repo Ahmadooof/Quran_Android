@@ -16,11 +16,11 @@ class IndexPane(
 
     private val res = host.resources
     private val juz = division(Surahs.juzStarts(), { host.getString(R.string.head_juz, figures(it, res)) },
-        { partWhere(Openings.ofJuz(host, it), Surahs.juzStarts()[it - 1]) }, { Openings.ofJuz(host, it)?.surah }, null, Surahs::juzOfPage)
+        { partWhere(Openings.ofJuz(host, it), Surahs.juzStarts()[it - 1]) }, { listOfNotNull(Openings.ofJuz(host, it)?.surah) }, false, null, Surahs::juzOfPage)
     private val hizb = division(Surahs.hizbStarts(), { host.getString(R.string.head_hizb, figures(it, res)) },
-        { partWhere(Openings.ofHizb(host, it), Surahs.hizbStarts()[it - 1]) }, { Openings.ofHizb(host, it)?.surah }, ::quarters, Surahs::hizbOfPage)
+        { "" }, { listOfNotNull(Openings.ofHizb(host, it)?.surah) }, false, ::quarters, Surahs::hizbOfPage)
     private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, { host.getString(R.string.head_page, figures(it, res)) },
-        ::surahAndJuz, null, null) { it }
+        ::juzSaid, { page -> Surahs.onPage(page).map { it.id } }, true, null) { it }
 
     private val lists: List<RecyclerView.Adapter<*>> = listOf(surahs, juz, hizb, pages)
 
@@ -34,12 +34,13 @@ class IndexPane(
     /** Rows show which part is being recited; called as the recitation moves or stops. */
     fun refresh() = lists.forEach { it.notifyDataSetChanged() }
 
-    private fun division(starts: IntArray, title: (Int) -> String, where: (Int) -> String, surahOf: ((Int) -> Int?)?, quarters: ((Int) -> List<Int>)?, numberOf: (Int) -> Int) =
+    private fun division(starts: IntArray, title: (Int) -> String, where: (Int) -> String, surahsOf: (Int) -> List<Int>, surahsUnder: Boolean, quarters: ((Int) -> List<Int>)?, numberOf: (Int) -> Int) =
         DivisionAdapter(
             starts = starts,
             title = title,
             where = where,
-            surahOf = surahOf,
+            surahsOf = surahsOf,
+            surahsUnder = surahsUnder,
             quarters = quarters,
             onOpen = open,
             onPlay = { page -> play(page, numberOf) },
@@ -48,27 +49,14 @@ class IndexPane(
             playing = { numberOf(Recite.playingPage(host)) }
         )
 
-    // Where a hizb's quarter, half and three-quarters begin, by page
-    private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb).drop(1)
+    // Where a hizb, its quarter, half and three-quarters begin, by page; the chips say it, so no line under the title
+    private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb)
 
     // Beside its surah, the ayah it begins at and its page; a surah's first ayah needs no number
     private fun partWhere(at: Openings.Opening?, page: Int): String {
         val onPage = host.getString(R.string.head_page, figures(page, res))
         if (at == null || at.ayah == 1) return onPage
         return host.getString(R.string.place_line, host.getString(R.string.ayah_at, figures(at.ayah, res)), onPage)
-    }
-
-    // Every surah on the page; its juz is the pinned heading's, said here only where a juz begins partway down it
-    private fun surahAndJuz(page: Int): String {
-        val surahs = Surahs.onPage(page)
-        val named = when (surahs.size) {
-            0 -> ""
-            1 -> host.getString(R.string.surah_named, surahs[0].name)
-            else -> surahs.joinToString(host.getString(R.string.list_join)) { it.name }
-        }
-        val span = Surahs.juzSpanOf(page)
-        if (span.first == span.last) return named
-        return if (named.isEmpty()) juzSaid(page) else host.getString(R.string.place_line, named, juzSaid(page))
     }
 
     private fun juzSaid(page: Int): String {
@@ -87,16 +75,6 @@ class IndexPane(
         else -> { at ->
             host.getString(R.string.place_line, host.getString(R.string.head_page, figures(at + 1, res)), juzSaid(at + 1))
         }
-    }
-
-    // The pages list is grouped by the juz each page opens in, its heading pinned over the rows
-    private val pageJuz by lazy { IntArray(Mushaf.PAGES) { Surahs.juzSpanOf(it + 1).first } }
-
-    private fun juzHead(juz: Int): String {
-        val first = pageJuz.indexOfFirst { it == juz } + 1
-        val last = pageJuz.indexOfLast { it == juz } + 1
-        return host.getString(R.string.place_line, host.getString(R.string.head_juz, figures(juz, res)),
-            host.getString(R.string.pages_range_short, figures(first, res), figures(last, res)))
     }
 
     private fun play(page: Int, numberOf: (Int) -> Int) {
@@ -122,7 +100,6 @@ class IndexPane(
                 layoutManager = LinearLayoutManager(parent.context)
                 keepToColumn()
                 addHandle(dragLabel(viewType))
-                if (viewType == PAGES) addPinnedHead(part = { pageJuz[it] }, said = ::juzHead)
             }
         )
 

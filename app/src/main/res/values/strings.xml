@@ -443,10 +443,10 @@
     <string name="dl_get_first">نزّل السورة أولًا</string>
     <string name="dl_saved_short">محفوظة</string>
     <string name="hizb_quarter_at">%1$s، الصفحة %2$s</string>
+    <string name="quarter_0">أول الحزب</string>
     <string name="quarter_1">ربع الحزب</string>
     <string name="quarter_2">نصف الحزب</string>
     <string name="quarter_3">ثلاثة أرباع الحزب</string>
-    <string name="pages_range_short">ص %1$s–%2$s</string>
     <string name="pages_range">الصفحات %1$s–%2$s</string>
     <string name="words_title">الكلمات منفردة</string>
     <string name="words_about">نزّل تسجيل كل كلمة، لتسمع أي كلمة وحدها بزر «كلمة» دون إنترنت.</string>
