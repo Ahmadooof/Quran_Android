@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 object WordPack {
 
     private const val BASE = "https://audio.readqurantoday.com/wbw"
-    private const val AT_ONCE = 8
+    private const val AT_ONCE = 16
     private const val TIMEOUT_MS = 15000
     // Progress is said this often, so the screen moves without redrawing for every word
     private const val SAY_EVERY = 200

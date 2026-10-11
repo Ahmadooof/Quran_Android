@@ -385,4 +385,7 @@
     <string name="words_resume">Continue downloading</string>
     <string name="words_remove">Remove words from the phone</string>
     <string name="words_remove_ask">Remove the word recordings (%1$s)? A word is fetched again when you hear it.</string>
+    <string name="size_kb">%1$s KB</string>
+    <string name="size_mb">%1$s MB</string>
+    <string name="size_gb">%1$s GB</string>
 </resources>

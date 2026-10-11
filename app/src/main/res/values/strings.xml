@@ -454,4 +454,7 @@
     <string name="words_resume">متابعة التنزيل</string>
     <string name="words_remove">حذف الكلمات من الهاتف</string>
     <string name="words_remove_ask">حذف تسجيلات الكلمات (%1$s)؟ ستُنزّل الكلمة من جديد حين تسمعها.</string>
+    <string name="size_kb">%1$s ك.ب</string>
+    <string name="size_mb">%1$s م.ب</string>
+    <string name="size_gb">%1$s ج.ب</string>
 </resources>

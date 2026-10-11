@@ -21,6 +21,20 @@ fun localDigits(text: String, resources: Resources): String {
     return text.map { if (it in '0'..'9') '٠' + (it - '0') else it }.joinToString("")
 }
 
+/** A file's size in one short style for every size, so a small file and a large one read alike. */
+fun fileSize(bytes: Long, resources: Resources): String {
+    val tenths = (bytes + 50_000_000L) / 100_000_000L
+    val said = when {
+        bytes >= 1_000_000_000L -> {
+            val mark = if (resources.configuration.locales[0].language == "ar") "٫" else "."
+            resources.getString(R.string.size_gb, "${tenths / 10}$mark${tenths % 10}")
+        }
+        bytes >= 1_000_000L -> resources.getString(R.string.size_mb, ((bytes + 500_000L) / 1_000_000L).toString())
+        else -> resources.getString(R.string.size_kb, ((bytes + 999L) / 1000L).coerceAtLeast(1L).toString())
+    }
+    return localDigits(said, resources)
+}
+
 /** Time since, in the locale's figures and Arabic's count forms. */
 fun ago(at: Long, resources: Resources): String {
     val minutes = ((System.currentTimeMillis() - at) / 60_000L).coerceAtLeast(0L).toInt()

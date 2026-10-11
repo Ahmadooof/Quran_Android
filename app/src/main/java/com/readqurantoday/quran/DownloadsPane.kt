@@ -2,7 +2,6 @@ package com.readqurantoday.quran
 
 import android.app.Activity
 import android.content.res.ColorStateList
-import android.text.format.Formatter
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -334,7 +333,7 @@ class DownloadsPane(
     }
 
     // The phone writes sizes in its own digits; the screen's are the app's
-    private fun bytes(n: Long): String = localDigits(Formatter.formatShortFileSize(host, n), host.resources)
+    private fun bytes(n: Long): String = fileSize(n, host.resources)
 
     private companion object {
         const val WAITING = 0.45f
