@@ -388,4 +388,5 @@
     <string name="size_kb">%1$s KB</string>
     <string name="size_mb">%1$s MB</string>
     <string name="size_gb">%1$s GB</string>
+    <string name="surah_ayah">%1$s, verse %2$s</string>
 </resources>

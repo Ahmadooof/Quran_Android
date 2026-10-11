@@ -15,9 +15,13 @@ class IndexPane(
 ) {
 
     private val res = host.resources
-    private val juz = division(Surahs.juzStarts(), R.string.head_juz, ::pageOnly, ::surahStarting, null, Surahs::juzOfPage)
-    private val hizb = division(Surahs.hizbStarts(), R.string.head_hizb, ::pageOnly, ::surahStarting, ::quarters, Surahs::hizbOfPage)
-    private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, R.string.head_page, ::surahAndJuz, null, null) { it }
+    // Juz and hizb are named by their first words, as a printed mushaf's index names them
+    private val juz = division(Surahs.juzStarts(), { Openings.ofJuz(host, it)?.words.orEmpty() },
+        { partWhere(Openings.ofJuz(host, it), Surahs.juzStarts()[it - 1]) }, null, Surahs::juzOfPage)
+    private val hizb = division(Surahs.hizbStarts(), { Openings.ofHizb(host, it)?.words.orEmpty() },
+        { partWhere(Openings.ofHizb(host, it), Surahs.hizbStarts()[it - 1]) }, ::quarters, Surahs::hizbOfPage)
+    private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, { host.getString(R.string.head_page, figures(it, res)) },
+        ::surahAndJuz, null) { it }
 
     private val lists: List<RecyclerView.Adapter<*>> = listOf(surahs, juz, hizb, pages)
 
@@ -31,12 +35,11 @@ class IndexPane(
     /** Rows show which part is being recited; called as the recitation moves or stops. */
     fun refresh() = lists.forEach { it.notifyDataSetChanged() }
 
-    private fun division(starts: IntArray, title: Int, where: (Int) -> String, surahOf: ((Int) -> Int?)?, quarters: ((Int) -> List<Int>)?, numberOf: (Int) -> Int) =
+    private fun division(starts: IntArray, title: (Int) -> String, where: (Int) -> String, quarters: ((Int) -> List<Int>)?, numberOf: (Int) -> Int) =
         DivisionAdapter(
             starts = starts,
-            title = { n -> host.getString(title, figures(n, res)) },
+            title = title,
             where = where,
-            surahOf = surahOf,
             quarters = quarters,
             onOpen = open,
             onPlay = { page -> play(page, numberOf) },
@@ -48,10 +51,14 @@ class IndexPane(
     // Where a hizb's quarter, half and three-quarters begin, by page
     private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb).drop(1)
 
-    // The surah it begins in is the row's title, so the line under it gives only the page
-    private fun pageOnly(page: Int): String = host.getString(R.string.head_page, figures(page, res))
-
-    private fun surahStarting(page: Int): Int? = Surahs.ofPage(page)?.id
+    // The ayah it begins at, then its page: a surah's first ayah is the surah itself
+    private fun partWhere(at: Openings.Opening?, page: Int): String {
+        val onPage = host.getString(R.string.head_page, figures(page, res))
+        val surah = at?.let { a -> Surahs.list().getOrNull(a.surah - 1) } ?: return onPage
+        val begins = if (at.ayah == 1) host.getString(R.string.surah_named, surah.name)
+        else host.getString(R.string.surah_ayah, surah.name, figures(at.ayah, res))
+        return host.getString(R.string.place_line, begins, onPage)
+    }
 
     // Every surah on the page; its juz is the pinned heading's, said here only where a juz begins partway down it
     private fun surahAndJuz(page: Int): String {
@@ -118,6 +125,8 @@ class IndexPane(
                 keepToColumn()
                 addHandle(dragLabel(viewType))
                 if (viewType == PAGES) addPinnedHead(part = { pageJuz[it] }, said = ::juzHead)
+                // Two hizb to a juz: the hizb list is grouped under its juz as the pages are
+                if (viewType == HIZB) addPinnedHead(part = { it / 2 + 1 }, said = { host.getString(R.string.head_juz, figures(it, res)) })
             }
         )
 

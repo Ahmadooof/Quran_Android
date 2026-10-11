@@ -12,7 +12,6 @@ class DivisionAdapter(
     private val starts: IntArray,
     private val title: (Int) -> String,
     private val where: (Int) -> String,
-    private val surahOf: ((Int) -> Int?)?,
     private val quarters: ((Int) -> List<Int>)?,
     private val onOpen: (Int) -> Unit,
     private val onPlay: (Int) -> Unit,
@@ -33,22 +32,8 @@ class DivisionAdapter(
         val page = starts[position]
 
         row.findViewById<TextView>(R.id.div_num).text = figures(number, row.resources)
-        // Named by its surah, the part and page beneath: a title and its quiet line, as on the surah list
-        val surah = surahOf?.invoke(page)
-        val named = row.findViewById<View>(R.id.div_surah)
-        val heading = row.findViewById<TextView>(R.id.div_title)
-        val under = row.findViewById<TextView>(R.id.div_where)
-        if (surah != null) {
-            fillSurahTitle(named, surah, R.dimen.surah_title)
-            named.visibility = View.VISIBLE
-            heading.visibility = View.GONE
-            under.text = row.resources.getString(R.string.place_line, title(number), where(page))
-        } else {
-            named.visibility = View.GONE
-            heading.visibility = View.VISIBLE
-            heading.text = title(number)
-            under.text = where(page)
-        }
+        row.findViewById<TextView>(R.id.div_title).text = title(number)
+        row.findViewById<TextView>(R.id.div_where).text = where(number)
         fillQuarters(row, quarters?.invoke(number).orEmpty())
 
         // The seam belongs between two rows, not under the last one

@@ -43,6 +43,8 @@
     <dimen name="surah_title_row">22sp</dimen>
     <!-- A row's own title, the quiet line under it, and the label under an icon -->
     <dimen name="row_title">15sp</dimen>
+    <!-- A juz, hizb or page row's name, as large as a surah row's name reads -->
+    <dimen name="part_title">18sp</dimen>
     <!-- A surah's English name, beside its calligraphy in a row -->
     <dimen name="surah_english">14sp</dimen>
     <!-- Between a surah's juz and its pages, stacked beside the row's buttons -->
