@@ -42,7 +42,7 @@ class DownloadsPane(
             it.setOnClickListener { pickReciter() }
         }))
 
-        blow.card(into, 0, listOf(note(R.string.dl_about_download), note(R.string.dl_about_save)))
+        blow.card(into, 0, listOf(note(R.string.dl_about)))
 
         blow.card(into, R.string.dl_group_space, listOf(
             infoRow(R.string.dl_kept).also { keptValue = it.findViewById(R.id.set_value) },
@@ -112,16 +112,15 @@ class DownloadsPane(
         catchUpSaves()
     }
 
+    // Every row has the same three buttons: save to phone and share wait, greyed, until the surah is downloaded
     private fun sayRow(surah: Int, row: View, isKept: Boolean, flight: Downloads.Flight?) {
         val detail = row.findViewById<TextView>(R.id.dl_detail)
-        val save = row.findViewById<ImageView>(R.id.dl_save)
         val act = row.findViewById<ImageView>(R.id.dl_action)
-        val saveButton = row.findViewById<View>(R.id.dl_save_wrap)
         val actButton = row.findViewById<View>(R.id.dl_action_wrap)
-        val saveLabel = row.findViewById<TextView>(R.id.dl_save_label)
         val actLabel = row.findViewById<TextView>(R.id.dl_action_label)
         val size = Downloads.size(host, surah, reciter.id)
         val sizeText = if (size > 0) bytes(size) else host.getString(R.string.dl_size_unknown)
+        val onPhone = isKept && isOnPhone(host, surah, reciter.id)
 
         when {
             flight != null -> {
@@ -131,50 +130,45 @@ class DownloadsPane(
                     figures((flight.done * 100 / total).toInt().coerceIn(0, 100), host.resources),
                     bytes(total)
                 ) else host.getString(R.string.dl_waiting)
-                actButton.isClickable = true
                 act.setImageResource(R.drawable.ic_close)
-                say(actButton, act, actLabel, R.string.dl_stop_one, R.color.text_mute)
+                say(actButton, act, actLabel, R.string.dl_stop_one, ready = true)
                 actButton.setOnClickListener {
                     Downloads.stop(host, surah, reciter.id)
                     saveAfterDownload(host, surah, reciter.id, false)
                     refresh()
                 }
-                // A save asked for before the download shows as waiting on it
-                if (savesAfterDownload(host, surah, reciter.id)) {
-                    saveButton.visibility = View.VISIBLE
-                    save.setImageResource(R.drawable.ic_save_phone)
-                    say(saveButton, save, saveLabel, R.string.dl_save_queued, R.color.text_mute)
-                    saveButton.setOnClickListener(null)
-                    saveButton.isClickable = false
-                } else {
-                    saveButton.visibility = View.GONE
-                }
             }
             isKept -> {
-                val onPhone = isOnPhone(host, surah, reciter.id)
                 detail.text = if (onPhone) host.getString(R.string.dl_kept_saved, sizeText) else sizeText
                 // Only a mark: removing is done for all surahs at once
                 act.setImageResource(R.drawable.ic_downloaded)
-                say(actButton, act, actLabel, R.string.dl_done_short, R.color.accent)
+                say(actButton, act, actLabel, R.string.dl_done_short, ready = true)
                 actButton.setOnClickListener(null)
                 actButton.isClickable = false
-                saveButton.visibility = View.VISIBLE
-                // Once saved the button shares that copy; the line under the name says it is saved
-                save.setImageResource(if (onPhone) R.drawable.ic_share else R.drawable.ic_save_phone)
-                say(saveButton, save, saveLabel,
-                    if (onPhone) R.string.dl_share else R.string.dl_save_short, R.color.accent)
-                saveButton.setOnClickListener { if (onPhone) shareOne(surah) else saveToPhoneOne(surah) }
             }
             else -> {
                 detail.text = sizeText
-                actButton.isClickable = true
                 act.setImageResource(R.drawable.ic_download)
-                say(actButton, act, actLabel, R.string.dl_get_one, R.color.accent)
+                say(actButton, act, actLabel, R.string.dl_get_one, ready = true)
                 actButton.setOnClickListener { Downloads.start(host, surah, reciter.id); refresh() }
-                saveButton.visibility = View.VISIBLE
-                save.setImageResource(R.drawable.ic_save_phone)
-                say(saveButton, save, saveLabel, R.string.dl_save_short, R.color.accent)
-                saveButton.setOnClickListener { downloadThenSave(surah) }
+            }
+        }
+
+        // Share hands over the downloaded file itself; saving puts a copy in the phone's Download folder
+        val share = row.findViewById<View>(R.id.dl_share_wrap)
+        say(share, row.findViewById(R.id.dl_share), row.findViewById(R.id.dl_share_label), R.string.dl_share, ready = isKept)
+        share.setOnClickListener { if (isKept) host.shareDownloads(listOf(surah), reciter) else host.notice(host.getString(R.string.dl_get_first)) }
+
+        val save = row.findViewById<View>(R.id.dl_save_wrap)
+        val saveIcon = row.findViewById<ImageView>(R.id.dl_save)
+        saveIcon.setImageResource(if (onPhone) R.drawable.ic_check else R.drawable.ic_save_phone)
+        say(save, saveIcon, row.findViewById(R.id.dl_save_label), if (onPhone) R.string.dl_saved_short else R.string.dl_save_short,
+            ready = isKept && !onPhone)
+        save.setOnClickListener {
+            when {
+                onPhone -> Unit
+                isKept -> saveToPhoneOne(surah)
+                else -> host.notice(host.getString(R.string.dl_get_first))
             }
         }
     }
@@ -222,43 +216,19 @@ class DownloadsPane(
         }
     }
 
-    private fun shareOne(surah: Int) {
-        val voice = reciter
-        Thread {
-            val uri = phoneUri(host, surah, voice)
-            host.runOnUiThread {
-                if (uri != null) host.shareAudio(listOf(uri)) else {
-                    host.notice(host.getString(R.string.dl_share_missing))
-                    refresh()
-                }
-            }
-        }.start()
-    }
-
-    /* Every saved surah at once: sizes add up fast, so say how much before the share sheet. */
+    /* Every downloaded surah at once: sizes add up fast, so say how much before the share sheet. */
     private fun confirmShareAll() {
         val voice = reciter
-        val saved = Downloads.kept(host, voice.id).filter { isOnPhone(host, it, voice.id) }.sorted()
-        val total = saved.sumOf { Downloads.file(host, it, voice.id).length() }
-        host.sheet(
-            host.getString(R.string.dl_share_all_ask, figures(saved.size, host.resources), bytes(total)),
-            listOf(Choice(host.getString(R.string.dl_share)))
-        ) {
-            Thread {
-                val uris = saved.mapNotNull { phoneUri(host, it, voice) }
-                host.runOnUiThread {
-                    if (uris.isNotEmpty()) host.shareAudio(uris) else host.notice(host.getString(R.string.dl_share_missing))
-                    if (uris.size < saved.size) refresh()
-                }
-            }.start()
+        val kept = Downloads.kept(host, voice.id).sorted()
+        if (kept.isEmpty()) {
+            host.notice(host.getString(R.string.dl_get_first))
+            return
         }
-    }
-
-    // Not downloaded yet: download it, and the save follows when it lands
-    private fun downloadThenSave(surah: Int) = askToSave {
-        saveAfterDownload(host, surah, reciter.id, true)
-        Downloads.start(host, surah, reciter.id)
-        refresh()
+        val total = kept.sumOf { Downloads.file(host, it, voice.id).length() }
+        host.sheet(
+            host.getString(R.string.dl_share_all_ask, figures(kept.size, host.resources), bytes(total)),
+            listOf(Choice(host.getString(R.string.dl_share)))
+        ) { host.shareDownloads(kept, voice) }
     }
 
     private fun saveToPhoneOne(surah: Int) = askToSave {
@@ -368,11 +338,14 @@ class DownloadsPane(
         return if (i > 0) parent.getChildAt(i - 1) else null
     }
 
-    // Icon and its label share one colour; the label also names the button for screen readers
-    private fun say(button: View, icon: ImageView, label: TextView, text: Int, colour: Int) {
-        tint(icon, colour)
+    // The icon in the accent, the label in plain text; greyed, both, while the button waits for the download.
+    // The label also names the button for screen readers
+    private fun say(button: View, icon: ImageView, label: TextView, text: Int, ready: Boolean) {
+        tint(icon, if (ready) R.color.accent else R.color.text_mute)
         label.setText(text)
-        label.setTextColor(host.getColor(colour))
+        label.setTextColor(host.getColor(if (ready) R.color.text else R.color.text_mute))
+        button.alpha = if (ready) 1f else WAITING
+        button.isClickable = true
         button.contentDescription = label.text
     }
 
@@ -383,5 +356,6 @@ class DownloadsPane(
     private fun bytes(n: Long): String = Formatter.formatShortFileSize(host, n)
 
     private companion object {
+        const val WAITING = 0.45f
     }
 }

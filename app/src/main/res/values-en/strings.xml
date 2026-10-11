@@ -130,19 +130,15 @@
     <string name="dl_stop_one">Stop</string>
     <string name="dl_saved_one">Saved to Download/⁠Quran on your phone</string>
     <string name="dl_saved_all">Saved %1$s surahs to Download/⁠Quran on your phone</string>
-    <string name="dl_about_download">Download: keeps the recitation inside the app so you can listen without internet.</string>
-    <string name="dl_about_save">Save to phone: copies downloaded surahs to Download/⁠Quran on your phone so you can play them in any app, for personal use.</string>
     <string name="dl_save_done">All downloaded surahs are already saved to the phone</string>
     <string name="dl_done_short">Downloaded</string>
     <string name="dl_save_short">To phone</string>
     <string name="dl_share">Share</string>
-    <string name="dl_share_all">Share all saved</string>
+    <string name="dl_share_all">Share all downloaded</string>
     <string name="dl_open_folder">Open folder on phone</string>
     <string name="dl_kept_saved">Saved to phone · %1$s</string>
     <string name="dl_share_all_ask">Share %1$s surahs, %2$s? Some apps refuse many or large files.</string>
-    <string name="dl_share_missing">The file was not found on the phone; save it again</string>
     <string name="dl_folder_failed">Could not open the folder; open your file manager, then Download, then Quran</string>
-    <string name="dl_save_queued">After download</string>
     <string name="dl_save_all_ask">%1$s surahs (%2$s) will be downloaded, then everything saved to the phone automatically. Continue?</string>
     <string name="dl_save_all_do">Download and save</string>
     <string name="dl_save_failed">Could not save to the phone</string>
@@ -381,4 +377,7 @@
     <string name="places_surahs_head">Latest you’ve read in each surah</string>
     <string name="range">%1$s–%2$s</string>
     <string name="heard_each">Your listening, surah by surah</string>
+    <string name="dl_about">Downloading keeps a recitation in the app so you can listen without internet. Once downloaded, you can share a surah or save a copy to your phone\'s Download/Quran folder.</string>
+    <string name="dl_get_first">Download the surah first</string>
+    <string name="dl_saved_short">Saved</string>
 </resources>

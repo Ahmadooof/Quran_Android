@@ -88,6 +88,17 @@
             </intent-filter>
         </receiver>
 
+        <!-- Downloaded recitations handed to other apps from the app's own storage -->
+        <provider
+            android:name=".AudioShare"
+            android:authorities="${applicationId}.share"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_audio" />
+        </provider>
+
         <service
             android:name=".PlayerService"
             android:foregroundServiceType="mediaPlayback"

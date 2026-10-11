@@ -2,7 +2,6 @@ package com.readqurantoday.quran
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
-import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -13,7 +12,6 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.core.content.edit
-import androidx.core.net.toUri
 import java.io.File
 
 // Copies kept downloads to Download/Quran/<reciter>/, which survives uninstall; never downloads
@@ -35,7 +33,7 @@ fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean 
     if (!source.exists() || source.length() == 0L) return false
     if (isOnPhone(context, surah, reciter.id)) return true
 
-    val title = phoneTitle(surah)
+    val title = surahFileTitle(surah)
     val folder = phoneFolder(reciter)
 
     val copy: String? = try {
@@ -81,37 +79,13 @@ fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean 
     return copy != null
 }
 
-private fun phoneTitle(surah: Int): String {
+/** A surah's file named as a person would look for it: "018 Al-Kahf". */
+fun surahFileTitle(surah: Int): String {
     val english = Surahs.list().firstOrNull { it.id == surah }?.english.orEmpty()
     return "${surah.toString().padStart(3, '0')} $english".trim()
 }
 
 private fun phoneFolder(reciter: Recite.Reciter) = "Quran/${reciter.name}"
-
-/** The saved copy of [surah] by [reciter] as a shareable content address; null, and no longer counted as saved, if it is gone. Blocking. */
-fun phoneUri(context: Context, surah: Int, reciter: Recite.Reciter): Uri? {
-    val key = "${reciter.id}/$surah"
-    val copy = saved(context).getString(key, null) ?: return null
-    val uri = try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val stored = copy.toUri()
-            context.contentResolver.query(stored, arrayOf(MediaStore.Downloads._ID), null, null, null)
-                ?.use { c -> if (c.moveToFirst()) stored else null }
-        } else {
-            val collection = MediaStore.Files.getContentUri("external")
-            @Suppress("DEPRECATION")
-            context.contentResolver.query(
-                collection, arrayOf(MediaStore.Files.FileColumns._ID),
-                "${MediaStore.Files.FileColumns.DATA}=?", arrayOf(copy), null
-            )?.use { c -> if (c.moveToFirst()) ContentUris.withAppendedId(collection, c.getLong(0)) else null }
-        }
-    } catch (_: Exception) {
-        null
-    }
-    // Deleted from the phone: the surah can be saved again
-    if (uri == null) saved(context).edit { remove(key) }
-    return uri
-}
 
 /** Open the share sheet for [uris], one file or many. */
 fun Activity.shareAudio(uris: List<Uri>) {
@@ -158,10 +132,6 @@ fun Activity.openPhoneFolder(reciter: Recite.Reciter) {
 
 private fun waiting(context: Context) =
     context.getSharedPreferences("save-after-download", Context.MODE_PRIVATE)
-
-/** Whether [surah] of [reciter] is to be saved to the phone as soon as its download ends. */
-fun savesAfterDownload(context: Context, surah: Int, reciter: String) =
-    waiting(context).getBoolean("$reciter/$surah", false)
 
 fun saveAfterDownload(context: Context, surah: Int, reciter: String, on: Boolean) {
     waiting(context).edit {

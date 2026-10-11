@@ -176,19 +176,15 @@
     <string name="dl_stop_one">إيقاف</string>
     <string name="dl_saved_one">حُفظت في الهاتف في مجلد ⁦Download/⁠Quran⁩</string>
     <string name="dl_saved_all">حُفظت %1$s سورة في الهاتف في مجلد ⁦Download/⁠Quran⁩</string>
-    <string name="dl_about_download">التنزيل: يحفظ التلاوة داخل التطبيق لتستمع إليها دون إنترنت.</string>
-    <string name="dl_about_save">الحفظ في الهاتف: ينسخ السور المنزّلة إلى مجلد ⁦Download/⁠Quran⁩ في الهاتف لتستمع إليها في أي تطبيق، للاستخدام الشخصي.</string>
     <string name="dl_save_done">كل السور المنزّلة محفوظة في الهاتف</string>
     <string name="dl_done_short">منزّل</string>
     <string name="dl_save_short">حفظ بالهاتف</string>
     <string name="dl_share">مشاركة</string>
-    <string name="dl_share_all">مشاركة كل المحفوظ</string>
+    <string name="dl_share_all">مشاركة كل المنزّل</string>
     <string name="dl_open_folder">فتح المجلد في الهاتف</string>
     <string name="dl_kept_saved">محفوظ في الهاتف · %1$s</string>
     <string name="dl_share_all_ask">مشاركة %1$s سورة بحجم %2$s؟ بعض التطبيقات لا تقبل ملفات كثيرة أو كبيرة.</string>
-    <string name="dl_share_missing">لم يُعثر على الملف في الهاتف، احفظه مرة أخرى</string>
     <string name="dl_folder_failed">تعذّر فتح المجلد، افتح مدير الملفات ثم Download ثم Quran</string>
-    <string name="dl_save_queued">بعد التنزيل</string>
     <string name="dl_save_all_ask">سيتم تنزيل %1$s سورة (%2$s) ثم حفظ الكل في الهاتف تلقائيًا. متابعة؟</string>
     <string name="dl_save_all_do">تنزيل وحفظ</string>
     <string name="dl_save_failed">تعذّر الحفظ في الهاتف</string>
@@ -450,4 +446,7 @@
     <string name="places_surahs_head">آخر ما قرأته من كل سورة</string>
     <string name="range">%1$s–%2$s</string>
     <string name="heard_each">استماعك لكل سورة</string>
+    <string name="dl_about">التنزيل يحفظ التلاوة داخل التطبيق لتستمع إليها دون إنترنت. وبعد التنزيل يمكنك مشاركة السورة، أو حفظ نسخة منها في مجلد ⁦Download/⁠Quran⁩ في الهاتف.</string>
+    <string name="dl_get_first">نزّل السورة أولًا</string>
+    <string name="dl_saved_short">محفوظة</string>
 </resources>
