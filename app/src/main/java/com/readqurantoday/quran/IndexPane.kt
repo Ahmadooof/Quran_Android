@@ -15,10 +15,9 @@ class IndexPane(
 ) {
 
     private val res = host.resources
-    // Juz and hizb are named by their first words, as a printed mushaf's index names them
-    private val juz = division(Surahs.juzStarts(), { Openings.ofJuz(host, it)?.words.orEmpty() },
+    private val juz = division(Surahs.juzStarts(), { host.getString(R.string.head_juz, figures(it, res)) },
         { partWhere(Openings.ofJuz(host, it), Surahs.juzStarts()[it - 1]) }, null, Surahs::juzOfPage)
-    private val hizb = division(Surahs.hizbStarts(), { Openings.ofHizb(host, it)?.words.orEmpty() },
+    private val hizb = division(Surahs.hizbStarts(), { host.getString(R.string.head_hizb, figures(it, res)) },
         { partWhere(Openings.ofHizb(host, it), Surahs.hizbStarts()[it - 1]) }, ::quarters, Surahs::hizbOfPage)
     private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, { host.getString(R.string.head_page, figures(it, res)) },
         ::surahAndJuz, null) { it }

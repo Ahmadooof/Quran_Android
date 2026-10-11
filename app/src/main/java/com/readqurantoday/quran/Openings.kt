@@ -4,10 +4,10 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Where each juz and hizb begins, and its first words: the names a printed mushaf's index gives them. */
+/** The ayah each juz and hizb begins at. */
 object Openings {
 
-    data class Opening(val surah: Int, val ayah: Int, val words: String)
+    data class Opening(val surah: Int, val ayah: Int)
 
     private var juz = emptyList<Opening>()
     private var hizb = emptyList<Opening>()
@@ -22,7 +22,7 @@ object Openings {
 
     private fun read(rows: JSONArray) = List(rows.length()) {
         val row = rows.getJSONArray(it)
-        Opening(row.getInt(0), row.getInt(1), row.getString(2))
+        Opening(row.getInt(0), row.getInt(1))
     }
 
     fun ofJuz(context: Context, n: Int): Opening? = juz(context).getOrNull(n - 1)
