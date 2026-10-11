@@ -50,14 +50,17 @@ class DownloadsPane(
         ))
 
         blow.card(into, R.string.dl_group_actions, listOf(
-            action(R.string.dl_get_all) { confirmGetAll() }.also { getAll = it },
+            action(R.string.dl_get_all) {
+                Downloads.startAll(host, reciter.id)
+                refresh()
+            }.also { getAll = it },
             action(R.string.dl_stop_all) {
                 for (s in Downloads.inFlight(host, reciter.id).keys) saveAfterDownload(host, s, reciter.id, false)
                 Downloads.stopAll(host, reciter.id)
                 refresh()
             }.also { stopAll = it },
             action(R.string.dl_save_all) { saveAllToPhone() }.also { saveAll = it },
-            action(R.string.dl_share_all) { confirmShareAll() }.also { shareAll = it },
+            action(R.string.dl_share_all) { host.shareDownloads(Downloads.kept(host, reciter.id).sorted(), reciter) }.also { shareAll = it },
             action(R.string.dl_open_folder) { host.openPhoneFolder(reciter) }.also { openFolder = it },
             action(R.string.dl_delete_all) { confirmDeleteAll() }.also { deleteAll = it }
         ))
@@ -96,15 +99,21 @@ class DownloadsPane(
 
         val missing = (1..Downloads.SURAHS).filter { it !in kept && it !in flying }
         getAll.visibility = if (missing.isEmpty()) View.GONE else View.VISIBLE
+        // What is left to come down, said on the button, since a tap starts it straight away
+        val left = missing.sumOf { Downloads.size(host, it, reciter.id) }
+        getAll.text = if (left > 0) host.getString(R.string.place_line, host.getString(R.string.dl_get_all), bytes(left))
+            else host.getString(R.string.dl_get_all)
         stopAll.visibility = if (flying.isEmpty()) View.GONE else View.VISIBLE
         saveAll.isEnabled = !saving
         saveAll.alpha = if (saving) 0.5f else 1f
         deleteAll.visibility = if (kept.isEmpty()) View.GONE else View.VISIBLE
-        val anySaved = kept.any { isOnPhone(host, it, reciter.id) }
-        shareAll.visibility = if (anySaved) View.VISIBLE else View.GONE
-        openFolder.visibility = shareAll.visibility
+        // Sharing and saving work on what is downloaded; the folder is there once something is saved to it
+        val anyKept = if (kept.isEmpty()) View.GONE else View.VISIBLE
+        shareAll.visibility = anyKept
+        saveAll.visibility = anyKept
+        openFolder.visibility = if (kept.any { isOnPhone(host, it, reciter.id) }) View.VISIBLE else View.GONE
         /* A hidden action's seam goes with it, so a card never shows two lines in a row. */
-        for (a in listOf(getAll, stopAll, shareAll, openFolder, deleteAll)) seamBefore(a)?.visibility = a.visibility
+        for (a in listOf(getAll, stopAll, saveAll, shareAll, openFolder, deleteAll)) seamBefore(a)?.visibility = a.visibility
 
         for ((surah, row) in rows) sayRow(surah, row, surah in kept, flying[surah])
 
@@ -185,23 +194,6 @@ class DownloadsPane(
         }
     }
 
-    /* Before fetching gigabytes: how many surahs, how big, and over which network. */
-    private fun confirmGetAll() {
-        val kept = Downloads.kept(host, reciter.id)
-        val flying = Downloads.inFlight(host, reciter.id).keys
-        val missing = (1..Downloads.SURAHS).filter { it !in kept && it !in flying }
-        val sizes = missing.map { Downloads.size(host, it, reciter.id) }
-        val total = sizes.sum()
-        val size = if (sizes.all { it > 0 }) bytes(total) else host.getString(R.string.dl_counting, bytes(total))
-        host.sheet(
-            host.getString(R.string.dl_get_all_ask, figures(missing.size, host.resources), size),
-            listOf(Choice(host.getString(R.string.dl_get_all_do)))
-        ) {
-            Downloads.startAll(host, reciter.id)
-            refresh()
-        }
-    }
-
     private fun confirmDeleteAll() {
         val kept = Downloads.kept(host, reciter.id)
         host.sheet(
@@ -216,21 +208,6 @@ class DownloadsPane(
         }
     }
 
-    /* Every downloaded surah at once: sizes add up fast, so say how much before the share sheet. */
-    private fun confirmShareAll() {
-        val voice = reciter
-        val kept = Downloads.kept(host, voice.id).sorted()
-        if (kept.isEmpty()) {
-            host.notice(host.getString(R.string.dl_get_first))
-            return
-        }
-        val total = kept.sumOf { Downloads.file(host, it, voice.id).length() }
-        host.sheet(
-            host.getString(R.string.dl_share_all_ask, figures(kept.size, host.resources), bytes(total)),
-            listOf(Choice(host.getString(R.string.dl_share)))
-        ) { host.shareDownloads(kept, voice) }
-    }
-
     private fun saveToPhoneOne(surah: Int) = askToSave {
         val voice = reciter
         Thread {
@@ -242,36 +219,14 @@ class DownloadsPane(
         }.start()
     }
 
-    /* Every kept surah not already saved, copied out off the main thread. */
+    /* Every downloaded surah not already saved, copied out off the main thread. */
     private fun saveAllToPhone() {
-        val voice = reciter
-        val kept = Downloads.kept(host, voice.id)
-        val flying = Downloads.inFlight(host, voice.id).keys
-        val missing = (1..Downloads.SURAHS).filter { it !in kept && it !in flying }
-        if (missing.isEmpty() && flying.isEmpty() && kept.all { isOnPhone(host, it, voice.id) }) {
+        val kept = Downloads.kept(host, reciter.id)
+        if (kept.all { isOnPhone(host, it, reciter.id) }) {
             host.notice(host.getString(R.string.dl_save_done))
             return
         }
-        if (missing.isEmpty()) {
-            askToSave {
-                for (s in flying) saveAfterDownload(host, s, voice.id, true)
-                saveUnsaved()
-            }
-            return
-        }
-        // Some are not downloaded: say how much will come down before it all lands on the phone
-        val sizes = missing.map { Downloads.size(host, it, voice.id) }
-        val size = if (sizes.all { it > 0 }) bytes(sizes.sum()) else host.getString(R.string.dl_counting, bytes(sizes.sum()))
-        host.sheet(
-            host.getString(R.string.dl_save_all_ask, figures(missing.size, host.resources), size),
-            listOf(Choice(host.getString(R.string.dl_save_all_do)))
-        ) {
-            askToSave {
-                for (s in missing + flying) saveAfterDownload(host, s, voice.id, true)
-                Downloads.startAll(host, voice.id)
-                saveUnsaved()
-            }
-        }
+        askToSave { saveUnsaved() }
     }
 
     private fun saveUnsaved() {

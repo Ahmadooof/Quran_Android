@@ -119,8 +119,6 @@
     <string name="dl_stop_all">Stop downloading</string>
     <string name="dl_save_all">Save all to phone</string>
     <string name="dl_delete_all">Delete downloads</string>
-    <string name="dl_get_all_ask">Download %1$s surahs, %2$s?</string>
-    <string name="dl_get_all_do">Download</string>
     <string name="dl_delete_all_ask">Delete %1$s surahs (%2$s) from the app? Copies saved to the phone stay.</string>
     <string name="dl_delete_do">Delete</string>
     <string name="dl_size_unknown">…</string>
@@ -137,10 +135,7 @@
     <string name="dl_share_all">Share all downloaded</string>
     <string name="dl_open_folder">Open folder on phone</string>
     <string name="dl_kept_saved">Saved to phone · %1$s</string>
-    <string name="dl_share_all_ask">Share %1$s surahs, %2$s? Some apps refuse many or large files.</string>
     <string name="dl_folder_failed">Could not open the folder; open your file manager, then Download, then Quran</string>
-    <string name="dl_save_all_ask">%1$s surahs (%2$s) will be downloaded, then everything saved to the phone automatically. Continue?</string>
-    <string name="dl_save_all_do">Download and save</string>
     <string name="dl_save_failed">Could not save to the phone</string>
     <string name="dl_save_denied">Storage permission is needed to save to the phone</string>
     <string name="label_locate">Follow</string>

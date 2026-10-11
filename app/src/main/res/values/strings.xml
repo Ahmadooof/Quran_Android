@@ -164,8 +164,6 @@
     <string name="dl_stop_all">إيقاف التنزيل</string>
     <string name="dl_save_all">حفظ الكل في الهاتف</string>
     <string name="dl_delete_all">حذف التنزيلات</string>
-    <string name="dl_get_all_ask">تنزيل %1$s سورة بحجم %2$s؟</string>
-    <string name="dl_get_all_do">تنزيل</string>
     <string name="dl_delete_all_ask">حذف %1$s سورة (%2$s) من التطبيق؟ النسخ المحفوظة في الهاتف تبقى.</string>
     <string name="dl_delete_do">حذف</string>
     <string name="dl_size_unknown">…</string>
@@ -183,10 +181,7 @@
     <string name="dl_share_all">مشاركة كل المنزّل</string>
     <string name="dl_open_folder">فتح المجلد في الهاتف</string>
     <string name="dl_kept_saved">محفوظ في الهاتف · %1$s</string>
-    <string name="dl_share_all_ask">مشاركة %1$s سورة بحجم %2$s؟ بعض التطبيقات لا تقبل ملفات كثيرة أو كبيرة.</string>
     <string name="dl_folder_failed">تعذّر فتح المجلد، افتح مدير الملفات ثم Download ثم Quran</string>
-    <string name="dl_save_all_ask">سيتم تنزيل %1$s سورة (%2$s) ثم حفظ الكل في الهاتف تلقائيًا. متابعة؟</string>
-    <string name="dl_save_all_do">تنزيل وحفظ</string>
     <string name="dl_save_failed">تعذّر الحفظ في الهاتف</string>
     <string name="dl_save_denied">يلزم إذن التخزين للحفظ في الهاتف</string>
     <string name="set_group_help">المساعدة</string>
