@@ -48,7 +48,7 @@ class IndexPane(
     // Where a hizb's quarter, half and three-quarters begin, by page
     private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb).drop(1)
 
-    // The surah it begins in is beside the title, so the line under it gives only the page
+    // The surah it begins in is the row's title, so the line under it gives only the page
     private fun pageOnly(page: Int): String = host.getString(R.string.head_page, figures(page, res))
 
     private fun surahStarting(page: Int): Int? = Surahs.ofPage(page)?.id

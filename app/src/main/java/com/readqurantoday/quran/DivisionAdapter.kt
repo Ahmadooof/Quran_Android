@@ -33,12 +33,21 @@ class DivisionAdapter(
         val page = starts[position]
 
         row.findViewById<TextView>(R.id.div_num).text = figures(number, row.resources)
-        row.findViewById<TextView>(R.id.div_title).text = title(number)
-        row.findViewById<TextView>(R.id.div_where).text = where(page)
+        // Named by its surah, the part and page beneath: a title and its quiet line, as on the surah list
         val surah = surahOf?.invoke(page)
-        row.findViewById<View>(R.id.div_surah).apply {
-            visibility = if (surah != null) View.VISIBLE else View.GONE
-            if (surah != null) fillSurahTitle(this, surah, R.dimen.surah_title_row)
+        val named = row.findViewById<View>(R.id.div_surah)
+        val heading = row.findViewById<TextView>(R.id.div_title)
+        val under = row.findViewById<TextView>(R.id.div_where)
+        if (surah != null) {
+            fillSurahTitle(named, surah, R.dimen.surah_title)
+            named.visibility = View.VISIBLE
+            heading.visibility = View.GONE
+            under.text = row.resources.getString(R.string.place_line, title(number), where(page))
+        } else {
+            named.visibility = View.GONE
+            heading.visibility = View.VISIBLE
+            heading.text = title(number)
+            under.text = where(page)
         }
         fillQuarters(row, quarters?.invoke(number).orEmpty())
 
