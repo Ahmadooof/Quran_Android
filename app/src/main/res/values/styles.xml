@@ -10,6 +10,10 @@
         <item name="android:textSize">@dimen/icon_label</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:maxLines">1</item>
+        <!-- A wide page number shrinks a little rather than lose a digit -->
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMinTextSize">9sp</item>
+        <item name="autoSizeMaxTextSize">@dimen/quarter_text</item>
         <item name="autoSizeTextType">uniform</item>
         <item name="autoSizeMinTextSize">@dimen/icon_label_min</item>
         <item name="autoSizeMaxTextSize">@dimen/icon_label</item>
@@ -25,7 +29,7 @@
         <item name="android:gravity">center</item>
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:drawablePadding">4dp</item>
+        <item name="android:drawablePadding">3dp</item>
         <item name="android:maxLines">1</item>
         <item name="android:textSize">@dimen/mark_button_text</item>
         <item name="android:includeFontPadding">false</item>
@@ -40,8 +44,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">@dimen/quarter_chip_height</item>
         <item name="android:layout_marginEnd">@dimen/quarter_gap</item>
-        <item name="android:paddingStart">6dp</item>
-        <item name="android:paddingEnd">6dp</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingEnd">4dp</item>
         <item name="android:background">@drawable/chip_quarter</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
