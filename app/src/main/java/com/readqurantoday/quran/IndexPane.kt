@@ -18,7 +18,7 @@ class IndexPane(
     private val juz = division(Surahs.juzStarts(), { host.getString(R.string.head_juz, figures(it, res)) },
         { host.getString(R.string.head_page, figures(Surahs.juzStarts()[it - 1], res)) }, { listOfNotNull(Openings.ofJuz(host, it)) }, true, null, Surahs::juzOfPage)
     private val hizb = division(Surahs.hizbStarts(), { host.getString(R.string.head_hizb, figures(it, res)) },
-        { "" }, { listOfNotNull(Openings.ofHizb(host, it)) }, false, ::quarters, Surahs::hizbOfPage)
+        { host.getString(R.string.head_juz, figures((it + 1) / 2, res)) }, { listOfNotNull(Openings.ofHizb(host, it)) }, false, ::quarters, Surahs::hizbOfPage)
     private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, { host.getString(R.string.head_page, figures(it, res)) },
         ::juzSaid, { page -> Surahs.onPage(page).map { it.id } }, true, null) { it }
 

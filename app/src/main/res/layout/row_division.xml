@@ -39,7 +39,7 @@
             android:paddingTop="@dimen/row_pad_v"
             android:paddingBottom="@dimen/row_pad_v">
 
-            <!-- The part, and beside it in grey its surahs, as the surah list writes them -->
+            <!-- The part, and beside it in grey its surahs as the surah list writes them, then where it lies -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -62,6 +62,14 @@
                     android:layout_marginStart="@dimen/part_surah_gap"
                     android:orientation="horizontal"
                     android:layoutDirection="rtl" />
+
+                <TextView
+                    android:id="@+id/div_where_beside"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/part_surah_gap"
+                    android:textColor="@color/text_mute"
+                    android:textSize="@dimen/part_meta" />
             </LinearLayout>
 
             <!-- The quiet line: on a juz or page row its surahs first, then the rest -->

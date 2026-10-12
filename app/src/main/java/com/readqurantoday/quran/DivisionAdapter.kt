@@ -3,6 +3,7 @@ package com.readqurantoday.quran
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
@@ -37,15 +38,19 @@ class DivisionAdapter(
         row.findViewById<TextView>(R.id.div_num).text = figures(number, row.resources)
         row.findViewById<TextView>(R.id.div_title).text = title(number)
         val surahs = surahsOf(number)
-        val beside = row.findViewById<ViewGroup>(R.id.div_surahs)
-        val under = row.findViewById<ViewGroup>(R.id.div_surahs_under)
+        val beside = row.findViewById<LinearLayout>(R.id.div_surahs)
+        val under = row.findViewById<LinearLayout>(R.id.div_surahs_under)
         fillSurahs(if (surahsUnder) under else beside, surahs)
         (if (surahsUnder) beside else under).removeAllViews()
         under.visibility = if (under.childCount > 0) View.VISIBLE else View.GONE
+        // Where it lies follows its surahs, on whichever line they are
         val said = where(number)
-        row.findViewById<TextView>(R.id.div_where).text = said
-        row.findViewById<View>(R.id.div_under).visibility =
-            if (said.isEmpty() && under.childCount == 0) View.GONE else View.VISIBLE
+        row.findViewById<TextView>(R.id.div_where).text = if (surahsUnder) said else ""
+        row.findViewById<TextView>(R.id.div_where_beside).apply {
+            text = if (surahsUnder) "" else said
+            visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
+        }
+        row.findViewById<View>(R.id.div_under).visibility = if (surahsUnder) View.VISIBLE else View.GONE
         fillQuarters(row, quarters?.invoke(number).orEmpty())
 
         // The seam belongs between two rows, not under the last one
@@ -61,20 +66,16 @@ class DivisionAdapter(
         sayPlayButton(row, playing = here && Recite.wantsToPlay(), waiting = here && Recite.waiting())
     }
 
-    // Grey beside the title, so the part stays the name; several surahs on a page are named without سورة each time
-    private fun fillSurahs(into: ViewGroup, surahs: List<Int>) {
+    // Grey, so the part stays the name; several surahs on one page stand one under another, each named in full
+    private fun fillSurahs(into: LinearLayout, surahs: List<Int>) {
         into.removeAllViews()
+        into.orientation = if (surahs.size > 1) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
         val grey = into.context.getColor(R.color.text_mute)
-        val gap = into.resources.getDimensionPixelSize(R.dimen.part_surah_gap)
-        surahs.forEachIndexed { i, surah ->
+        for (surah in surahs) {
             val title = LayoutInflater.from(into.context).inflate(R.layout.part_surah_title, into, false)
             fillSurahTitle(title, surah, R.dimen.surah_title_row)
-            title.findViewById<TextView>(R.id.surah_word).apply {
-                setTextColor(grey)
-                if (surahs.size > 1) visibility = View.GONE
-            }
+            title.findViewById<TextView>(R.id.surah_word).setTextColor(grey)
             title.findViewById<TextView>(R.id.surah_name).setTextColor(grey)
-            if (i > 0) (title.layoutParams as ViewGroup.MarginLayoutParams).marginStart = gap
             into.addView(title)
         }
     }
