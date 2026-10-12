@@ -25,6 +25,7 @@ class PlacesPane(
             adapter = list
             addItemDecoration(PlacesSeams(list, host.getColor(R.color.line), resources.displayMetrics.density))
             keepToColumn()
+            addHandle()
         }
     }
 
