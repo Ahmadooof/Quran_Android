@@ -88,8 +88,7 @@ class IndexPane(
             (host.layoutInflater.inflate(R.layout.part_list, parent, false) as RecyclerView).apply {
                 layoutManager = LinearLayoutManager(parent.context)
                 keepToColumn()
-                // Thirty juz are a few swipes long; the longer lists get a handle
-                if (viewType != JUZ) addHandle(dragLabel(viewType))
+                addHandle(dragLabel(viewType))
             }
         )
 
