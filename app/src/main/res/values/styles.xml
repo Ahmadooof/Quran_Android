@@ -42,7 +42,7 @@
         <item name="android:layout_marginEnd">@dimen/quarter_gap</item>
         <item name="android:paddingStart">4dp</item>
         <item name="android:paddingEnd">4dp</item>
-        <item name="android:background">@drawable/chip_quarter</item>
+        <item name="android:background">@drawable/chip_outline</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:gravity">center</item>
