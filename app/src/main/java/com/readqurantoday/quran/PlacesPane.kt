@@ -56,7 +56,7 @@ class PlacesPane(
     // As the other two lists: the surah in the mushaf's hand, its juz and page beneath
     private fun pageRow(read: Settings.Read): View {
         val row = place(R.drawable.ic_surahs, read.page)
-        Surahs.ofPage(read.page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title_row) }
+        Surahs.ofPage(read.page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title) }
         row.findViewById<TextView>(R.id.place_detail).text = where(read.page)
         stamp(row, read.at)
         return row
@@ -65,7 +65,7 @@ class PlacesPane(
     private fun surahRow(read: Settings.Read): View {
         val row = place(R.drawable.ic_surahs, read.page)
         val surah = Surahs.list().firstOrNull { it.id == read.surah }
-        fillSurahTitle(row.findViewById(R.id.place_title), read.surah, R.dimen.surah_title_row)
+        fillSurahTitle(row.findViewById(R.id.place_title), read.surah, R.dimen.surah_title)
 
         // Progress as a bar only; a second page number in words read as a contradiction
         row.findViewById<TextView>(R.id.place_detail).text = where(read.page)
@@ -85,7 +85,7 @@ class PlacesPane(
 
     private fun savedRow(page: Int): View {
         val row = place(R.drawable.ic_bookmark, page)
-        Surahs.ofPage(page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title_row) }
+        Surahs.ofPage(page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title) }
         row.findViewById<TextView>(R.id.place_detail).text = where(page)
         row.findViewById<ImageView>(R.id.place_remove).apply {
             imageTintList = ColorStateList.valueOf(host.getColor(R.color.text_mute))
