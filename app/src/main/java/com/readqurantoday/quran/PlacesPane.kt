@@ -4,8 +4,9 @@ import android.app.Activity
 import android.content.res.ColorStateList
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 
 // Places tab: pages read lately, surahs read lately and saved pages, a swipe apart and never mixed
@@ -16,11 +17,16 @@ class PlacesPane(
     private val open: (Int) -> Unit
 ) {
 
-    private val blow = host.layoutInflater
-
-    // One scrolling column a list
-    private val pages = List(LISTS) { blow.inflate(R.layout.part_scroll_column, pager, false).apply { keepToColumn() } }
-    private val columns = pages.map { it.findViewById<LinearLayout>(R.id.column) }
+    // Each a recycling list, as the index's are: a long history makes only the rows in view
+    private val lists = List(LISTS) { PlacesList() }
+    private val pages = lists.map { list ->
+        (host.layoutInflater.inflate(R.layout.part_list, pager, false) as RecyclerView).apply {
+            layoutManager = LinearLayoutManager(host)
+            adapter = list
+            addItemDecoration(PlacesSeams(list, host.getColor(R.color.line), resources.displayMetrics.density))
+            keepToColumn()
+        }
+    }
 
     private val tabs = SwipeTabs(
         pager, strip,
@@ -31,17 +37,18 @@ class PlacesPane(
 
     // Rebuilt on every return: reading changes the history and saved pages
     fun build() {
-        columns.forEach { it.removeAllViews() }
-        fill(columns[PAGES], R.string.places_pages_head, readToday().map(::pageRow), R.string.no_recent_pages)
-        fill(columns[SURAHS], R.string.places_surahs_head, recentSurahs().map(::surahRow), R.string.no_recent)
-        fill(columns[SAVED], 0, Settings.marks(host).map(::savedRow), R.string.no_marks)
+        fill(PAGES, R.string.places_pages_head, readToday().map { read -> PlacesList.Item.Row { pageRow(it, read) } }, R.string.no_recent_pages)
+        fill(SURAHS, R.string.places_surahs_head, recentSurahs().map { read -> PlacesList.Item.Row { surahRow(it, read) } }, R.string.no_recent)
+        fill(SAVED, 0, Settings.marks(host).map { page -> PlacesList.Item.Row { savedRow(it, page) } }, R.string.no_marks)
     }
 
     /** The list in view comes in, as every tab does when it is opened. */
-    fun rise() = columns[tabs.current].riseChildren()
+    fun rise() = pages[tabs.current].riseWhole()
 
-    private fun fill(into: LinearLayout, title: Int, rows: List<View>, none: Int) =
-        blow.card(into, title, rows.ifEmpty { listOf(empty(into, none)) })
+    private fun fill(list: Int, title: Int, rows: List<PlacesList.Item>, none: Int) {
+        val head = if (title != 0) listOf(PlacesList.Item.Head(host.getString(title))) else emptyList()
+        lists[list].show(head + rows.ifEmpty { listOf(PlacesList.Item.Empty(host.getString(none))) })
+    }
 
     /* The reading history; before any was kept, the one last page stands in for it. */
     private fun recentSurahs(): List<Settings.Read> {
@@ -61,16 +68,15 @@ class PlacesPane(
     }
 
     // As the other two lists: the surah in the mushaf's hand, its juz and page beneath
-    private fun pageRow(read: Settings.Read): View {
-        val row = place(R.drawable.ic_surahs, read.page)
+    private fun pageRow(row: View, read: Settings.Read) {
+        place(row, R.drawable.ic_surahs, read.page)
         Surahs.ofPage(read.page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title) }
         row.findViewById<TextView>(R.id.place_detail).text = where(read.page)
         stamp(row, read.at)
-        return row
     }
 
-    private fun surahRow(read: Settings.Read): View {
-        val row = place(R.drawable.ic_surahs, read.page)
+    private fun surahRow(row: View, read: Settings.Read) {
+        place(row, R.drawable.ic_surahs, read.page)
         val surah = Surahs.list().firstOrNull { it.id == read.surah }
         fillSurahTitle(row.findViewById(R.id.place_title), read.surah, R.dimen.surah_title)
 
@@ -80,6 +86,7 @@ class PlacesPane(
             val of = (surah.to - surah.from + 1).coerceAtLeast(1)
             val at = (read.page - surah.from + 1).coerceIn(1, of)
             row.findViewById<View>(R.id.place_track).apply {
+                visibility = View.VISIBLE
                 fillTrack(at.toFloat(), of.toFloat())
                 contentDescription = host.getString(
                     R.string.place_progress, figures(at, host.resources), figures(of, host.resources)
@@ -87,23 +94,21 @@ class PlacesPane(
             }
         }
         stamp(row, read.at)
-        return row
     }
 
-    private fun savedRow(page: Int): View {
-        val row = place(R.drawable.ic_bookmark, page)
+    private fun savedRow(row: View, page: Int) {
+        place(row, R.drawable.ic_bookmark, page)
         Surahs.ofPage(page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title) }
         row.findViewById<TextView>(R.id.place_detail).text = where(page)
         row.findViewById<ImageView>(R.id.place_remove).apply {
             imageTintList = ColorStateList.valueOf(host.getColor(R.color.text_mute))
             visibility = View.VISIBLE
-            /* Dropping a saved page rebuilds the lists, so the card closes up at once. */
+            /* Dropping a saved page rebuilds the lists, so the list closes up at once. */
             setOnClickListener {
                 Settings.toggleMark(host, page)
                 build()
             }
         }
-        return row
     }
 
     // How long ago; entries carried over from before times were kept have none
@@ -116,14 +121,12 @@ class PlacesPane(
     }
 
     /* The row every list shares: the disc with its icon, and the tap that goes there. */
-    private fun place(icon: Int, page: Int): View {
-        val row = blow.inflate(R.layout.row_place, columns[0], false)
+    private fun place(row: View, icon: Int, page: Int) {
         row.findViewById<ImageView>(R.id.place_icon).apply {
             setImageResource(icon)
             imageTintList = ColorStateList.valueOf(host.getColor(R.color.accent))
         }
         row.setOnClickListener { open(page) }
-        return row
     }
 
     /* "Juz 1 · Page 3", in the figures the page itself uses. */
@@ -134,9 +137,6 @@ class PlacesPane(
             R.string.place_line, host.getString(R.string.head_juz, figures(juz, host.resources)), at
         )
     }
-
-    private fun empty(into: LinearLayout, said: Int): View =
-        (blow.inflate(R.layout.row_empty, into, false) as TextView).apply { setText(said) }
 
     private companion object {
         const val LISTS = 3

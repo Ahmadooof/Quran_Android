@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What a places list holds, above its rows: the card titles' style, at the screen margin -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/screen_margin"
+    android:paddingEnd="@dimen/screen_margin"
+    android:paddingTop="18dp"
+    android:paddingBottom="8dp"
+    android:textColor="@color/text_mute"
+    android:textSize="@dimen/text_meta"
+    android:includeFontPadding="false" />
