@@ -17,7 +17,7 @@
         android:paddingTop="18dp"
         android:paddingBottom="8dp"
         android:textColor="@color/text_mute"
-        android:textSize="12sp"
+        android:textSize="@dimen/text_meta"
         android:includeFontPadding="false" />
 
     <LinearLayout

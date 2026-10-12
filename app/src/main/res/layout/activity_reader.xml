@@ -99,7 +99,7 @@
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 android:textColor="@color/text"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_title"
                 android:textStyle="bold"
                 android:includeFontPadding="false"
                 android:maxLines="1"

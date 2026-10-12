@@ -24,7 +24,7 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:textColor="@color/text_mute"
-        android:textSize="13sp" />
+        android:textSize="@dimen/text_body" />
 
     <!-- The line itself, restyled as the colour moves. -->
     <FrameLayout
@@ -59,7 +59,7 @@
         android:textDirection="ltr"
         android:fontFamily="monospace"
         android:textColor="@color/text"
-        android:textSize="14sp"
+        android:textSize="@dimen/text_body"
         android:inputType="textNoSuggestions|textCapCharacters"
         android:maxLength="7"
         android:imeOptions="actionDone"
@@ -76,7 +76,7 @@
         android:paddingEnd="20dp"
         android:text="@string/color_in_use"
         android:textColor="@color/text_mute"
-        android:textSize="11sp"
+        android:textSize="@dimen/text_small"
         android:includeFontPadding="false" />
 
     <LinearLayout
@@ -114,7 +114,7 @@
             android:background="@drawable/row_flat"
             android:text="@string/done"
             android:textColor="@color/text"
-            android:textSize="15sp"
+            android:textSize="@dimen/text_body"
             android:textStyle="bold" />
 
         <TextView
@@ -126,6 +126,6 @@
             android:background="@drawable/row_flat"
             android:text="@string/cancel"
             android:textColor="@color/text_mute"
-            android:textSize="15sp" />
+            android:textSize="@dimen/text_body" />
     </LinearLayout>
 </LinearLayout>

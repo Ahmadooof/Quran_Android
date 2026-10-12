@@ -6,7 +6,7 @@
     android:background="@color/surface_2"
     android:text="@string/search_none"
     android:textColor="@color/text_mute"
-    android:textSize="12sp"
+    android:textSize="@dimen/text_meta"
     android:gravity="center"
     android:includeFontPadding="false"
     android:paddingTop="36dp"

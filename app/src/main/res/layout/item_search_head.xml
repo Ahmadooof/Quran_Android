@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/surface_2"
     android:textColor="@color/text_mute"
-    android:textSize="11sp"
+    android:textSize="@dimen/text_small"
     android:includeFontPadding="false"
     android:paddingStart="@dimen/screen_margin"
     android:paddingEnd="@dimen/screen_margin"

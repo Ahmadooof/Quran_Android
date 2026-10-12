@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.util.TypedValue
 
 // A small label over one word of the page: the lit word's transliteration
 class WordTip(context: Context) {
@@ -14,7 +13,7 @@ class WordTip(context: Context) {
         textAlign = Paint.Align.CENTER
         // The system face: it carries the dotted and macroned Latin letters
         typeface = Typeface.DEFAULT
-        textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, TEXT_SP, context.resources.displayMetrics)
+        textSize = context.resources.getDimension(R.dimen.text_body)
     }
     private val ground = Paint(Paint.ANTI_ALIAS_FLAG)
     private val box = RectF()
@@ -47,7 +46,6 @@ class WordTip(context: Context) {
     }
 
     private companion object {
-        const val TEXT_SP = 15f
         const val MARK_CLEARANCE = 0.25f
     }
 }

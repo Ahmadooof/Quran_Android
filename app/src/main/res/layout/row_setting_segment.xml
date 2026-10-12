@@ -16,7 +16,7 @@
         android:clickable="true"
         android:focusable="true"
         android:text="@string/theme_light"
-        android:textSize="14sp" />
+        android:textSize="@dimen/text_body" />
 
     <TextView
         android:id="@+id/seg_night"
@@ -28,5 +28,5 @@
         android:clickable="true"
         android:focusable="true"
         android:text="@string/theme_dark"
-        android:textSize="14sp" />
+        android:textSize="@dimen/text_body" />
 </LinearLayout>

@@ -41,19 +41,25 @@
     <!-- A surah's name in the mushaf hand: the index lists, then rows inside other screens -->
     <dimen name="surah_title">26sp</dimen>
     <dimen name="surah_title_row">22sp</dimen>
+    <!-- The type scale: every text in the app is one of these five, or points at one -->
+    <dimen name="text_heading">18sp</dimen>
+    <dimen name="text_title">16sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_meta">12sp</dimen>
+    <dimen name="text_small">11sp</dimen>
     <!-- A row's own title, the quiet line under it, and the label under an icon -->
-    <dimen name="row_title">15sp</dimen>
+    <dimen name="row_title">@dimen/text_title</dimen>
     <!-- A juz, hizb or page row's name, as large as a surah row's name reads -->
-    <dimen name="part_title">18sp</dimen>
+    <dimen name="part_title">@dimen/text_heading</dimen>
     <!-- A surah's English name, beside its calligraphy in a row -->
-    <dimen name="surah_english">14sp</dimen>
+    <dimen name="surah_english">@dimen/text_body</dimen>
     <!-- Between a surah's juz and its pages, stacked beside the row's buttons -->
     <dimen name="meta_stack_gap">5dp</dimen>
-    <dimen name="row_meta">11sp</dimen>
+    <dimen name="row_meta">@dimen/text_meta</dimen>
     <!-- The accent value at the end of a settings or statistics row -->
-    <dimen name="row_value">14sp</dimen>
-    <dimen name="icon_label">10sp</dimen>
-    <dimen name="nav_label">11sp</dimen>
+    <dimen name="row_value">@dimen/text_body</dimen>
+    <dimen name="icon_label">@dimen/text_small</dimen>
+    <dimen name="nav_label">@dimen/text_small</dimen>
     <!-- Room under a list's last row -->
     <dimen name="list_end_pad">8dp</dimen>
     <!-- Scrollbars: the thin one, and the handle a long list can be dragged by -->
@@ -67,14 +73,14 @@
     <dimen name="scroll_track">3dp</dimen>
     <!-- The index switch above the lists -->
     <dimen name="seg_height">36dp</dimen>
-    <dimen name="seg_text">14sp</dimen>
+    <dimen name="seg_text">@dimen/text_body</dimen>
     <dimen name="icon_label_min">7sp</dimen>
     <!-- Smallest the reader bar's juz and page may shrink to under a large font -->
     <dimen name="bar_place_min">8sp</dimen>
 
     <!-- The numbered disc that opens a surah, juz or search row -->
     <dimen name="num_disc">32dp</dimen>
-    <dimen name="num_disc_text">12sp</dimen>
+    <dimen name="num_disc_text">@dimen/text_meta</dimen>
 
     <!-- A lone icon button inside a row: big enough to hit without a second try -->
     <dimen name="row_button">44dp</dimen>
@@ -102,18 +108,18 @@
     <dimen name="tile_min_height">118dp</dimen>
     <dimen name="trend_icon">14dp</dimen>
     <dimen name="pill_radius">12dp</dimen>
-    <dimen name="section_title">18sp</dimen>
+    <dimen name="section_title">@dimen/text_heading</dimen>
     <dimen name="section_gap">22dp</dimen>
     <!-- Lines the section title up with the cards' own titles -->
     <dimen name="section_inset">18dp</dimen>
-    <dimen name="chart_label">10sp</dimen>
+    <dimen name="chart_label">@dimen/text_small</dimen>
     <dimen name="chart_gap">6dp</dimen>
     <!-- Toggle buttons and page tiles: chosen is filled, not chosen is outlined -->
     <dimen name="choice_radius">12dp</dimen>
     <dimen name="choice_tile">48dp</dimen>
     <dimen name="choice_gap">4dp</dimen>
     <dimen name="mark_button_height">36dp</dimen>
-    <dimen name="mark_button_text">13sp</dimen>
+    <dimen name="mark_button_text">@dimen/text_body</dimen>
     <dimen name="mark_button_icon">16dp</dimen>
     <!-- The arrow at the end of a tappable statistics row -->
     <dimen name="row_go">18dp</dimen>
@@ -126,7 +132,7 @@
     <dimen name="chart_bar">26dp</dimen>
     <dimen name="chart_bar_corner">6dp</dimen>
     <dimen name="chart_count">13sp</dimen>
-    <dimen name="chart_day">12sp</dimen>
+    <dimen name="chart_day">@dimen/text_meta</dimen>
     <dimen name="legend_dot">10dp</dimen>
     <!-- Setting a goal: the minus and plus buttons, the number between them, a weekday button -->
     <dimen name="step_button">40dp</dimen>
@@ -134,19 +140,19 @@
     <dimen name="day_choice">40dp</dimen>
     <!-- A hizb row's quarter pies, and the room between one and the next -->
     <dimen name="quarter_icon">15dp</dimen>
-    <dimen name="quarter_text">13sp</dimen>
+    <dimen name="quarter_text">@dimen/text_meta</dimen>
     <dimen name="quarter_gap">4dp</dimen>
     <dimen name="quarter_chip_height">36dp</dimen>
     <dimen name="quarter_chip_radius">18dp</dimen>
     <!-- Between a juz or hizb row's name and its surah beside it -->
     <dimen name="part_surah_gap">8dp</dimen>
     <!-- A juz or page row's juz or page beside its surah, sized to sit level with the names -->
-    <dimen name="part_meta">14sp</dimen>
+    <dimen name="part_meta">@dimen/text_body</dimen>
     <!-- The bubble beside a held list handle, naming where the drag has reached -->
     <dimen name="scroll_bubble_gap">40dp</dimen>
     <dimen name="scroll_bubble_pad_x">16dp</dimen>
     <dimen name="scroll_bubble_pad_y">8dp</dimen>
-    <dimen name="scroll_bubble_text">15sp</dimen>
+    <dimen name="scroll_bubble_text">@dimen/text_body</dimen>
     <!-- Each of a download row's three buttons: save to phone, share, download -->
     <dimen name="dl_button">60dp</dimen>
 </resources>
