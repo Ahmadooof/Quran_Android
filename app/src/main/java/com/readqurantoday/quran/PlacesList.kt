@@ -8,11 +8,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-/** One of the places lists: a heading, then rows made only as they scroll into view, or a quiet line when empty. */
+/** One of the places lists: rows made only as they scroll into view, or a quiet line when empty. */
 class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed class Item {
-        data class Head(val said: String) : Item()
         data class Empty(val said: String) : Item()
         /** A row_place, filled by [fill] each time it is shown. */
         class Row(val fill: (View) -> Unit) : Item()
@@ -32,7 +31,6 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount() = items.size
 
     override fun getItemViewType(position: Int) = when (items[position]) {
-        is Item.Head -> HEAD
         is Item.Empty -> EMPTY
         is Item.Row -> ROW
         is Item.Action -> ACTION
@@ -40,7 +38,6 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layout = when (viewType) {
-            HEAD -> R.layout.item_list_head
             EMPTY -> R.layout.row_empty
             ACTION -> R.layout.row_setting_action
             else -> R.layout.row_place
@@ -51,7 +48,6 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val v = holder.itemView
         when (val item = items[position]) {
-            is Item.Head -> (v as TextView).text = item.said
             is Item.Empty -> (v as TextView).text = item.said
             is Item.Action -> {
                 (v as TextView).text = item.said
@@ -68,10 +64,9 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     private companion object {
-        const val HEAD = 0
-        const val EMPTY = 1
-        const val ROW = 2
-        const val ACTION = 3
+        const val EMPTY = 0
+        const val ROW = 1
+        const val ACTION = 2
     }
 }
 

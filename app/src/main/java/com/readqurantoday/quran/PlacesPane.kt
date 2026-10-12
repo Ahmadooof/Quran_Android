@@ -17,15 +17,19 @@ class PlacesPane(
     private val open: (Int) -> Unit
 ) {
 
-    // Each a recycling list, as the index's are: a long history makes only the rows in view
+    // Each a recycling list, as the index's are: a long history makes only the rows in view.
+    // Its heading sits above it, so it stays while the rows scroll
     private val lists = List(LISTS) { PlacesList() }
     private val pages = lists.map { list ->
-        (host.layoutInflater.inflate(R.layout.part_list, pager, false) as RecyclerView).apply {
-            layoutManager = LinearLayoutManager(host)
-            adapter = list
-            addItemDecoration(PlacesSeams(list, host.getColor(R.color.line), resources.displayMetrics.density))
-            keepToColumn()
-            addHandle()
+        host.layoutInflater.inflate(R.layout.part_headed_list, pager, false).apply {
+            findViewById<View>(R.id.list_head).keepToColumn()
+            findViewById<RecyclerView>(R.id.list_rows).apply {
+                layoutManager = LinearLayoutManager(host)
+                adapter = list
+                addItemDecoration(PlacesSeams(list, host.getColor(R.color.line), resources.displayMetrics.density))
+                keepToColumn()
+                addHandle()
+            }
         }
     }
 
@@ -58,8 +62,11 @@ class PlacesPane(
     fun rise() = pages[tabs.current].riseWhole()
 
     private fun fill(list: Int, title: Int, rows: List<PlacesList.Item>, none: Int) {
-        val head = if (title != 0) listOf(PlacesList.Item.Head(host.getString(title))) else emptyList()
-        lists[list].show(head + rows.ifEmpty { listOf(PlacesList.Item.Empty(host.getString(none))) })
+        pages[list].findViewById<TextView>(R.id.list_head).apply {
+            visibility = if (title != 0) View.VISIBLE else View.GONE
+            if (title != 0) setText(title)
+        }
+        lists[list].show(rows.ifEmpty { listOf(PlacesList.Item.Empty(host.getString(none))) })
     }
 
     /* The reading history; before any was kept, the one last page stands in for it. */
