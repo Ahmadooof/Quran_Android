@@ -462,4 +462,5 @@
     <string name="marks_clear_ask">حذف %1$s صفحة محفوظة؟</string>
     <string name="remove_short">إزالة</string>
     <string name="hifz_known_surahs">السور المحفوظة</string>
+    <string name="chart_goal_day" translatable="false">%1$s %2$s</string>
 </resources>

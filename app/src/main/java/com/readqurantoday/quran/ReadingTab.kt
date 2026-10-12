@@ -86,13 +86,21 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
             orientation = LinearLayout.VERTICAL
             addView(chart)
             addView(blow.inflate(R.layout.part_chart_legend, this, false).apply {
-                // The goal said once here, not under every day; when the days differ the tracks show how
-                val one = goals.filter { it > 0 }.distinct().singleOrNull()
-                findViewById<TextView>(R.id.legend_goal).text =
-                    if (one != null) host.getString(R.string.chart_goal_of, pagesSaid(one, res)) else host.getString(R.string.chart_goal_word)
+                findViewById<TextView>(R.id.legend_goal).text = goalKey(goals)
             })
         }
         return listOf(withKey, cards.row(host.getString(R.string.chart_total), pagesSaid(counts.sum(), res)))
+    }
+
+    // The goal said once, not under every day: the usual one, then any day that asks for another, by its name
+    private fun goalKey(goals: List<Int>): String {
+        val usual = goals.filter { it > 0 }.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+            ?: return host.getString(R.string.chart_goal_word)
+        val said = host.getString(R.string.chart_goal_of, pagesSaid(usual, res))
+        val last = goals.size - 1
+        val others = goals.indices.filter { goals[it] > 0 && goals[it] != usual }
+            .map { host.getString(R.string.chart_goal_day, dayName(last - it), figures(goals[it], res)) }
+        return (listOf(said) + others).joinToString(host.getString(R.string.list_join))
     }
 
     // A day's goal by its weekday; a khatma's pages a day are only known for today
