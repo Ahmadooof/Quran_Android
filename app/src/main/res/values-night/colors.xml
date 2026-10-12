@@ -16,7 +16,7 @@
     <color name="reader_chrome">#242C35</color>
     <!-- Every screen's ground, lists included, so the tabs read as one app -->
     <color name="surface_2">#11161A</color>
-    <color name="scroll_thumb">#80B2B9C0</color>
+    <color name="scroll_thumb">#B3B2B9C0</color>
     <color name="line">#323C47</color>
     <color name="text">#DDE2E7</color>
     <color name="text_mute">#B2B9C0</color>

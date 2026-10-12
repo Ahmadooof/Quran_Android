@@ -58,12 +58,12 @@
     <dimen name="list_end_pad">8dp</dimen>
     <!-- Scrollbars: the thin one, and the handle a long list can be dragged by -->
     <dimen name="scroll_thin">4dp</dimen>
-    <dimen name="scroll_handle">8dp</dimen>
-    <dimen name="scroll_handle_held">12dp</dimen>
-    <dimen name="scroll_handle_tall">52dp</dimen>
+    <dimen name="scroll_handle">10dp</dimen>
+    <dimen name="scroll_handle_held">14dp</dimen>
+    <dimen name="scroll_handle_tall">60dp</dimen>
     <dimen name="scroll_handle_inset">4dp</dimen>
     <!-- The strip at the edge that takes hold of the handle -->
-    <dimen name="scroll_handle_reach">44dp</dimen>
+    <dimen name="scroll_handle_reach">48dp</dimen>
     <!-- The index switch above the lists -->
     <dimen name="seg_height">36dp</dimen>
     <dimen name="seg_text">14sp</dimen>

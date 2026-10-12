@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * A handle to drag a long list by: one size however long the list, shown while it moves and held,
+ * A handle to drag a long list by: one size however long the list, always in view so it is found,
  * and kept out of the system's edge-swipe so dragging it never goes back. With [label], a bubble beside the
  * held handle names the row at the top of the list, so a drag can stop where it means to.
  */
@@ -21,7 +21,6 @@ fun RecyclerView.addHandle(label: ((Int) -> String)? = null) {
     val handle = ListHandle(this, label)
     addItemDecoration(handle)
     addOnItemTouchListener(handle)
-    addOnScrollListener(handle.onScroll)
 }
 
 private class ListHandle(
@@ -57,30 +56,10 @@ private class ListHandle(
     }
     private val bubble = RectF()
 
-    private var shown = false
     private var dragging = false
-
-    private val hide = Runnable {
-        shown = false
-        list.invalidate()
-    }
-
-    val onScroll = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
-            if (dy != 0 || dragging) show()
-        }
-    }
 
     // Only worth a handle when the list runs well past one screen
     private fun long() = list.computeVerticalScrollRange() > list.height * 2
-
-    private fun show() {
-        if (!long()) return
-        shown = true
-        list.removeCallbacks(hide)
-        if (!dragging) list.postDelayed(hide, HIDE_MS)
-        list.invalidate()
-    }
 
     private fun place() {
         val range = list.computeVerticalScrollRange() - list.computeVerticalScrollExtent()
@@ -96,7 +75,7 @@ private class ListHandle(
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        if (!shown) return
+        if (!long()) return
         place()
         pill.color = if (dragging) held else rest
         c.drawRoundRect(box, box.width() / 2f, box.width() / 2f, pill)
@@ -124,7 +103,7 @@ private class ListHandle(
     }
 
     private fun onHandle(e: MotionEvent): Boolean {
-        if (!shown) return false
+        if (!long()) return false
         place()
         val from = edgeStart().toFloat()
         return e.x in from..from + reach && e.y in box.top - inset..box.bottom + inset
@@ -139,7 +118,6 @@ private class ListHandle(
             dragging = true
             // Holding the handle is not a swipe to the next list
             list.parent?.requestDisallowInterceptTouchEvent(true)
-            list.removeCallbacks(hide)
             list.invalidate()
             return true
         }
@@ -159,14 +137,10 @@ private class ListHandle(
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 dragging = false
-                show()
+                list.invalidate()
             }
         }
     }
 
     override fun onRequestDisallowInterceptTouchEvent(disallow: Boolean) = Unit
-
-    private companion object {
-        const val HIDE_MS = 1200L
-    }
 }
