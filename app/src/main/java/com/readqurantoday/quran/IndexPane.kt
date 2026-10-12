@@ -72,6 +72,7 @@ class IndexPane(
         // Already reciting this part: the button is a pause, as it is on a surah row
         if (here != 0 && here == numberOf(Recite.playingPage(host))) Recite.toggle()
         else Recite.startPage(host, page)
+        if (Recite.wantsToPlay()) host.warnIfMuted()
         played()
     }
 

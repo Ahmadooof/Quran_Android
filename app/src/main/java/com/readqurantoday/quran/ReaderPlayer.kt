@@ -191,6 +191,12 @@ class ReaderPlayer(
         panel.findViewById<View>(R.id.p_translit).setOnClickListener {
             val on = !Settings.translit(host)
             Settings.setTranslit(host, on)
+            // With no word lit on this page the pronunciation would show nowhere; its first word is lit to show it
+            val view = reader.pageInView()
+            val lit = reader.shownWord()
+            if (on && !Recite.wantsToPlay() && view != null && (lit == null || !view.holds(lit[0], lit[1], lit[2]))) {
+                view.firstWord()?.let { (s, a, w) -> reader.lit(s, a, w) }
+            }
             say()
             if (on && !Translit.ready) Thread { Translit.load(host); host.runOnUiThread { reader.redrawPages() } }.start()
             else reader.redrawPages()
@@ -213,6 +219,7 @@ class ReaderPlayer(
             if (pendingSurah == 0) offerPageStart()
             if (pendingSurah > 0) {
                 rc.start(pendingSurah, pendingFrom)
+                host.warnIfMuted()
                 pendingSurah = 0
                 reader.showPlayer()
                 say()
@@ -222,6 +229,7 @@ class ReaderPlayer(
         }
         Recite.toggle()
         if (Recite.wantsToPlay()) {
+            host.warnIfMuted()
             rc.follow()
             reader.closeSoon()
         }
@@ -282,6 +290,7 @@ class ReaderPlayer(
             ?: view?.firstWord() ?: return
         if (Recite.wantsToPlay()) Recite.toggle()
         reader.lit(surah, ayah, w)
+        host.warnIfMuted()
         WordVoice.say(host, surah, ayah, w, changed = ::say) { how ->
             say()
             when (how) {

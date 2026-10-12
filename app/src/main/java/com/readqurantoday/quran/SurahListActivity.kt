@@ -217,16 +217,19 @@ class SurahListActivity : LanguageActivity() {
         onVerse    = { surah, ayah -> answer(pageOfAyah(surah, ayah), surah, ayah) },
         onPlay     = { s ->
             if (Recite.playing == s.id) Recite.toggle() else Recite.start(this, s.id)
+            if (Recite.wantsToPlay()) warnIfMuted()
             refreshLists()
         },
         // A second tap on what is already reciting pauses it, as on every row
         onPlayPage = { page ->
             if (page == Recite.playingPage(this)) Recite.toggle() else Recite.startPage(this, page)
+            if (Recite.wantsToPlay()) warnIfMuted()
             refreshLists()
         },
         onPlayVerse = { surah, ayah ->
             if (Recite.playing == surah && Recite.playingAyah(this) == ayah) Recite.toggle()
             else Recite.startAyah(this, surah, ayah)
+            if (Recite.wantsToPlay()) warnIfMuted()
             refreshLists()
         },
         onReciter  = { s -> pickReciter(s) },

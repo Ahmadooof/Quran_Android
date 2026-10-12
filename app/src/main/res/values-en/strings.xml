@@ -391,4 +391,5 @@
     <string name="marks_clear_ask">Remove %1$s saved pages?</string>
     <string name="remove_short">Remove</string>
     <string name="hifz_known_surahs">Memorised surahs</string>
+    <string name="volume_off">The volume is all the way down; turn it up to listen</string>
 </resources>
