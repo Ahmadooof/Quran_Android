@@ -1,6 +1,7 @@
 package com.readqurantoday.quran
 
 import android.graphics.Typeface
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -44,7 +45,25 @@ class SwipeTabs(
             }
         })
         mark(pager.currentItem)
+        landOnTouch()
     }
+
+    // A touch while the new tab still glides in would be caught by the pager and turn the tab back; the glide
+    // ends at once instead, and the touch is the list's
+    private fun landOnTouch() = (pager.getChildAt(0) as RecyclerView).addOnItemTouchListener(
+        object : RecyclerView.SimpleOnItemTouchListener() {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                if (e.actionMasked == MotionEvent.ACTION_DOWN && rv.scrollState == RecyclerView.SCROLL_STATE_SETTLING) {
+                    val target = pager.currentItem
+                    // Stopping the glide wakes the pager's snap, which starts one more glide; that one stops too
+                    rv.stopScroll()
+                    rv.stopScroll()
+                    rv.layoutManager?.scrollToPosition(target)
+                }
+                return false
+            }
+        }
+    )
 
     val current: Int get() = pager.currentItem
 
