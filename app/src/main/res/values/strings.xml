@@ -46,7 +46,7 @@
     <string name="list_hizb">الأحزاب</string>
     <string name="list_pages">الصفحات</string>
     <string name="tab_juz">الأجزاء</string>
-    <string name="tab_marks">علاماتي</string>
+    <string name="tab_marks">العلامات</string>
     <string name="tab_settings">الإعدادات</string>
     <string name="search_hint">سورة، صفحة، أو آية…</string>
 
@@ -202,14 +202,14 @@
     <string name="fb_severity_high">كبيرة</string>
     <string name="fb_message">الرسالة</string>
     <string name="fb_message_hint">اكتب ما حدث أو ما تقترحه…</string>
-    <string name="fb_email">بريدك للرد (اختياري)</string>
+    <string name="fb_email">البريد الإلكتروني للرد (اختياري)</string>
     <string name="fb_email_hint">name@example.com</string>
-    <string name="fb_details_note">يُرسل مع رسالتك: إصدار التطبيق، وإصدار أندرويد، ونوع الهاتف، واللغة، والمظهر، وطريقة تقليب الصفحات، والقارئ، واتجاه الشاشة، وآخر صفحة قرأتها.</string>
+    <string name="fb_details_note">يُرسل مع الرسالة: إصدار التطبيق، وإصدار أندرويد، ونوع الهاتف، واللغة، والمظهر، وطريقة تقليب الصفحات، والقارئ، واتجاه الشاشة، وآخر صفحة مقروءة.</string>
     <string name="fb_send">إرسال</string>
     <string name="fb_by_email">الإرسال بالبريد الإلكتروني بدلًا من ذلك</string>
     <string name="fb_too_short">اكتب رسالة أطول قليلًا</string>
     <string name="fb_bad_email">البريد الإلكتروني غير صحيح</string>
-    <string name="fb_thanks">شكرًا لك، وصلت رسالتك</string>
+    <string name="fb_thanks">شكرًا، وصلت الرسالة</string>
     <string name="fb_too_many">أرسلت رسائل كثيرة، حاول لاحقًا</string>
     <string name="fb_failed">تعذّر الإرسال الآن. هل تريد إرسالها بالبريد الإلكتروني؟</string>
     <string name="set_about">عن التطبيق</string>
@@ -228,10 +228,10 @@
 
     <!-- Statistics: kept on the phone only. Figures arrive already written in Arabic figures -->
     <!-- The tab of reading and listening numbers, told as what the reader has done -->
-    <string name="tab_achievements">إنجازي</string>
+    <string name="tab_achievements">الإنجازات</string>
     <string name="stats_read_time">وقت القراءة</string>
     <string name="stats_listen_time">وقت الاستماع اليوم</string>
-    <string name="stats_none_today">لم تقرأ اليوم بعد</string>
+    <string name="stats_none_today">لا قراءة اليوم بعد</string>
     <string name="stats_goal_reached">أتممت هدف اليوم</string>
     <string name="stats_goal_month">ختمة في شهر تقريبًا</string>
     <string name="stats_khatma_read">%1$s من %2$s</string>
@@ -241,7 +241,7 @@
     <string name="stats_new_khatma_do">ابدأ من جديد</string>
     <string name="stats_week">وقت الاستماع في آخر %1$s أيام</string>
     <string name="stats_chart_desc">الصفحات المقروءة في كل يوم من آخر %1$s أيام، وأكثرها في يوم %2$s</string>
-    <string name="stats_private">إحصاءات قراءتك وحفظك تبقى في هاتفك فقط، ولا تُرسل إلى أي مكان. تُحسب الصفحة مقروءة بعد بقائها على الشاشة عشر ثوانٍ، وخمسًا لصفحتي الفاتحة وأول البقرة لقِصَرهما.</string>
+    <string name="stats_private">إحصاءات القراءة والحفظ تبقى في الهاتف فقط، ولا تُرسل إلى أي مكان. تُحسب الصفحة مقروءة بعد بقائها على الشاشة عشر ثوانٍ، وخمسًا لصفحتي الفاتحة وأول البقرة لقِصَرهما.</string>
     <string name="percent">%1$s٪</string>
     <string name="time_under_minute">أقل من دقيقة</string>
     <plurals name="pages_count">
@@ -274,9 +274,9 @@
         <item quantity="many">صفحة</item>
         <item quantity="other">صفحة</item>
     </plurals>
-    <string name="sec_reading">قراءتي</string>
-    <string name="sec_khatma">ختمتي</string>
-    <string name="sec_listening">استماعي</string>
+    <string name="sec_reading">القراءة</string>
+    <string name="sec_khatma">الختمة</string>
+    <string name="sec_listening">الاستماع</string>
     <string name="stats_page_times">وقت كل صفحة قرأتها اليوم</string>
     <string name="chart_today">اليوم</string>
     <string name="stats_read_month">وقت القراءة هذا الشهر</string>
@@ -285,7 +285,7 @@
     <string name="stats_page_times_open">وقت كل صفحة قرأتها</string>
     <string name="goal_done">أتممت هدف اليوم</string>
     <string name="time_and">%1$s و%2$s</string>
-    <string name="stats_per_hour_note">يظهر بعد أن تقرأ بضع صفحات</string>
+    <string name="stats_per_hour_note">يظهر بعد قراءة بضع صفحات</string>
     <string name="pt_sort">الترتيب</string>
     <string name="pt_by_page">بترتيب الصفحات</string>
     <string name="pt_by_time">الأبطأ أولًا</string>
@@ -323,7 +323,7 @@
     </plurals>
     <string name="goal_custom_hint">العدد</string>
     <string name="goal_keep">حفظ الهدف</string>
-    <string name="goal_title">هدفك</string>
+    <string name="goal_title">الهدف</string>
     <string name="goal_none_today">لا هدف لهذا اليوم</string>
     <string name="goal_every_day">كل يوم</string>
     <string name="goal_plan">%1$s %2$s</string>
@@ -354,7 +354,7 @@
     </string-array>
     <!-- Goals tab: what the goal is, what is done, what is left -->
     <string name="goal_change">تغيير</string>
-    <string name="khatma_daily">%1$s كل يوم لتختم في %2$s</string>
+    <string name="khatma_daily">%1$s كل يوم للختم في %2$s</string>
     <string name="goal_khatma_by">ختمة تنتهي في %1$s</string>
 
     <!-- Memorisation: pages known by heart, kept on the phone -->
@@ -362,21 +362,21 @@
     <string name="hifz_goal_title">هدف الحفظ</string>
     <string name="hifz_stop">إلغاء هدف الحفظ</string>
     <string name="hifz_mine">سجلّ الحفظ</string>
-    <string name="hifz_mine_empty">سجّل السور والصفحات التي تحفظها</string>
+    <string name="hifz_mine_empty">تسجيل السور والصفحات المحفوظة</string>
     <string name="hifz_keep">تم</string>
-    <string name="hifz_pages_ask">اختر الصفحات التي تحفظها</string>
+    <string name="hifz_pages_ask">اختر الصفحات المحفوظة</string>
     <string name="pages_all">اختر الكل</string>
     <string name="pages_none">ألغِ الكل</string>
     <string name="hifz_mine_add">أضف</string>
-    <string name="sec_hifz">حفظي</string>
+    <string name="sec_hifz">الحفظ</string>
     <string name="khatma_goal">موعد الختم</string>
     <string name="khatma_expected">الختم المتوقع</string>
     <string name="khatma_per_day">%1$s كل يوم</string>
-    <string name="khatma_by_pace">بحسب قراءتك الأخيرة، اضغط لتحدّد موعدًا</string>
+    <string name="khatma_by_pace">بحسب وتيرة القراءة الأخيرة، اضغط لتحديد موعد</string>
     <string name="hifz_full">محفوظة كاملة</string>
     <string name="hifz_part">محفوظة جزئيًا</string>
     <string name="hifz_full_said">سورة %1$s محفوظة كاملة</string>
-    <string name="hifz_part_said">اختر ما تحفظه من سورة %1$s</string>
+    <string name="hifz_part_said">اختر المحفوظ من سورة %1$s</string>
     <plurals name="khatmas_before">
         <item quantity="zero">%1$s ختمة قبلها</item>
         <item quantity="one">وأتممت قبلها ختمة واحدة</item>
@@ -385,18 +385,18 @@
         <item quantity="many">وأتممت قبلها %1$s ختمة</item>
         <item quantity="other">وأتممت قبلها %1$s ختمة</item>
     </plurals>
-    <string name="goal_over">أتممت هدفك وزدت %1$s</string>
+    <string name="goal_over">اكتمل الهدف، وزيادة %1$s</string>
     <string name="goal_left">بقي %1$s</string>
-    <string name="hifz_none_today">لم تحفظ اليوم بعد</string>
-    <string name="paper_read">أتممت هدف اليوم</string>
+    <string name="hifz_none_today">لا حفظ اليوم بعد</string>
+    <string name="paper_read">اكتمل هدف اليوم</string>
     <string name="ring_today">اليوم</string>
     <string name="ring_week">هذا الأسبوع</string>
     <string name="ring_month">هذا الشهر</string>
     <string name="ring_of">من %1$s</string>
     <string name="set_calendar">التقويم</string>
-    <string name="about_privacy">خصوصيتك</string>
-    <string name="stats_pages_month">صفحاتك هذا الشهر</string>
-    <string name="stats_last_days">صفحاتك في آخر %1$s أيام</string>
+    <string name="about_privacy">الخصوصية</string>
+    <string name="stats_pages_month">صفحات هذا الشهر</string>
+    <string name="stats_last_days">الصفحات في آخر %1$s أيام</string>
     <string name="chart_total">المجموع</string>
     <string name="ring_known">ما حفظته</string>
     <string name="ring_whole">سور كاملة</string>
@@ -417,13 +417,13 @@
     <string name="ring_days_met">أيام أتممتها</string>
     <string name="ring_pages_learned">صفحات حفظتها</string>
     <string name="ring_of_quran">من القرآن</string>
-    <string name="stats_speed_today">سرعة قراءتك</string>
+    <string name="stats_speed_today">سرعة القراءة</string>
     <string name="speed_per_page">%1$s للصفحة</string>
     <string name="speed_per_hour">%1$s في الساعة، أي %2$s</string>
-    <string name="khatma_read_left">قرأت %1$s، وبقي %2$s</string>
+    <string name="khatma_read_left">المقروء %1$s، والباقي %2$s</string>
     <!-- Setting a goal on its own screen -->
     <string name="goal_ready">أهداف جاهزة</string>
-    <string name="goal_own">أو اختر بنفسك</string>
+    <string name="goal_own">أو هدف مخصّص</string>
     <string name="kind_pages">صفحات</string>
     <string name="kind_juz">أجزاء</string>
     <string name="kind_surah">سورة</string>
@@ -431,16 +431,16 @@
     <string name="goal_amount_pages">عدد الصفحات</string>
     <string name="goal_amount_juz">عدد الأجزاء</string>
     <string name="goal_amount_surah">السورة</string>
-    <string name="goal_amount_days">تختم في كم يومًا</string>
+    <string name="goal_amount_days">مدة الختمة بالأيام</string>
     <string name="goal_on_days">في أي الأيام</string>
     <string name="goal_pick_day">اختر يومًا واحدًا على الأقل</string>
     <string name="step_less">أقل</string>
     <string name="step_more">أكثر</string>
     <string name="no_recent_pages">لم تُقرأ أي صفحة بعد</string>
-    <string name="places_pages_head">آخر الصفحات التي قرأتها</string>
-    <string name="places_surahs_head">آخر ما قرأته من كل سورة</string>
-    <string name="heard_each">استماعك لكل سورة</string>
-    <string name="dl_about">التنزيل يحفظ التلاوة داخل التطبيق لتستمع إليها دون إنترنت. وبعد التنزيل يمكنك مشاركة السورة، أو حفظ نسخة منها في مجلد ⁦Download/⁠Quran⁩ في الهاتف.</string>
+    <string name="places_pages_head">آخر الصفحات المقروءة</string>
+    <string name="places_surahs_head">آخر موضع مقروء في كل سورة</string>
+    <string name="heard_each">الاستماع لكل سورة</string>
+    <string name="dl_about">التنزيل يحفظ التلاوة داخل التطبيق للاستماع إليها دون إنترنت. وبعد التنزيل يمكن مشاركة السورة، أو حفظ نسخة منها في مجلد ⁦Download/⁠Quran⁩ في الهاتف.</string>
     <string name="dl_get_first">نزّل السورة أولًا</string>
     <string name="dl_saved_short">محفوظة</string>
     <string name="hizb_quarter_at">%1$s، الصفحة %2$s</string>
@@ -450,11 +450,11 @@
     <string name="quarter_3">ثلاثة أرباع الحزب</string>
     <string name="pages_range">الصفحات %1$s–%2$s</string>
     <string name="words_title">الكلمات منفردة</string>
-    <string name="words_about">نزّل تسجيل كل كلمة، لتسمع أي كلمة وحدها بزر «كلمة» دون إنترنت.</string>
+    <string name="words_about">تنزيل تسجيل كل كلمة، للاستماع إلى أي كلمة وحدها بزر «كلمة» دون إنترنت.</string>
     <string name="words_get">تنزيل كل الكلمات</string>
     <string name="words_resume">متابعة التنزيل</string>
     <string name="words_remove">حذف الكلمات من الهاتف</string>
-    <string name="words_remove_ask">حذف تسجيلات الكلمات (%1$s)؟ ستُنزّل الكلمة من جديد حين تسمعها.</string>
+    <string name="words_remove_ask">حذف تسجيلات الكلمات (%1$s)؟ تُنزَّل الكلمة من جديد عند تشغيلها.</string>
     <string name="size_kb">%1$s ك.ب</string>
     <string name="size_mb">%1$s م.ب</string>
     <string name="size_gb">%1$s ج.ب</string>

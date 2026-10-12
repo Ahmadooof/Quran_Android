@@ -124,8 +124,8 @@
     <string name="dl_progress">%1$s%% · %2$s</string>
     <string name="dl_get_one">Download</string>
     <string name="dl_stop_one">Stop</string>
-    <string name="dl_saved_one">Saved to Download/⁠Quran on your phone</string>
-    <string name="dl_saved_all">Saved %1$s surahs to Download/⁠Quran on your phone</string>
+    <string name="dl_saved_one">Saved to Download/⁠Quran on the phone</string>
+    <string name="dl_saved_all">Saved %1$s surahs to Download/⁠Quran on the phone</string>
     <string name="dl_save_done">All downloaded surahs are already saved to the phone</string>
     <string name="dl_done_short">Downloaded</string>
     <string name="dl_save_short">To phone</string>
@@ -133,7 +133,7 @@
     <string name="dl_share_all">Share all downloaded</string>
     <string name="dl_open_folder">Open folder on phone</string>
     <string name="dl_kept_saved">Saved to phone · %1$s</string>
-    <string name="dl_folder_failed">Could not open the folder; open your file manager, then Download, then Quran</string>
+    <string name="dl_folder_failed">Could not open the folder; open the file manager, then Download, then Quran</string>
     <string name="dl_save_failed">Could not save to the phone</string>
     <string name="dl_save_denied">Storage permission is needed to save to the phone</string>
     <string name="label_locate">Follow</string>
@@ -141,9 +141,9 @@
     <string name="label_translit">Phonetic</string>
     <string name="label_word">Word</string>
     <string name="word_play_name">Play the word alone</string>
-    <string name="word_unheard">This word could not be played. Check your internet connection</string>
+    <string name="word_unheard">This word could not be played. Check the internet connection</string>
     <string name="word_missing">This word has no recording of its own</string>
-    <string name="recite_unheard">The recitation could not be played. Check your internet connection, or download the surah to listen offline.</string>
+    <string name="recite_unheard">The recitation could not be played. Check the internet connection, or download the surah to listen offline.</string>
     <string name="speed_name">Recitation speed</string>
     <string name="speed_slow">0.75×</string>
     <string name="speed_normal">1×</string>
@@ -152,28 +152,28 @@
     <string name="set_group_help">Help</string>
     <string name="set_report">Report an issue or suggest</string>
     <string name="report_subject">Issue in %1$s</string>
-    <string name="report_details">\n\nDescribe the issue above, and attach a screenshot if you can.\n\n---\nApp version: %1$s\nAndroid: %2$s (SDK %3$d)\nPhone: %4$s\nLanguage: %5$s</string>
+    <string name="report_details">\n\nDescribe the issue above, and attach a screenshot if possible.\n\n---\nApp version: %1$s\nAndroid: %2$s (SDK %3$d)\nPhone: %4$s\nLanguage: %5$s</string>
     <string name="report_no_mail">No email app on this phone</string>
     <string name="fb_kind">Type</string>
     <string name="fb_kind_bug">Problem</string>
     <string name="fb_kind_suggestion">Suggestion</string>
     <string name="fb_kind_feature">New feature request</string>
     <string name="fb_kind_other">Other</string>
-    <string name="fb_severity">How much does it affect you? (optional)</string>
+    <string name="fb_severity">How much does it affect use? (optional)</string>
     <string name="fb_severity_none">Not sure</string>
     <string name="fb_severity_low">Low</string>
     <string name="fb_severity_medium">Medium</string>
     <string name="fb_severity_high">High</string>
     <string name="fb_message">Message</string>
-    <string name="fb_message_hint">Describe what happened or what you suggest…</string>
-    <string name="fb_email">Your email for a reply (optional)</string>
+    <string name="fb_message_hint">Describe what happened, or a suggestion…</string>
+    <string name="fb_email">Email for a reply (optional)</string>
     <string name="fb_email_hint">name@example.com</string>
-    <string name="fb_details_note">Sent with your message: app version, Android version, phone model, language, theme, page motion, reciter, screen orientation, and the last page you read.</string>
+    <string name="fb_details_note">Sent with the message: app version, Android version, phone model, language, theme, page motion, reciter, screen orientation, and the last page read.</string>
     <string name="fb_send">Send</string>
     <string name="fb_by_email">Send by email instead</string>
     <string name="fb_too_short">Please write a little more</string>
     <string name="fb_bad_email">That email address is not valid</string>
-    <string name="fb_thanks">Thank you, your message was sent</string>
+    <string name="fb_thanks">Thank you, the message was sent</string>
     <string name="fb_too_many">Too many messages sent, please try later</string>
     <string name="fb_failed">Could not send right now. Send it by email instead?</string>
     <string name="set_about">About</string>
@@ -188,7 +188,7 @@
     <string name="credits_text">Quran text used for search: Tanzil Project, tanzil.net, under Creative Commons Attribution 3.0, unmodified.\n\nMushaf page and surah name fonts: King Fahd Glorious Quran Printing Complex.\n\nRecitation audio: rights belong to the reciters and their recording publishers.\n\nWord-by-word recitation: Tafsir Center for Quranic Studies, via Quran.com.\n\nTransliteration: Quran.com.\n\nCairo font: SIL Open Font License 1.1, with an enlarged zero.\n\nAndroidX and Media3 libraries by Google, and ColorPicker by Jared Rummler: Apache License 2.0.</string>
 
     <!-- Statistics -->
-    <string name="tab_achievements">My Achievements</string>
+    <string name="tab_achievements">Achievements</string>
     <string name="stats_read_time">Reading time</string>
     <string name="stats_listen_time">Listening time today</string>
     <string name="stats_none_today">Nothing read yet today</string>
@@ -201,7 +201,7 @@
     <string name="stats_new_khatma_do">Start over</string>
     <string name="stats_week">Listening, last %1$s days</string>
     <string name="stats_chart_desc">Pages read on each of the last %1$s days, most on one day %2$s</string>
-    <string name="stats_private">Your reading and memorising statistics stay on your phone and are never sent anywhere. A page counts as read after ten seconds on screen, or five for the two short opening pages, Al-Fatiha and the start of Al-Baqarah.</string>
+    <string name="stats_private">Reading and memorising statistics stay on the phone and are never sent anywhere. A page counts as read after ten seconds on screen, or five for the two short opening pages, Al-Fatiha and the start of Al-Baqarah.</string>
     <string name="percent">%1$s%%</string>
     <string name="time_under_minute">Under a minute</string>
     <plurals name="pages_count">
@@ -222,9 +222,9 @@
         <item quantity="one">page</item>
         <item quantity="other">pages</item>
     </plurals>
-    <string name="sec_reading">My reading</string>
-    <string name="sec_khatma">My khatma</string>
-    <string name="sec_listening">My listening</string>
+    <string name="sec_reading">Reading</string>
+    <string name="sec_khatma">Khatma</string>
+    <string name="sec_listening">Listening</string>
     <string name="stats_page_times">Time on each page read today</string>
     <string name="chart_today">Today</string>
     <string name="stats_read_month">Reading time this month</string>
@@ -233,7 +233,7 @@
     <string name="stats_page_times_open">Time on each page</string>
     <string name="goal_done">Today\'s goal is done</string>
     <string name="time_and">%1$s %2$s</string>
-    <string name="stats_per_hour_note">Shows once you have read a few pages</string>
+    <string name="stats_per_hour_note">Shows after a few pages are read</string>
     <string name="pt_sort">Order</string>
     <string name="pt_by_page">In page order</string>
     <string name="pt_by_time">Slowest first</string>
@@ -257,7 +257,7 @@
     </plurals>
     <string name="goal_custom_hint">Number</string>
     <string name="goal_keep">Save goal</string>
-    <string name="goal_title">Your goal</string>
+    <string name="goal_title">Goal</string>
     <string name="goal_none_today">No goal for today</string>
     <string name="goal_every_day">every day</string>
     <string name="goal_plan">%1$s %2$s</string>
@@ -295,21 +295,21 @@
     <string name="hifz_goal_title">Memorising goal</string>
     <string name="hifz_stop">Remove the memorising goal</string>
     <string name="hifz_mine">Memorising record</string>
-    <string name="hifz_mine_empty">Add the surahs and pages you know by heart</string>
+    <string name="hifz_mine_empty">Add the surahs and pages known by heart</string>
     <string name="hifz_keep">Done</string>
-    <string name="hifz_pages_ask">Pick the pages you know</string>
+    <string name="hifz_pages_ask">Pick the pages known by heart</string>
     <string name="pages_all">Select all</string>
     <string name="pages_none">Clear all</string>
     <string name="hifz_mine_add">Add</string>
-    <string name="sec_hifz">My memorising</string>
+    <string name="sec_hifz">Memorising</string>
     <string name="khatma_goal">Finish by</string>
     <string name="khatma_expected">Expected finish</string>
     <string name="khatma_per_day">%1$s a day</string>
-    <string name="khatma_by_pace">At your recent pace; tap to set a date</string>
+    <string name="khatma_by_pace">At the recent pace; tap to set a date</string>
     <string name="hifz_full">Known whole</string>
     <string name="hifz_part">Known in part</string>
     <string name="hifz_full_said">Surah %1$s known whole</string>
-    <string name="hifz_part_said">Pick the pages you know of Surah %1$s</string>
+    <string name="hifz_part_said">Pick the pages known of Surah %1$s</string>
     <plurals name="khatmas_before">
         <item quantity="one">%1$s khatma finished before this</item>
         <item quantity="other">%1$s khatmas finished before this</item>
@@ -317,15 +317,15 @@
     <string name="goal_over">Goal done, and %1$s more</string>
     <string name="goal_left">%1$s to go</string>
     <string name="hifz_none_today">Nothing memorised yet today</string>
-    <string name="paper_read">I finished today\'s goal</string>
+    <string name="paper_read">Today\'s goal is done</string>
     <string name="ring_today">Today</string>
     <string name="ring_week">This week</string>
     <string name="ring_month">This month</string>
     <string name="ring_of">of %1$s</string>
     <string name="set_calendar">Calendar</string>
-    <string name="about_privacy">Your privacy</string>
+    <string name="about_privacy">Privacy</string>
     <string name="stats_pages_month">Pages this month</string>
-    <string name="stats_last_days">Your pages, last %1$s days</string>
+    <string name="stats_last_days">Pages, last %1$s days</string>
     <string name="chart_total">In all</string>
     <string name="ring_known">Memorised</string>
     <string name="ring_whole">Whole surahs</string>
@@ -352,7 +352,7 @@
     <string name="khatma_read_left">Read %1$s, %2$s to go</string>
     <!-- Setting a goal on its own screen -->
     <string name="goal_ready">Ready goals</string>
-    <string name="goal_own">Or set your own</string>
+    <string name="goal_own">Or a custom goal</string>
     <string name="kind_pages">Pages</string>
     <string name="kind_juz">Juz</string>
     <string name="kind_surah">Surah</string>
@@ -366,10 +366,10 @@
     <string name="step_less">Less</string>
     <string name="step_more">More</string>
     <string name="no_recent_pages">No pages read yet</string>
-    <string name="places_pages_head">Latest pages you’ve read</string>
-    <string name="places_surahs_head">Latest you’ve read in each surah</string>
-    <string name="heard_each">Your listening, surah by surah</string>
-    <string name="dl_about">Downloading keeps a recitation in the app so you can listen without internet. Once downloaded, you can share a surah or save a copy to your phone\'s Download/Quran folder.</string>
+    <string name="places_pages_head">Latest pages read</string>
+    <string name="places_surahs_head">Latest place read in each surah</string>
+    <string name="heard_each">Listening, surah by surah</string>
+    <string name="dl_about">Downloading keeps a recitation in the app to listen without internet. Once downloaded, a surah can be shared or a copy saved to the phone’s Download/Quran folder.</string>
     <string name="dl_get_first">Download the surah first</string>
     <string name="dl_saved_short">Saved</string>
     <string name="hizb_quarter_at">%1$s, page %2$s</string>
@@ -383,7 +383,7 @@
     <string name="words_get">Download all words</string>
     <string name="words_resume">Continue downloading</string>
     <string name="words_remove">Remove words from the phone</string>
-    <string name="words_remove_ask">Remove the word recordings (%1$s)? A word is fetched again when you hear it.</string>
+    <string name="words_remove_ask">Remove the word recordings (%1$s)? A word is fetched again when played.</string>
     <string name="size_kb">%1$s KB</string>
     <string name="size_mb">%1$s MB</string>
     <string name="size_gb">%1$s GB</string>
