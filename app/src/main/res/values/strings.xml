@@ -436,8 +436,8 @@
     <string name="goal_pick_day">اختر يومًا واحدًا على الأقل</string>
     <string name="step_less">أقل</string>
     <string name="step_more">أكثر</string>
-    <string name="no_recent_pages">لم تُقرأ أي صفحة بعد</string>
-    <string name="places_pages_head">آخر الصفحات المقروءة</string>
+    <string name="no_recent_pages">لا صفحات مقروءة اليوم بعد</string>
+    <string name="places_pages_head">الصفحات المقروءة اليوم</string>
     <string name="places_surahs_head">آخر موضع مقروء في كل سورة</string>
     <string name="heard_each">الاستماع لكل سورة</string>
     <string name="dl_about">التنزيل يحفظ التلاوة داخل التطبيق للاستماع إليها دون إنترنت. وبعد التنزيل يمكن مشاركة السورة، أو حفظ نسخة منها في مجلد ⁦Download/⁠Quran⁩ في الهاتف.</string>

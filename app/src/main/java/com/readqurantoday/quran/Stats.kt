@@ -71,10 +71,10 @@ object Stats {
     private fun store(ctx: Context) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     /** Days since 1970 on this phone's clock, so a day turns at local midnight. */
-    fun today(): Long {
-        val now = System.currentTimeMillis()
-        return Math.floorDiv(now + TimeZone.getDefault().getOffset(now), DAY_MS)
-    }
+    fun today(): Long = dayOf(System.currentTimeMillis())
+
+    /** The day [at] fell on, counted as [today] counts. */
+    fun dayOf(at: Long): Long = Math.floorDiv(at + TimeZone.getDefault().getOffset(at), DAY_MS)
 
     /** Local midday of [day] in epoch ms, for formatting a date. */
     fun noonOf(day: Long): Long {

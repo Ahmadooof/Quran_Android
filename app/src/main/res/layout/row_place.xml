@@ -40,16 +40,6 @@
             android:id="@+id/place_title"
             layout="@layout/part_surah_title" />
 
-        <!-- In place of the surah title, for a row that is a page -->
-        <TextView
-            android:id="@+id/place_heading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text"
-            android:textSize="@dimen/row_title"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
         <TextView
             android:id="@+id/place_detail"
             android:layout_width="match_parent"

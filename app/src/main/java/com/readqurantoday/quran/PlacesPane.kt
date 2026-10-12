@@ -32,7 +32,8 @@ class PlacesPane(
     // Rebuilt on every return: reading changes the history and saved pages
     fun build() {
         columns.forEach { it.removeAllViews() }
-        fill(columns[PAGES], R.string.places_pages_head, Settings.recentPages(host).map(::pageRow), R.string.no_recent_pages)
+        val today = Settings.recentPages(host).filter { Stats.dayOf(it.at) == Stats.today() }
+        fill(columns[PAGES], R.string.places_pages_head, today.map(::pageRow), R.string.no_recent_pages)
         fill(columns[SURAHS], R.string.places_surahs_head, recentSurahs().map(::surahRow), R.string.no_recent)
         fill(columns[SAVED], 0, Settings.marks(host).map(::savedRow), R.string.no_marks)
     }
@@ -52,18 +53,11 @@ class PlacesPane(
         return if (last in 1..604) listOf(Settings.Read(surah.id, last, 0L)) else emptyList()
     }
 
-    // A page is the row's own title, in plain type; its surah is only where it is, so it sits in the line beneath
+    // As the other two lists: the surah in the mushaf's hand, its juz and page beneath
     private fun pageRow(read: Settings.Read): View {
         val row = place(R.drawable.ic_surahs, read.page)
-        row.findViewById<View>(R.id.place_title).visibility = View.GONE
-        row.findViewById<TextView>(R.id.place_heading).apply {
-            text = host.getString(R.string.head_page, figures(read.page, host.resources))
-            visibility = View.VISIBLE
-        }
-        val surah = Surahs.ofPage(read.page)
-        val juz = host.getString(R.string.head_juz, figures(Surahs.juzOfPage(read.page), host.resources))
-        row.findViewById<TextView>(R.id.place_detail).text =
-            if (surah == null) juz else host.getString(R.string.place_line, host.getString(R.string.surah_named, surah.name), juz)
+        Surahs.ofPage(read.page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title_row) }
+        row.findViewById<TextView>(R.id.place_detail).text = where(read.page)
         stamp(row, read.at)
         return row
     }
