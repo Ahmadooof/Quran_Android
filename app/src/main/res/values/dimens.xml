@@ -130,6 +130,9 @@
     <!-- A bar of the week chart, round-ended; and its words: pages over it, the day under it -->
     <dimen name="chart_bar">26dp</dimen>
     <dimen name="chart_bar_corner">6dp</dimen>
+    <!-- The week chart's goal mark across each day, and the tick over a day that reached it -->
+    <dimen name="chart_goal_line">2dp</dimen>
+    <dimen name="chart_tick">14dp</dimen>
     <dimen name="chart_count">13sp</dimen>
     <dimen name="chart_day">@dimen/text_meta</dimen>
     <dimen name="legend_dot">10dp</dimen>

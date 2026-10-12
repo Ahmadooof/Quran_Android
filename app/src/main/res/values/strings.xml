@@ -277,12 +277,12 @@
     <string name="sec_reading">القراءة</string>
     <string name="sec_khatma">الختمة</string>
     <string name="sec_listening">الاستماع</string>
-    <string name="stats_page_times">وقت كل صفحة قرأتها اليوم</string>
+    <string name="stats_page_times">وقت كل صفحة مقروءة اليوم</string>
     <string name="chart_today">اليوم</string>
     <string name="stats_read_month">وقت القراءة هذا الشهر</string>
     <string name="cal_hijri">هجري</string>
     <string name="cal_greg">ميلادي</string>
-    <string name="stats_page_times_open">وقت كل صفحة قرأتها</string>
+    <string name="stats_page_times_open">وقت كل صفحة مقروءة</string>
     <string name="goal_done">اكتمل هدف اليوم</string>
     <string name="time_and">%1$s و%2$s</string>
     <string name="stats_per_hour_note">يظهر بعد قراءة بضع صفحات</string>
@@ -398,7 +398,7 @@
     <string name="stats_pages_month">صفحات هذا الشهر</string>
     <string name="stats_last_days">الصفحات في آخر %1$s أيام</string>
     <string name="chart_total">المجموع</string>
-    <string name="ring_known">ما حفظته</string>
+    <string name="ring_known">المحفوظ</string>
     <string name="ring_whole">سور كاملة</string>
     <string name="stats_today">قراءة اليوم</string>
     <!-- Weekdays short enough to sit under a bar of the week chart, Sunday first -->
@@ -415,7 +415,7 @@
     <string name="chart_goal_word">الهدف</string>
     <string name="chart_goal_of">الهدف %1$s</string>
     <string name="ring_days_met">أيام أتممتها</string>
-    <string name="ring_pages_learned">صفحات حفظتها</string>
+    <string name="ring_pages_learned">الصفحات المحفوظة</string>
     <string name="ring_of_quran">من القرآن</string>
     <string name="stats_speed_today">سرعة القراءة</string>
     <string name="speed_per_page">%1$s للصفحة</string>
