@@ -118,8 +118,9 @@ class PlacesPane(
         place(row, R.drawable.ic_bookmark, page)
         Surahs.ofPage(page)?.let { fillSurahTitle(row.findViewById(R.id.place_title), it.id, R.dimen.surah_title) }
         row.findViewById<TextView>(R.id.place_detail).text = where(page)
-        row.findViewById<ImageView>(R.id.place_remove).apply {
-            imageTintList = ColorStateList.valueOf(host.getColor(R.color.text_mute))
+        row.findViewById<ImageView>(R.id.place_remove_icon).imageTintList =
+            ColorStateList.valueOf(host.getColor(R.color.icon_btn))
+        row.findViewById<View>(R.id.place_remove).apply {
             visibility = View.VISIBLE
             /* Dropping a saved page rebuilds the lists, so the list closes up at once. */
             setOnClickListener {

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- A quiet grey disc inside a row button's touch area, so a remove button reads as a button -->
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:inset="8dp">
-    <shape android:shape="oval">
-        <solid android:color="@color/surface_2" />
-    </shape>
-</inset>

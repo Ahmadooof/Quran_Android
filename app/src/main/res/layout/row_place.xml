@@ -72,15 +72,30 @@
         android:maxLines="1"
         android:visibility="gone" />
 
-    <ImageView
+    <!-- Remove, drawn as the index rows draw their reciter button: the icon, its word beneath -->
+    <LinearLayout
         android:id="@+id/place_remove"
         android:layout_width="@dimen/row_button"
-        android:layout_height="@dimen/row_button"
-        android:padding="17dp"
-        android:background="@drawable/chip_remove"
-        android:src="@drawable/ic_close"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
         android:clickable="true"
         android:focusable="true"
         android:contentDescription="@string/remove_mark"
-        android:visibility="gone" />
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/place_remove_icon"
+            android:layout_width="@dimen/icon_nav"
+            android:layout_height="@dimen/icon_nav"
+            android:duplicateParentState="true"
+            android:src="@drawable/ic_close"
+            android:contentDescription="@null" />
+
+        <TextView
+            style="@style/IconLabel"
+            android:duplicateParentState="true"
+            android:text="@string/remove_short"
+            android:textColor="@color/icon_btn" />
+    </LinearLayout>
 </LinearLayout>

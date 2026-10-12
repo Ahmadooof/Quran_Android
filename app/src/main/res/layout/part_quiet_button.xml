@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A button for a lesser action on a whole list, outlined beside the filled one that finishes a screen -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/choice_tile"
+    android:layout_marginStart="@dimen/screen_margin"
+    android:layout_marginEnd="@dimen/screen_margin"
+    android:layout_marginTop="@dimen/group_gap"
+    android:layout_marginBottom="@dimen/group_gap"
+    android:gravity="center"
+    android:background="@drawable/choice_off"
+    android:clickable="true"
+    android:focusable="true"
+    android:textColor="@color/text"
+    android:textSize="@dimen/row_title" />

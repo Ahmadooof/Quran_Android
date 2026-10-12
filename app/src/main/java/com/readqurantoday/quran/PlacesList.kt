@@ -39,7 +39,7 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layout = when (viewType) {
             EMPTY -> R.layout.row_empty
-            ACTION -> R.layout.row_setting_action
+            ACTION -> R.layout.part_quiet_button
             else -> R.layout.row_place
         }
         return object : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false)) {}
