@@ -290,7 +290,7 @@ class SurahListActivity : LanguageActivity() {
         val surah = Surahs.ofPage(page)
         surah?.let { fillSurahTitle(findViewById(R.id.resume_title), it.id, R.dimen.surah_title) }
         // The title already names the surah, so the line beside it is only the page
-        findViewById<TextView>(R.id.resume_detail).text = getString(R.string.head_page, figures(page, resources))
+        findViewById<TextView>(R.id.resume_detail).text = pageNamed(page, resources)
 
         // Page 0 tells the reader to follow the live recitation rather than open a fixed page
         card.setOnClickListener { answer(if (reciting) 0 else page) }

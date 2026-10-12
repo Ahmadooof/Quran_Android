@@ -589,9 +589,9 @@ class ReaderActivity : LanguageActivity() {
     /* The top bar's account of this page: which surah and where, and whether it is kept. */
     private fun sayPage(page: Int) {
         val juz = Surahs.juzOfPage(page)
-        val at = getString(R.string.head_page, figures(page, resources))
+        val at = pageNamed(page, resources)
         barPlace.text = if (juz > 0) {
-            getString(R.string.bar_place, getString(R.string.head_juz, figures(juz, resources)), at)
+            getString(R.string.bar_place, juzNamed(juz, resources), at)
         } else at
 
         // Icon fill shows the saved state; the label turns accent only when saved

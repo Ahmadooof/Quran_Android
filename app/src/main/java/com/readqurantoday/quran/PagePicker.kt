@@ -35,7 +35,7 @@ fun Activity.pickPages(title: String, note: String, pages: List<Int>, chosen: Se
             val page = chunk.getOrNull(i)
             if (page == null) tile.visibility = View.INVISIBLE else {
                 tile.text = figures(page, resources)
-                tile.contentDescription = getString(R.string.head_page, figures(page, resources))
+                tile.contentDescription = pageNamed(page, resources)
                 tile.setOnClickListener {
                     if (!now.remove(page)) now.add(page)
                     show()

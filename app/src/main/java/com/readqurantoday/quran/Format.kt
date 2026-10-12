@@ -21,6 +21,12 @@ fun localDigits(text: String, resources: Resources): String {
     return text.map { if (it in '0'..'9') '٠' + (it - '0') else it }.joinToString("")
 }
 
+/** "Page 9" / «الصفحة ٩». */
+fun pageNamed(page: Int, resources: Resources): String = resources.getString(R.string.head_page, figures(page, resources))
+
+/** "Juz 1" / «الجزء ١». */
+fun juzNamed(juz: Int, resources: Resources): String = resources.getString(R.string.head_juz, figures(juz, resources))
+
 /** A file's size in one short style for every size, so a small file and a large one read alike. */
 fun fileSize(bytes: Long, resources: Resources): String {
     val tenths = (bytes + 50_000_000L) / 100_000_000L

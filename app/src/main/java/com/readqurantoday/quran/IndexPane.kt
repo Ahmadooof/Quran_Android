@@ -15,11 +15,11 @@ class IndexPane(
 ) {
 
     private val res = host.resources
-    private val juz = division(Surahs.juzStarts(), { host.getString(R.string.head_juz, figures(it, res)) },
-        { host.getString(R.string.head_page, figures(Surahs.juzStarts()[it - 1], res)) }, { listOfNotNull(Openings.ofJuz(host, it)) }, true, null, Surahs::juzOfPage)
+    private val juz = division(Surahs.juzStarts(), { juzNamed(it, res) },
+        { pageNamed(Surahs.juzStarts()[it - 1], res) }, { listOfNotNull(Openings.ofJuz(host, it)) }, true, null, Surahs::juzOfPage)
     private val hizb = division(Surahs.hizbStarts(), { host.getString(R.string.head_hizb, figures(it, res)) },
-        { host.getString(R.string.head_juz, figures((it + 1) / 2, res)) }, { listOfNotNull(Openings.ofHizb(host, it)) }, false, ::quarters, Surahs::hizbOfPage)
-    private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, { host.getString(R.string.head_page, figures(it, res)) },
+        { juzNamed((it + 1) / 2, res) }, { listOfNotNull(Openings.ofHizb(host, it)) }, false, ::quarters, Surahs::hizbOfPage)
+    private val pages = division(IntArray(Mushaf.PAGES) { it + 1 }, { pageNamed(it, res) },
         ::juzSaid, { page -> Surahs.onPage(page).map { it.id } }, true, null) { it }
 
     private val lists: List<RecyclerView.Adapter<*>> = listOf(surahs, juz, hizb, pages)
@@ -53,17 +53,17 @@ class IndexPane(
     private fun quarters(hizb: Int): List<Int> = Surahs.quartersOf(hizb)
 
     // The juz the page's own head names, so the list and the page agree
-    private fun juzSaid(page: Int): String = host.getString(R.string.head_juz, figures(Surahs.juzOfPage(page), res))
+    private fun juzSaid(page: Int): String = juzNamed(Surahs.juzOfPage(page), res)
 
     // --- finding one's way down a long list ---
 
     // What the bubble beside a dragged handle says, for each list: the row at the top of the list
     private fun dragLabel(list: Int): (Int) -> String = when (list) {
         SURAHS -> { at -> Surahs.list().getOrNull(at)?.let { host.getString(R.string.surah_named, it.name) }.orEmpty() }
-        JUZ -> { at -> host.getString(R.string.head_juz, figures(at + 1, res)) }
+        JUZ -> { at -> juzNamed(at + 1, res) }
         HIZB -> { at -> host.getString(R.string.head_hizb, figures(at + 1, res)) }
         else -> { at ->
-            host.getString(R.string.place_line, host.getString(R.string.head_page, figures(at + 1, res)), juzSaid(at + 1))
+            host.getString(R.string.place_line, pageNamed(at + 1, res), juzSaid(at + 1))
         }
     }
 

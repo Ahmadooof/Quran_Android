@@ -149,10 +149,10 @@ class PlacesPane(
 
     /* "Juz 1 · Page 3", in the figures the page itself uses. */
     private fun where(page: Int): String {
-        val at = host.getString(R.string.head_page, figures(page, host.resources))
+        val at = pageNamed(page, host.resources)
         val juz = Surahs.juzOfPage(page)
         return if (juz <= 0) at else host.getString(
-            R.string.place_line, host.getString(R.string.head_juz, figures(juz, host.resources)), at
+            R.string.place_line, juzNamed(juz, host.resources), at
         )
     }
 

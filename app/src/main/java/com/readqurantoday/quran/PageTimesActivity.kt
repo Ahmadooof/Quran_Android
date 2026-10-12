@@ -34,7 +34,7 @@ class PageTimesActivity : CardsActivity(R.string.stats_page_times) {
 
         val order = if (longestFirst) sec.entries.sortedByDescending { it.value } else sec.entries.sortedBy { it.key }
         layoutInflater.card(cards, 0, order.map { (page, s) ->
-            row(getString(R.string.head_page, figures(page, resources)), spentExact(s, resources), Surahs.ofPage(page)?.name.orEmpty())
+            row(pageNamed(page, resources), spentExact(s, resources), Surahs.ofPage(page)?.name.orEmpty())
         })
     }
 
@@ -53,7 +53,7 @@ class PageTimesActivity : CardsActivity(R.string.stats_page_times) {
 
     // The page, then its surah after an Arabic comma: a dot beside a figure reads as a zero
     private fun where(page: Int): String {
-        val at = getString(R.string.head_page, figures(page, resources))
+        val at = pageNamed(page, resources)
         val surah = Surahs.ofPage(page)?.name ?: return at
         return getString(R.string.page_in_surah, at, surah)
     }
