@@ -1,6 +1,5 @@
 package com.readqurantoday.quran
 
-import android.content.Intent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -38,9 +37,13 @@ class HifzTab(private val cards: StatCards, private val rings: GoalRings) {
             findViewById<TextView>(R.id.rings_line).text = if (known == 0) host.getString(R.string.hifz_mine_empty)
                 else host.getString(R.string.stats_khatma_read, pagesSaid(known, res), figures(Mushaf.PAGES, res))
         }
+        // The surahs memorised so far, one tap away, before the full record of all of them
+        val some = surahs.count { Hifz.knownOf(it, bySurah) > 0 }
+        val mine = cards.row(host.getString(R.string.hifz_known_surahs), figures(some, res))
+            .apply { opens { MemorizedActivity.open(host, knownOnly = true) } }
         val record = cards.row(host.getString(R.string.hifz_mine), if (known == 0) host.getString(R.string.hifz_mine_add) else "")
-            .apply { opens { host.startActivity(Intent(host, MemorizedActivity::class.java)) } }
-        return listOf(view, record)
+            .apply { opens { MemorizedActivity.open(host) } }
+        return if (some > 0) listOf(view, mine, record) else listOf(view, record)
     }
 
     private companion object {

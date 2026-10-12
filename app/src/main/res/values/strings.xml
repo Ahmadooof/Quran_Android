@@ -461,4 +461,5 @@
     <string name="marks_clear">حذف كل الصفحات المحفوظة</string>
     <string name="marks_clear_ask">حذف %1$s صفحة محفوظة؟</string>
     <string name="remove_short">إزالة</string>
+    <string name="hifz_known_surahs">السور المحفوظة</string>
 </resources>

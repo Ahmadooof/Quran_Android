@@ -1,19 +1,27 @@
 package com.readqurantoday.quran
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 
-/** What is memorised: every surah, known whole or in part, page by page. */
+/** What is memorised: every surah, known whole or in part, page by page; or only the surahs memorised so far. */
 class MemorizedActivity : CardsActivity(R.string.hifz_mine) {
 
+    private lateinit var shown: List<Surahs.Surah>
     private lateinit var rows: List<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Surahs.load(this)
-        rows = Surahs.list().map { surah ->
+        // The surahs known when the screen opened stay listed, so one unmarked here can be marked again
+        val knownOnly = intent.getBooleanExtra(KNOWN_ONLY, false)
+        val kept = Hifz.bySurah(this)
+        shown = if (knownOnly) Surahs.list().filter { Hifz.knownOf(it, kept) > 0 } else Surahs.list()
+        if (knownOnly) findViewById<TextView>(R.id.cards_title).setText(R.string.hifz_known_surahs)
+        rows = shown.map { surah ->
             layoutInflater.inflate(R.layout.row_hifz_surah, cards, false).apply {
                 fillSurahTitle(findViewById(R.id.hifz_title), surah.id, R.dimen.surah_title_row)
             }
@@ -26,7 +34,7 @@ class MemorizedActivity : CardsActivity(R.string.hifz_mine) {
     // Filled again in place after each change, so the list keeps where it was scrolled to
     private fun refresh() {
         val kept = Hifz.bySurah(this)
-        Surahs.list().forEachIndexed { i, surah -> fill(rows[i], surah, kept) }
+        shown.forEachIndexed { i, surah -> fill(rows[i], surah, kept) }
     }
 
     private fun fill(row: View, surah: Surahs.Surah, kept: Map<Int, Map<Int, Long>>) {
@@ -75,5 +83,12 @@ class MemorizedActivity : CardsActivity(R.string.hifz_mine) {
             Hifz.setPages(this, surah, marked = now - was, unmarked = was - now)
             refresh()
         }
+    }
+
+    companion object {
+        private const val KNOWN_ONLY = "known_only"
+
+        fun open(context: Context, knownOnly: Boolean = false) =
+            context.startActivity(Intent(context, MemorizedActivity::class.java).putExtra(KNOWN_ONLY, knownOnly))
     }
 }
