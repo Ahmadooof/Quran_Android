@@ -7,8 +7,7 @@ import android.widget.LinearLayout
 import androidx.viewpager2.widget.ViewPager2
 import com.readqurantoday.quran.StatCards.Companion.WEEK
 
-// Achievements: reading, memorising, khatma and listening a swipe apart; each opens on where it stands,
-// what is wanted and what is done
+// Achievements: reading, memorising, khatma and listening, a swipe apart
 class StatsPane(private val host: Activity, strip: View, pager: ViewPager2) {
 
     /** [OPEN] plays the whole entrance; [UPDATE] moves rings and figures from where they last stood. */

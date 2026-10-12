@@ -12,12 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-/**
- * A handle to drag a long list by, in a column of its own at the list's edge so it never sits on a row's buttons:
- * one size however long the list, always in view, and kept out of the system's edge-swipe so dragging it never
- * goes back. With [label], a bubble beside the
- * held handle names the row at the top of the list, so a drag can stop where it means to.
- */
+/** A drag handle in its own edge column, always shown on long lists; [label] names the top row while held. */
 fun RecyclerView.addHandle(label: ((Int) -> String)? = null) {
     val handle = ListHandle(this, label)
     setPaddingRelative(paddingStart, paddingTop, paddingEnd + resources.getDimensionPixelSize(R.dimen.scroll_column), paddingBottom)

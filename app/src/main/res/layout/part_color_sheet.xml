@@ -34,8 +34,7 @@
         android:layout_marginStart="@dimen/screen_margin"
         android:layout_marginEnd="@dimen/screen_margin"
         android:layout_marginTop="10dp"
-        android:background="@drawable/card_group"
-        android:clipToOutline="true" />
+        android:background="@drawable/card_group" />
 
     <com.jaredrummler.android.colorpicker.ColorPickerView
         android:id="@+id/color_field"

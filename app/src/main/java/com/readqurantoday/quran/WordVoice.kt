@@ -128,10 +128,7 @@ object WordVoice {
         }
     }
 
-    /**
-     * Says [word] (counted from 0, as the page counts) of [surah]:[ayah].
-     * [changed] runs when loading ends; [done] is told how it ended.
-     */
+    /** Says [word] (from 0) of [surah]:[ayah]; [changed] runs when loading ends, [done] hears how it ended. */
     fun say(context: Context, surah: Int, ayah: Int, word: Int, changed: () -> Unit, done: (End) -> Unit) {
         stop()
         this.changed = changed

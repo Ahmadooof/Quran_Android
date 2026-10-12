@@ -7,10 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 
-/**
- * The reader's player: which word a recitation starts from, its buttons, and how they look. It keeps the word chosen
- * but not yet played; everything about the page itself it asks of [reader].
- */
+/** The reader's player: the chosen start word, the buttons and their look; the page itself is [reader]'s. */
 class ReaderPlayer(
     private val host: Activity,
     private val panel: View,

@@ -5,19 +5,13 @@ import android.widget.TextView
 import com.readqurantoday.quran.StatCards.Companion.WEEK
 import java.util.Calendar
 
-/**
- * A goal at a glance, for reading and memorising alike: today in pages, this week and this month in days the goal
- * was met out of the days that have one, and a line on what is left of today.
- */
+/** A goal at a glance: today in pages, the week and month in days the goal was met. */
 class GoalRings(private val cards: StatCards) {
 
     private val host = cards.host
     private val res = cards.res
 
-    /**
-     * [todayDone] against [goal]; [nothingYet] is today's line before anything is done, [todaySaid] what today's
-     * figure counts. [want] gives a day's goal by its weekday, [done] what was done on it.
-     */
+    /** [want] gives a weekday's goal and [done] what a day did; [nothingYet] is today's line before any. */
     fun view(key: String, todayDone: Int, goal: Int, nothingYet: Int, todaySaid: Int,
              want: (day: Long, weekday: Int) -> Int, done: (day: Long) -> Int): View =
         cards.rings().apply {

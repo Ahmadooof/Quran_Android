@@ -23,6 +23,8 @@ fun LayoutInflater.card(into: LinearLayout, title: String, rows: List<View>) {
         )
     }
     val body = frame.findViewById<LinearLayout>(R.id.group_rows)
+    // Set here: the XML attribute is read only from Android 12
+    body.clipToOutline = true
     rows.forEachIndexed { i, row ->
         if (i > 0) body.addView(inflate(R.layout.part_divider, body, false))
         body.addView(row)

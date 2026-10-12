@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A statistics row: label, an optional quiet line and trend, then the value centred on them all;
-     an arrow after the value when tappable -->
+<!-- A statistics row: label, quiet line and trend, the value centred, an arrow when tappable -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

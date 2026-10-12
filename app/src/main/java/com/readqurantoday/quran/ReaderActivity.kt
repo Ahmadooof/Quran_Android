@@ -1,5 +1,6 @@
 package com.readqurantoday.quran
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -577,6 +578,8 @@ class ReaderActivity : LanguageActivity() {
         }
     }
 
+    // Read once from the system on purpose: taken from insets, it arrives late and the page jumps
+    @SuppressLint("DiscouragedApi", "InternalInsetResource")
     private fun topBand(): Int {
         val id = resources.getIdentifier("status_bar_height", "dimen", "android")
         return if (id > 0) resources.getDimensionPixelSize(id)

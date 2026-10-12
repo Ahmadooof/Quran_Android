@@ -1,5 +1,5 @@
 """
-Writes app/src/main/res/raw/part_openings.json: the ayah each juz and hizb begins at, from the reference copy's
+Writes app/src/main/res/raw/part_openings.json: the surah each juz and hizb begins in, from the reference copy's
 ayah data.
 
     python tools/part_openings.py [reference.json]
@@ -20,14 +20,14 @@ def main():
     juz, hizb = {}, {}
     for surah in surahs:
         for ayah in surah['ayahs']:
-            at = (surah['number'], ayah['numberInSurah'])
+            at = surah['number']
             juz.setdefault(ayah['juz'], at)
             quarter = ayah['hizbQuarter']
             if quarter % 4 == 1:
                 hizb.setdefault((quarter + 3) // 4, at)
 
     def said(starts):
-        return [list(starts[n]) for n in sorted(starts)]
+        return [starts[n] for n in sorted(starts)]
 
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump({'juz': said(juz), 'hizb': said(hizb)}, f, separators=(',', ':'))

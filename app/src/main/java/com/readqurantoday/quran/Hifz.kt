@@ -3,11 +3,7 @@ package com.readqurantoday.quran
 import android.content.Context
 import androidx.core.content.edit
 
-/**
- * What the reader has memorised, kept surah by surah: each surah's own pages, each with the day it was learned.
- * Surahs share a page where one ends and the next begins, so a page known for one surah says nothing of the other.
- * A page entered as known from before carries [BEFORE], so entering old memorisation never counts toward a day's goal.
- */
+/** Memorised pages per surah with the day learned; [BEFORE] marks old memorisation, never counted toward a goal. */
 object Hifz {
 
     const val BEFORE = -1L

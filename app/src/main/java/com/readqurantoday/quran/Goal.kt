@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import java.util.Calendar
 
-/**
- * A reading goal: an amount of pages, juz or surahs, on chosen days of the week, with Al-Kahf added on
- * Fridays if [kahf]. Days are a mask, Sunday the lowest bit, as Calendar counts them.
- */
+/** Pages, juz or surahs on chosen weekdays (mask, Sunday lowest bit), plus Al-Kahf on Fridays if [kahf]. */
 data class Goal(val kind: Kind, val amount: Int, val surahs: List<Int>, val days: Int, val kahf: Boolean) {
 
     /** KHATMA keeps the day the khatma is to end in [amount]; its pages a day follow from what is left. */

@@ -59,7 +59,10 @@ fun Activity.colorSheet(
         previewMode = true
         show(MushafPageView.PREVIEW_PAGE)
     }
-    view.findViewById<FrameLayout>(R.id.color_preview).addView(preview)
+    view.findViewById<FrameLayout>(R.id.color_preview).apply {
+        clipToOutline = true
+        addView(preview)
+    }
 
     val field = view.findViewById<ColorPickerView>(R.id.color_field)
     val hex = view.findViewById<EditText>(R.id.color_hex)

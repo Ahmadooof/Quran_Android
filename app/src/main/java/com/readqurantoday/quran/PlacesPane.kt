@@ -17,8 +17,7 @@ class PlacesPane(
     private val open: (Int) -> Unit
 ) {
 
-    // Each a recycling list, as the index's are: a long history makes only the rows in view.
-    // Its heading sits above it, so it stays while the rows scroll
+    // Recycling lists under fixed headings, so a long history builds only the rows in view
     private val lists = List(LISTS) { PlacesList() }
     private val pages = lists.map { list ->
         host.layoutInflater.inflate(R.layout.part_headed_list, pager, false).apply {

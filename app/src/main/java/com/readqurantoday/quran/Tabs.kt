@@ -8,10 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 
-/**
- * The switch over a pager, as the index, places and achievements have it: tap a segment or swipe, and the segment
- * of the page in view is marked.
- */
+/** The segment switch over a pager: tap or swipe, and the page in view is marked. */
 class SwipeTabs(
     private val pager: ViewPager2,
     strip: View,
@@ -48,8 +45,7 @@ class SwipeTabs(
         landOnTouch()
     }
 
-    // A touch while the new tab still glides in would be caught by the pager and turn the tab back; the glide
-    // ends at once instead, and the touch is the list's
+    // A touch mid-glide would be caught by the pager and turn the tab back; end the glide instead
     private fun landOnTouch() = (pager.getChildAt(0) as RecyclerView).addOnItemTouchListener(
         object : RecyclerView.SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {

@@ -16,7 +16,8 @@
 
 ## Android
 - No business logic in Activities — Activities handle UI events and navigation only
-- Prefer `RecyclerView` over `ListView`
+- Prefer `RecyclerView` over `ListView`; a list that can grow long (history, saved pages) is a `RecyclerView`, never rows inflated into a `ScrollView`
+- Keep the platform's own touch and scroll behaviour; when it misbehaves, find what our code does to it (log it first) and change the least
 - Use `ViewCompat` / `WindowInsetsControllerCompat` for insets, not deprecated APIs
 - Don't call `findViewById` repeatedly — resolve once in `onCreate` or a `ViewHolder`
 - Resource IDs in `R.*` over hardcoded strings/colors/dimensions
@@ -30,6 +31,12 @@
 - All chrome/nav icons use the same style: `strokeColor`, `strokeWidth`, `fillColor="#00000000"` (no fill). Filled icon = active state only.
 - Icon tint is always set from code (`imageTintList`), never hardcoded in the drawable XML.
 
+### Wording
+- UI text is formal and impersonal in both languages: «العلامات», «سرعة القراءة», "Pages read today" — never "my/your" or "you read".
+
+### Buttons
+- Small actions in a row are outlined chips (`@drawable/chip_outline`, `quarter_chip_height`); whole-list actions are full-width outlined buttons (`part_quiet_button`); the one button that finishes a screen is filled (`part_primary_button`).
+
 ### Shared parts
 - A row or control that appears on more than one screen lives in one layout part, included by both — never copied. Copies drift: the same button ends up a different colour or size in each list.
 - Type sizes that repeat are `@dimen` tokens (`surah_title`, `surah_title_row`, `row_meta`), never numbers typed into a second layout or a `const` in a second file.
@@ -37,7 +44,8 @@
 
 ### Surah names
 - A surah named as a row's own title is written in the mushaf's own hand: include `@layout/part_surah_title` and fill it with `fillSurahTitle()`.
-- A surah mentioned inside a quiet meta line (a juz row, a search result) is plain text in the UI font — the calligraphy is for titles, not for asides.
+- In the index and bookmark lists a surah is always in the mushaf's hand: grey and `surah_title_row` size when it sits beside or under a juz, hizb or page title.
+- A surah named inside running text (a search result, a chart, a sentence) is plain text in the UI font.
 
 ### Dimensions
 - Hardcoded dp/sp values that appear in more than one layout belong in `res/values/dimens.xml`.

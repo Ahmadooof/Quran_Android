@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Titled settings card; clipToOutline keeps a row's own ground inside the rounded corners -->
+<!-- Titled settings card; its rows are clipped to the rounded corners in code -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -25,6 +25,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/card_group"
-        android:clipToOutline="true" />
+        android:background="@drawable/card_group" />
 </LinearLayout>

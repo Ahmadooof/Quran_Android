@@ -18,8 +18,7 @@ object Openings {
         hizb = surahs(root.getJSONArray("hizb"))
     }
 
-    // Each row is [surah, ayah]
-    private fun surahs(rows: JSONArray) = IntArray(rows.length()) { rows.getJSONArray(it).getInt(0) }
+    private fun surahs(rows: JSONArray) = IntArray(rows.length()) { rows.getInt(it) }
 
     fun ofJuz(context: Context, n: Int): Int? = load(context).let { juz.getOrNull(n - 1) }
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The switch's knob: large and light when on, small and muted when off. Its box is half the track wide,
-     which is what sets the switch's width -->
+<!-- The switch knob: large and light on, small and muted off; its box, half the track, sets the width -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <layer-list>

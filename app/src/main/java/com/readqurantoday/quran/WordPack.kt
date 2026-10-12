@@ -13,11 +13,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * Every word's recording kept on the phone, so Word plays without internet. Fetched all at once from the same files
- * Word plays, a few at a time; a stop, or the app closing, leaves what came down, and the next start picks up from
- * there. A word the recordings lack is counted as done, not asked for again and again.
- */
+/** Every word's recording on the phone for offline Word; resumable, and a word with no recording counts as done. */
 object WordPack {
 
     private const val BASE = "https://audio.readqurantoday.com/wbw"

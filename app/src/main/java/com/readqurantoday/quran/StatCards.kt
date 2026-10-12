@@ -9,10 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 
-/**
- * The parts the achievements tabs are built from: rows, tiles, gauges and rings. It remembers where each ring and
- * figure last stood, so a rebuild moves them on from there instead of from nothing.
- */
+/** Building parts for the achievements tabs; remembers where each figure stood so rebuilds animate from there. */
 class StatCards(val host: Activity, private val parent: ViewGroup) {
 
     val res: Resources = host.resources

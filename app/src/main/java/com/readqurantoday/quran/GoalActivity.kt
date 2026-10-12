@@ -9,10 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
-/**
- * Setting a goal on one screen: ready-made goals a tap away, below them every part of a goal of one's own, then
- * the goal written out and a button to keep it. The memorising goal is pages on chosen days only.
- */
+/** One screen to set a goal: ready-made ones, a custom one, and the goal written out over the save button. */
 class GoalActivity : CardsActivity(R.string.goal_title) {
 
     private val hifz by lazy { intent.getBooleanExtra(HIFZ, false) }
@@ -51,8 +48,7 @@ class GoalActivity : CardsActivity(R.string.goal_title) {
     // A khatma that ends [days] from today, today counted
     private fun khatmaEnd(days: Int) = (Stats.today() + days - 1).toInt()
 
-    // Rebuilt whole on every change. The goal written out sits last, over the button that keeps it, so as its
-    // wording grows or shrinks nothing above it moves under the finger
+    // Rebuilt on each change; the summary sits last so nothing above it moves under the finger
     private fun build() {
         cards.removeAllViews()
         layoutInflater.card(cards, R.string.goal_ready, presets().map { (goal, note) -> readyRow(goal, note) })

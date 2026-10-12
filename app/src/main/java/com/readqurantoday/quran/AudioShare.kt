@@ -7,10 +7,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
 
-/**
- * Hands downloaded recitations to other apps straight from the app's own storage, each named as a person would
- * look for it, "018 Al-Kahf - Mishary Alafasy.mp3", rather than as it is kept, "018.mp3".
- */
+/** Shares downloads under readable names: "018 Al-Kahf - Reciter.mp3", not "018.mp3". */
 class AudioShare : FileProvider() {
 
     override fun query(uri: Uri, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?): Cursor {

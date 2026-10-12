@@ -10,12 +10,7 @@ import android.view.animation.LinearInterpolator
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 
-/**
- * A week of reading as bars, today at the reading end. Each day stands against its own goal, since a day such as
- * Friday may ask for more: a soft track rises to the goal behind the bar, the pages read are written over the bar
- * with a badge over a day that reached its goal, and only the day's name sits at the foot; the key beneath the
- * chart says what the goal is.
- */
+/** A week of reading as bars, each day against its own goal; a badge marks a goal reached. */
 class DayBars(context: Context) : View(context) {
 
     private var pages: List<Int> = emptyList()
@@ -51,10 +46,7 @@ class DayBars(context: Context) : View(context) {
         textAlign = Paint.Align.CENTER
     }
 
-    /**
-     * [pages] and [goals] oldest first, one a day; [dayName] names a day by how many days ago it was.
-     * [grow] raises the bars from the baseline one after another; otherwise they simply stand.
-     */
+    /** [pages] and [goals] oldest first; [dayName] names a day by days ago; [grow] raises the bars in turn. */
     fun show(pages: List<Int>, goals: List<Int>, dayName: (Int) -> String, grow: Boolean = false) {
         this.pages = pages
         this.goals = goals

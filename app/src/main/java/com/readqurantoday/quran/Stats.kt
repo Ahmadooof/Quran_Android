@@ -22,7 +22,6 @@ object Stats {
     const val STAY_CAP_SEC = 300
 
     /** Days of history the statistics screen draws. */
-    const val CHART_DAYS = 30
 
     // Pace looks back two weeks: long enough to steady, short enough to follow a change of habit
     private const val PACE_DAYS = 14
@@ -46,10 +45,7 @@ object Stats {
     private const val CELEBRATED = "celebrated"
     private const val HEARD = "heard"
 
-    /**
-     * One day: seconds on each page, seconds heard from each surah, and whether the reader said the goal was read
-     * elsewhere, with how many pages had been read here when they said so.
-     */
+    /** One day: seconds per page and per surah heard, and whether the goal was said done, after how many pages. */
     data class Day(
         val pageSec: Map<Int, Int>,
         val surahSec: Map<Int, Int>,

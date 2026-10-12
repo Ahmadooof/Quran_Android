@@ -86,8 +86,7 @@ class DivisionAdapter(
         sayPlayButton(holder.itemView, playing = here && Recite.wantsToPlay(), waiting = here && Recite.waiting())
     }
 
-    // Grey, so the part stays the name; several surahs on one page stand one under another, each named in full.
-    // Titles already made are filled again, and only a page with more surahs than before makes another
+    // Grey under the part's name; titles are reused, one more made only when a page holds more surahs
     private fun fillSurahs(into: LinearLayout, surahs: List<Int>) {
         into.orientation = if (surahs.size > 1) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
         while (into.childCount < surahs.size) {

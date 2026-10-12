@@ -9,10 +9,7 @@ import com.readqurantoday.quran.StatCards.Tile
 import java.util.Calendar
 import kotlin.math.roundToInt
 
-/**
- * The reading tab: today against the goal, today's reading in time and speed, the month in pages and time,
- * and the last seven days each against its own goal. [done] hears the reader say today's goal was read elsewhere.
- */
+/** The reading tab: today against the goal, time and speed, the month, and the week chart. */
 class ReadingTab(private val cards: StatCards, private val rings: GoalRings, private val done: (Boolean) -> Unit) {
 
     private val host = cards.host

@@ -317,8 +317,7 @@ class DownloadsPane(
         return if (i > 0) parent.getChildAt(i - 1) else null
     }
 
-    // The icon in the accent, the label in plain text; greyed, both, while the button waits for the download.
-    // The label also names the button for screen readers
+    // Greyed while waiting on the download; the label also names it for screen readers
     private fun say(button: View, icon: ImageView, label: TextView, text: Int, ready: Boolean) {
         tint(icon, if (ready) R.color.accent else R.color.text_mute)
         label.setText(text)

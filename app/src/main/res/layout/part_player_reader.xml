@@ -8,7 +8,8 @@
     android:layoutDirection="locale"
     android:background="@drawable/reader_foot"
     android:elevation="@dimen/elevation_player"
-    android:visibility="gone">
+    android:visibility="gone"
+    android:baselineAligned="false">
 
     <LinearLayout
         android:id="@+id/p_locate"
