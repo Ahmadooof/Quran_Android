@@ -33,6 +33,7 @@
 ### Shared parts
 - A row or control that appears on more than one screen lives in one layout part, included by both — never copied. Copies drift: the same button ends up a different colour or size in each list.
 - Type sizes that repeat are `@dimen` tokens (`surah_title`, `surah_title_row`, `row_meta`), never numbers typed into a second layout or a `const` in a second file.
+- Every UI text size is on the type scale in `dimens.xml`: `text_heading` 18, `text_title` 16, `text_body` 14, `text_meta` 12, `text_small` 11 (role tokens like `row_title` point at these). Only the mushaf calligraphy and ring/chart numbers have their own sizes.
 
 ### Surah names
 - A surah named as a row's own title is written in the mushaf's own hand: include `@layout/part_surah_title` and fill it with `fillSurahTitle()`.
