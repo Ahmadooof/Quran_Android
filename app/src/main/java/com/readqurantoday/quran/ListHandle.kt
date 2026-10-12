@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * A handle to drag a long list by: one size however long the list, always in view so it is found,
- * and kept out of the system's edge-swipe so dragging it never goes back. With [label], a bubble beside the
+ * A handle to drag a long list by, in a column of its own at the list's edge so it never sits on a row's buttons:
+ * one size however long the list, always in view, and kept out of the system's edge-swipe so dragging it never
+ * goes back. With [label], a bubble beside the
  * held handle names the row at the top of the list, so a drag can stop where it means to.
  */
 fun RecyclerView.addHandle(label: ((Int) -> String)? = null) {
     val handle = ListHandle(this, label)
+    setPaddingRelative(paddingStart, paddingTop, paddingEnd + resources.getDimensionPixelSize(R.dimen.scroll_column), paddingBottom)
     addItemDecoration(handle)
     addOnItemTouchListener(handle)
 }
@@ -34,13 +36,16 @@ private class ListHandle(
     private val heldWide = res.getDimension(R.dimen.scroll_handle_held)
     private val tall = res.getDimension(R.dimen.scroll_handle_tall)
     private val inset = res.getDimension(R.dimen.scroll_handle_inset)
-    // A little wider than it looks, but only at the edge, so a flick through the list never takes it
-    private val reach = res.getDimension(R.dimen.scroll_handle_reach)
+    // The column is the handle's own: all of it takes the thumb, none of it is a row
+    private val column = res.getDimension(R.dimen.scroll_column)
 
     private val pill = Paint(Paint.ANTI_ALIAS_FLAG)
     private val rest = list.context.getColor(R.color.scroll_thumb)
     private val held = list.context.getColor(R.color.accent)
     private val box = RectF()
+    private val track = RectF()
+    private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = list.context.getColor(R.color.line) }
+    private val trackWide = res.getDimension(R.dimen.scroll_track)
     private val keepOut = Rect()
 
     // The bubble: the accent filled, its words light on it
@@ -67,21 +72,22 @@ private class ListHandle(
         val top = list.paddingTop + inset
         val travel = list.height - list.paddingBottom - inset - top - tall
         val y = top + travel * share.coerceIn(0f, 1f)
-        // The side Android gives a scrollbar: left in Arabic, right in English
-        val rtl = list.layoutDirection == View.LAYOUT_DIRECTION_RTL
+        // Centred in its column, on the side Android gives a scrollbar: left in Arabic, right in English
+        val mid = edgeStart() + column / 2f
         val w = if (dragging) heldWide else wide
-        val x = if (rtl) inset else list.width - inset - w
-        box.set(x, y, x + w, y + tall)
+        box.set(mid - w / 2f, y, mid + w / 2f, y + tall)
+        track.set(mid - trackWide / 2f, top, mid + trackWide / 2f, top + travel + tall)
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (!long()) return
         place()
+        c.drawRoundRect(track, trackWide / 2f, trackWide / 2f, trackPaint)
         pill.color = if (dragging) held else rest
         c.drawRoundRect(box, box.width() / 2f, box.width() / 2f, pill)
         if (dragging) drawBubble(c)
         // The system leaves this strip to the handle, rather than taking it as a back swipe
-        keepOut.set(edgeStart(), box.top.toInt(), edgeStart() + reach.toInt(), box.bottom.toInt())
+        keepOut.set(edgeStart(), box.top.toInt(), edgeStart() + column.toInt(), box.bottom.toInt())
         ViewCompat.setSystemGestureExclusionRects(list, listOf(keepOut))
     }
 
@@ -106,12 +112,12 @@ private class ListHandle(
         if (!long()) return false
         place()
         val from = edgeStart().toFloat()
-        return e.x in from..from + reach && e.y in box.top - inset..box.bottom + inset
+        return e.x in from..from + column && e.y in box.top - inset..box.bottom + inset
     }
 
-    // Where the touch strip begins: the screen edge on the handle's side
+    // Where the column begins: the screen edge on the handle's side
     private fun edgeStart(): Int =
-        if (list.layoutDirection == View.LAYOUT_DIRECTION_RTL) 0 else (list.width - reach).toInt()
+        if (list.layoutDirection == View.LAYOUT_DIRECTION_RTL) 0 else (list.width - column).toInt()
 
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
         if (e.actionMasked == MotionEvent.ACTION_DOWN && onHandle(e)) {

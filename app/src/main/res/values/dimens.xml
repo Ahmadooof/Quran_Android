@@ -62,8 +62,9 @@
     <dimen name="scroll_handle_held">14dp</dimen>
     <dimen name="scroll_handle_tall">60dp</dimen>
     <dimen name="scroll_handle_inset">4dp</dimen>
-    <!-- The strip at the edge that takes hold of the handle -->
-    <dimen name="scroll_handle_reach">48dp</dimen>
+    <!-- The handle's own column at the list's edge, and the faint track down it -->
+    <dimen name="scroll_column">24dp</dimen>
+    <dimen name="scroll_track">3dp</dimen>
     <!-- The index switch above the lists -->
     <dimen name="seg_height">36dp</dimen>
     <dimen name="seg_text">14sp</dimen>
