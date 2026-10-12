@@ -12,14 +12,13 @@ import androidx.core.content.res.ResourcesCompat
 /**
  * A week of reading as bars, today at the reading end. Each day stands against its own goal, since a day such as
  * Friday may ask for more: a soft track rises to the goal behind the bar, the pages read are written over it,
- * and the day's name sits at the foot with its goal beneath.
+ * and only the day's name sits at the foot; the key beneath the chart says what the goal is.
  */
 class DayBars(context: Context) : View(context) {
 
     private var pages: List<Int> = emptyList()
     private var goals: List<Int> = emptyList()
     private var dayName: (Int) -> String = { "" }
-    private var goalSaid: (Int) -> String = { "" }
 
     // 0 to 1 across the whole rise; each bar takes its own slice of it, oldest first
     private var grown = 1f
@@ -29,11 +28,10 @@ class DayBars(context: Context) : View(context) {
     private val bar = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.accent) }
     private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.accent_soft) }
     private val empty = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.line) }
-    // Pages over each bar read first, the day's name next, its goal quietest
+    // Pages over each bar read first, the day's name quieter
     private val count = text(R.color.text, R.dimen.chart_count, bold = true)
     private val label = text(R.color.text_mute, R.dimen.chart_day, bold = false)
     private val todayLabel = text(R.color.text, R.dimen.chart_day, bold = true)
-    private val goalLabel = text(R.color.text_mute, R.dimen.chart_label, bold = false)
     private val gap = resources.getDimension(R.dimen.chart_gap)
     private val barWide = resources.getDimension(R.dimen.chart_bar)
     private val corner = resources.getDimension(R.dimen.chart_bar_corner)
@@ -46,14 +44,13 @@ class DayBars(context: Context) : View(context) {
     }
 
     /**
-     * [pages] and [goals] oldest first, one a day; [dayName] names a day by how many days ago it was, and [goalSaid]
-     * writes a day's goal. [grow] raises the bars from the baseline one after another; otherwise they simply stand.
+     * [pages] and [goals] oldest first, one a day; [dayName] names a day by how many days ago it was.
+     * [grow] raises the bars from the baseline one after another; otherwise they simply stand.
      */
-    fun show(pages: List<Int>, goals: List<Int>, dayName: (Int) -> String, goalSaid: (Int) -> String, grow: Boolean = false) {
+    fun show(pages: List<Int>, goals: List<Int>, dayName: (Int) -> String, grow: Boolean = false) {
         this.pages = pages
         this.goals = goals
         this.dayName = dayName
-        this.goalSaid = goalSaid
         grown = if (grow) 0f else 1f
         invalidate()
         if (!grow) return
@@ -74,9 +71,9 @@ class DayBars(context: Context) : View(context) {
         return 1f - (1f - local) * (1f - local)
     }
 
-    // Room for the pages over the tallest bar, and the day's name and goal beneath the baseline
+    // Room for the pages over the tallest bar, and the day's name beneath the baseline
     private fun over() = count.textSize + gap
-    private fun under() = label.textSize + goalLabel.textSize + 2 * gap
+    private fun under() = label.textSize + 2 * gap
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         val tall = resources.getDimensionPixelSize(R.dimen.chart_height) + paddingTop + paddingBottom + (over() + under()).toInt()
@@ -112,28 +109,20 @@ class DayBars(context: Context) : View(context) {
             if (n > 0 && rise(i) == 1f) canvas.drawText(figures(n, resources), centre, minOf(base - tall, goalTop) - gap, count)
         }
 
-        // Every day's name and goal fit under its own bar; on a narrow screen each shrinks to fit, all alike
+        // Every day's name fits under its own bar; on a narrow screen each shrinks to fit, all alike
         val last = pages.size - 1
         val names = pages.indices.map { dayName(last - it) }
-        val said = goals.map { if (it > 0) goalSaid(it) else "" }
-        val room1 = slot - gap / 2f
         val dayFull = label.textSize
-        val goalFull = goalLabel.textSize
-        val dayFit = minOf(1f, room1 / names.maxOf { todayLabel.measureText(it) })
-        val goalFit = minOf(1f, room1 / maxOf(1f, said.maxOf { goalLabel.measureText(it) }))
+        val dayFit = minOf(1f, (slot - gap / 2f) / names.maxOf { todayLabel.measureText(it) })
         label.textSize = dayFull * dayFit
         todayLabel.textSize = dayFull * dayFit
-        goalLabel.textSize = goalFull * goalFit
         val nameY = base + gap + label.textSize * 0.9f
-        val goalY = nameY + gap / 2f + goalLabel.textSize
         pages.indices.forEach { i ->
             val centre = if (rtl) right - (i + 0.5f) * slot else left + (i + 0.5f) * slot
             canvas.drawText(names[i], centre, nameY, if (i == last) todayLabel else label)
-            if (said[i].isNotEmpty()) canvas.drawText(said[i], centre, goalY, goalLabel)
         }
         label.textSize = dayFull
         todayLabel.textSize = dayFull
-        goalLabel.textSize = goalFull
     }
 
     private companion object {

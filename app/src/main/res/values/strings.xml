@@ -411,7 +411,7 @@
         <item>جمعة</item>
         <item>سبت</item>
     </string-array>
-    <string name="chart_read">صفحات قرأتها</string>
+    <string name="chart_read">الصفحات المقروءة</string>
     <string name="chart_goal_word">الهدف</string>
     <string name="chart_goal_of">الهدف %1$s</string>
     <string name="ring_days_met">أيام أتممتها</string>

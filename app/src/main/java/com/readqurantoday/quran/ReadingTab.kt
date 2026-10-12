@@ -3,6 +3,7 @@ package com.readqurantoday.quran
 import android.content.Intent
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.readqurantoday.quran.StatCards.Companion.WEEK
 import com.readqurantoday.quran.StatCards.Tile
 import java.util.Calendar
@@ -77,14 +78,19 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         val pad = res.getDimensionPixelSize(R.dimen.tile_pad)
         val chart = DayBars(host).apply {
             setPadding(pad, pad, pad, pad)
-            show(counts, goals, ::dayName, { host.getString(R.string.chart_goal_of, figures(it, res)) }, grow = cards.growing)
+            show(counts, goals, ::dayName, grow = cards.growing)
             contentDescription = host.getString(R.string.stats_chart_desc, figures(week.size, res), pagesSaid(counts.max(), res))
         }
         // The chart and the key to its colours are one row, with no seam between them
         val withKey = LinearLayout(host).apply {
             orientation = LinearLayout.VERTICAL
             addView(chart)
-            addView(blow.inflate(R.layout.part_chart_legend, this, false))
+            addView(blow.inflate(R.layout.part_chart_legend, this, false).apply {
+                // The goal said once here, not under every day; when the days differ the tracks show how
+                val one = goals.filter { it > 0 }.distinct().singleOrNull()
+                findViewById<TextView>(R.id.legend_goal).text =
+                    if (one != null) host.getString(R.string.chart_goal_of, pagesSaid(one, res)) else host.getString(R.string.chart_goal_word)
+            })
         }
         return listOf(withKey, cards.row(host.getString(R.string.chart_total), pagesSaid(counts.sum(), res)))
     }

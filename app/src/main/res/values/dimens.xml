@@ -112,7 +112,6 @@
     <dimen name="section_gap">22dp</dimen>
     <!-- Lines the section title up with the cards' own titles -->
     <dimen name="section_inset">18dp</dimen>
-    <dimen name="chart_label">@dimen/text_small</dimen>
     <dimen name="chart_gap">6dp</dimen>
     <!-- Toggle buttons and page tiles: chosen is filled, not chosen is outlined -->
     <dimen name="choice_radius">12dp</dimen>
