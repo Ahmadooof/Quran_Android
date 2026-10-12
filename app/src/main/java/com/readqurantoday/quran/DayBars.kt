@@ -12,9 +12,9 @@ import androidx.core.content.res.ResourcesCompat
 
 /**
  * A week of reading as bars, today at the reading end. Each day stands against its own goal, since a day such as
- * Friday may ask for more: a soft track rises to the goal behind the bar and a line marks the goal across it,
- * the pages read are written over the bar with a tick over a day that reached its goal, and only the day's name
- * sits at the foot; the key beneath the chart says what the goal is.
+ * Friday may ask for more: a soft track rises to the goal behind the bar, the pages read are written over the bar
+ * with a badge over a day that reached its goal, and only the day's name sits at the foot; the key beneath the
+ * chart says what the goal is.
  */
 class DayBars(context: Context) : View(context) {
 
@@ -30,15 +30,10 @@ class DayBars(context: Context) : View(context) {
     private val bar = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.accent) }
     private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.accent_soft) }
     private val empty = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.line) }
-    // The goal's mark, in the ink so it shows on the bar as well as on the track
-    private val goalLine = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = context.getColor(R.color.text)
-        alpha = GOAL_LINE_ALPHA
-        strokeWidth = resources.getDimension(R.dimen.chart_goal_line)
-        strokeCap = Paint.Cap.ROUND
-    }
+    // A goal reached: a light tick on a filled accent disc
+    private val badge = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = context.getColor(R.color.accent) }
     private val tick = AppCompatResources.getDrawable(context, R.drawable.ic_check)?.mutate()?.apply {
-        setTint(context.getColor(R.color.accent))
+        setTint(context.getColor(R.color.on_dark))
     }
     private val tickSize = resources.getDimensionPixelSize(R.dimen.chart_tick)
     // Pages over each bar read first, the day's name quieter
@@ -107,7 +102,6 @@ class DayBars(context: Context) : View(context) {
         // Bars of one width however wide the screen; softly rounded, so a day of few pages is a low bar, not a dot
         val wide = minOf(barWide, slot * 0.62f)
         val round = minOf(corner, wide / 2f)
-        val lineOver = gap / 2f
         pages.forEachIndexed { i, n ->
             // Oldest first, so the newest day sits where the line of reading ends
             val centre = if (rtl) right - (i + 0.5f) * slot else left + (i + 0.5f) * slot
@@ -120,15 +114,17 @@ class DayBars(context: Context) : View(context) {
             if (n > 0) canvas.drawRoundRect(l, base - tall, r, base, round, round, bar)
             // A day with neither reading nor goal keeps a dot, so it still holds its place in the week
             else if (goal == 0) canvas.drawRoundRect(l, base - round * 2f, r, base, round, round, empty)
-            if (goal > 0) canvas.drawLine(l - lineOver, goalTop, r + lineOver, goalTop, goalLine)
             if (n > 0 && rise(i) == 1f) {
                 val numberY = minOf(base - tall, goalTop) - gap
                 canvas.drawText(figures(n, resources), centre, numberY, count)
                 // A day that reached its goal says so over its number
-                if (goal > 0 && n >= goal) tick?.run {
-                    val tickBottom = (numberY - count.textSize - gap / 2f).toInt()
-                    setBounds((centre - tickSize / 2f).toInt(), tickBottom - tickSize, (centre + tickSize / 2f).toInt(), tickBottom)
-                    draw(canvas)
+                if (goal > 0 && n >= goal) {
+                    val half = tickSize / 2f
+                    val cy = numberY - count.textSize - gap / 2f - half
+                    canvas.drawCircle(centre, cy, half, badge)
+                    val inset = half * TICK_INSET
+                    tick?.setBounds((centre - half + inset).toInt(), (cy - half + inset).toInt(), (centre + half - inset).toInt(), (cy + half - inset).toInt())
+                    tick?.draw(canvas)
                 }
             }
         }
@@ -152,6 +148,7 @@ class DayBars(context: Context) : View(context) {
     private companion object {
         const val GROW_MS = 900L
         const val WAVE = 3f
-        const val GOAL_LINE_ALPHA = 140
+        // How far in from the badge's edge its tick is drawn
+        const val TICK_INSET = 0.3f
     }
 }
