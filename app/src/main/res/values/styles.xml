@@ -10,10 +10,6 @@
         <item name="android:textSize">@dimen/icon_label</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:maxLines">1</item>
-        <!-- A wide page number shrinks a little rather than lose a digit -->
-        <item name="autoSizeTextType">uniform</item>
-        <item name="autoSizeMinTextSize">9sp</item>
-        <item name="autoSizeMaxTextSize">@dimen/quarter_text</item>
         <item name="autoSizeTextType">uniform</item>
         <item name="autoSizeMinTextSize">@dimen/icon_label_min</item>
         <item name="autoSizeMaxTextSize">@dimen/icon_label</item>

@@ -47,6 +47,7 @@ private class ListHandle(
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = list.context.getColor(R.color.line) }
     private val trackWide = res.getDimension(R.dimen.scroll_track)
     private val keepOut = Rect()
+    private val keptOut = Rect()
 
     // The bubble: the accent filled, its words light on it
     private val bubbleGap = res.getDimension(R.dimen.scroll_bubble_gap)
@@ -88,7 +89,11 @@ private class ListHandle(
         if (dragging) drawBubble(c)
         // The system leaves this strip to the handle, rather than taking it as a back swipe
         keepOut.set(edgeStart(), box.top.toInt(), edgeStart() + column.toInt(), box.bottom.toInt())
-        ViewCompat.setSystemGestureExclusionRects(list, listOf(keepOut))
+        // Told again only when it moves: each telling makes the window draw once more
+        if (keepOut != keptOut) {
+            keptOut.set(keepOut)
+            ViewCompat.setSystemGestureExclusionRects(list, listOf(Rect(keepOut)))
+        }
     }
 
     // Beside the handle, level with it, far enough off that the thumb holding it does not cover it

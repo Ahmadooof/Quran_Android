@@ -157,9 +157,9 @@ object Settings {
     private const val RECENT = "recent"
     private const val RECENT_PAGES = "recent_pages"
 
-    // Every surah read, once each; pages only lately, or the list would grow toward the whole mushaf
+    // Every surah and every page read, once each, with when it was last read
     private const val SURAHS_KEPT = 114
-    private const val PAGES_KEPT = 20
+    private const val PAGES_KEPT = Mushaf.PAGES
 
     /** Surahs read lately, newest first, each at the page it was left on. */
     fun recent(ctx: Context): List<Read> = reads(ctx, RECENT)

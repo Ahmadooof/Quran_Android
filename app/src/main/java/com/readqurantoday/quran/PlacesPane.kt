@@ -32,8 +32,7 @@ class PlacesPane(
     // Rebuilt on every return: reading changes the history and saved pages
     fun build() {
         columns.forEach { it.removeAllViews() }
-        val today = Settings.recentPages(host).filter { Stats.dayOf(it.at) == Stats.today() }
-        fill(columns[PAGES], R.string.places_pages_head, today.map(::pageRow), R.string.no_recent_pages)
+        fill(columns[PAGES], R.string.places_pages_head, readToday().map(::pageRow), R.string.no_recent_pages)
         fill(columns[SURAHS], R.string.places_surahs_head, recentSurahs().map(::surahRow), R.string.no_recent)
         fill(columns[SAVED], 0, Settings.marks(host).map(::savedRow), R.string.no_marks)
     }
@@ -51,6 +50,14 @@ class PlacesPane(
         val last = Settings.lastPage(host)
         val surah = Surahs.ofPage(last) ?: return emptyList()
         return if (last in 1..604) listOf(Settings.Read(surah.id, last, 0L)) else emptyList()
+    }
+
+    // Every page today counted as read, as the achievements count them; newest first where the time is known
+    private fun readToday(): List<Settings.Read> {
+        val at = Settings.recentPages(host).associate { it.page to it.at }
+        return Stats.day(host, Stats.today()).pages
+            .map { page -> Settings.Read(Surahs.ofPage(page)?.id ?: 0, page, at[page] ?: 0L) }
+            .sortedWith(compareByDescending<Settings.Read> { it.at }.thenBy { it.page })
     }
 
     // As the other two lists: the surah in the mushaf's hand, its juz and page beneath
