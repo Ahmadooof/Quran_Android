@@ -49,6 +49,7 @@ private class ListHandle(
     private val keepOut = Rect()
 
     // The bubble: the accent filled, its words light on it
+    private val bubbleGap = res.getDimension(R.dimen.scroll_bubble_gap)
     private val bubblePadX = res.getDimension(R.dimen.scroll_bubble_pad_x)
     private val bubblePadY = res.getDimension(R.dimen.scroll_bubble_pad_y)
     private val bubbleFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = list.context.getColor(R.color.accent) }
@@ -90,7 +91,7 @@ private class ListHandle(
         ViewCompat.setSystemGestureExclusionRects(list, listOf(keepOut))
     }
 
-    // In the middle of the list, level with the handle: the thumb holding it covers the space just beside it
+    // Beside the handle, level with it, far enough off that the thumb holding it does not cover it
     private fun drawBubble(c: Canvas) {
         val named = label ?: return
         val at = (list.layoutManager as? LinearLayoutManager)?.findFirstVisibleItemPosition() ?: return
@@ -98,7 +99,8 @@ private class ListHandle(
         val words = named(at)
         val w = bubbleWords.measureText(words) + 2 * bubblePadX
         val h = bubbleWords.textSize + 2 * bubblePadY
-        val x = (list.width - w) / 2f
+        val rtl = list.layoutDirection == View.LAYOUT_DIRECTION_RTL
+        val x = if (rtl) box.right + bubbleGap else box.left - bubbleGap - w
         val y = (box.centerY() - h / 2f).coerceIn(list.paddingTop.toFloat(), list.height - list.paddingBottom - h)
         bubble.set(x, y, x + w, y + h)
         c.drawRoundRect(bubble, h / 2f, h / 2f, bubbleFill)

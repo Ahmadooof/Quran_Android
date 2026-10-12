@@ -143,6 +143,7 @@
     <!-- A juz or page row's juz or page beside its surah, sized to sit level with the names -->
     <dimen name="part_meta">14sp</dimen>
     <!-- The bubble beside a held list handle, naming where the drag has reached -->
+    <dimen name="scroll_bubble_gap">40dp</dimen>
     <dimen name="scroll_bubble_pad_x">16dp</dimen>
     <dimen name="scroll_bubble_pad_y">8dp</dimen>
     <dimen name="scroll_bubble_text">15sp</dimen>
