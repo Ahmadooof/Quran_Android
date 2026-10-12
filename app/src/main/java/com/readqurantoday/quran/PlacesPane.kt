@@ -86,7 +86,6 @@ class PlacesPane(
             val of = (surah.to - surah.from + 1).coerceAtLeast(1)
             val at = (read.page - surah.from + 1).coerceIn(1, of)
             row.findViewById<View>(R.id.place_track).apply {
-                visibility = View.VISIBLE
                 fillTrack(at.toFloat(), of.toFloat())
                 contentDescription = host.getString(
                     R.string.place_progress, figures(at, host.resources), figures(of, host.resources)
