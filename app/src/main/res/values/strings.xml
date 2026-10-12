@@ -458,4 +458,6 @@
     <string name="size_kb">%1$s ك.ب</string>
     <string name="size_mb">%1$s م.ب</string>
     <string name="size_gb">%1$s ج.ب</string>
+    <string name="marks_clear">حذف كل الصفحات المحفوظة</string>
+    <string name="marks_clear_ask">حذف %1$s صفحة محفوظة؟</string>
 </resources>

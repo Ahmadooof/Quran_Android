@@ -387,4 +387,6 @@
     <string name="size_kb">%1$s KB</string>
     <string name="size_mb">%1$s MB</string>
     <string name="size_gb">%1$s GB</string>
+    <string name="marks_clear">Remove all saved pages</string>
+    <string name="marks_clear_ask">Remove %1$s saved pages?</string>
 </resources>

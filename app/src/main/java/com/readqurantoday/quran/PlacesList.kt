@@ -16,6 +16,8 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         data class Empty(val said: String) : Item()
         /** A row_place, filled by [fill] each time it is shown. */
         class Row(val fill: (View) -> Unit) : Item()
+        /** A row that does something to the whole list, as a settings action reads. */
+        class Action(val said: String, val act: () -> Unit) : Item()
     }
 
     private var items: List<Item> = emptyList()
@@ -33,12 +35,14 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         is Item.Head -> HEAD
         is Item.Empty -> EMPTY
         is Item.Row -> ROW
+        is Item.Action -> ACTION
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val layout = when (viewType) {
             HEAD -> R.layout.item_list_head
             EMPTY -> R.layout.row_empty
+            ACTION -> R.layout.row_setting_action
             else -> R.layout.row_place
         }
         return object : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(layout, parent, false)) {}
@@ -49,6 +53,10 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         when (val item = items[position]) {
             is Item.Head -> (v as TextView).text = item.said
             is Item.Empty -> (v as TextView).text = item.said
+            is Item.Action -> {
+                (v as TextView).text = item.said
+                v.setOnClickListener { item.act() }
+            }
             is Item.Row -> {
                 // A reused row may carry another list's time, bar or remove button
                 v.findViewById<View>(R.id.place_when).visibility = View.GONE
@@ -63,6 +71,7 @@ class PlacesList : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val HEAD = 0
         const val EMPTY = 1
         const val ROW = 2
+        const val ACTION = 3
     }
 }
 

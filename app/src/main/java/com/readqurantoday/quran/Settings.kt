@@ -65,6 +65,8 @@ object Settings {
             .mapNotNull { it.toIntOrNull() }
             .sorted()
 
+    fun clearMarks(context: Context) = store(context).edit { remove(MARKS) }
+
     fun marked(context: Context, page: Int) = marks(context).contains(page)
 
     fun toggleMark(context: Context, page: Int): Boolean {

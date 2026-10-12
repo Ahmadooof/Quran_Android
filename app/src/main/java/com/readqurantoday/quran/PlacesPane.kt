@@ -40,7 +40,18 @@ class PlacesPane(
     fun build() {
         fill(PAGES, R.string.places_pages_head, readToday().map { read -> PlacesList.Item.Row { pageRow(it, read) } }, R.string.no_recent_pages)
         fill(SURAHS, R.string.places_surahs_head, recentSurahs().map { read -> PlacesList.Item.Row { surahRow(it, read) } }, R.string.no_recent)
-        fill(SAVED, 0, Settings.marks(host).map { page -> PlacesList.Item.Row { savedRow(it, page) } }, R.string.no_marks)
+        val saved = Settings.marks(host)
+        val clear = if (saved.size > 1) listOf(PlacesList.Item.Action(host.getString(R.string.marks_clear), ::askClear)) else emptyList()
+        fill(SAVED, 0, saved.map { page -> PlacesList.Item.Row { savedRow(it, page) } } + clear, R.string.no_marks)
+    }
+
+    // Every saved page goes at once, after a yes: the one delete that asks first
+    private fun askClear() {
+        val count = Settings.marks(host).size
+        host.sheet(host.getString(R.string.marks_clear_ask, figures(count, host.resources)), listOf(Choice(host.getString(R.string.dl_delete_do)))) {
+            Settings.clearMarks(host)
+            build()
+        }
     }
 
     /** The list in view comes in, as every tab does when it is opened. */
