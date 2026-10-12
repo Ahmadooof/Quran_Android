@@ -2,7 +2,6 @@
 <!-- Night palette: a dark page in the app's blue-grey family, with near-white type -->
 <resources>
     <color name="paper">#151A1E</color>
-    <color name="page_paper">@color/paper</color>
     <!-- Near-white, short of white, which glares and blooms on a dark screen -->
     <color name="ink">#DDE2E7</color>
     <!-- Night grounds step up as things rise: screen, page, card and sheet, reader bars -->
