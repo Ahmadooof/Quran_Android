@@ -36,47 +36,54 @@ fun saveToPhone(context: Context, surah: Int, reciter: Recite.Reciter): Boolean 
     val title = surahFileTitle(surah)
     val folder = phoneFolder(reciter)
 
-    val copy: String? = try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val resolver = context.contentResolver
-            val values = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, "$title.mp3")
-                put(MediaStore.Downloads.TITLE, title)
-                put(MediaStore.Downloads.MIME_TYPE, "audio/mpeg")
-                // Apps may only place files under standard folders; Download takes any type
-                put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/$folder")
-                /* Hidden from other apps until the copy is whole. */
-                put(MediaStore.Downloads.IS_PENDING, 1)
-            }
-            val uri = resolver.insert(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values)
-                ?: return false
-            try {
-                resolver.openOutputStream(uri)?.use { out -> source.inputStream().use { it.copyTo(out) } }
-                    ?: throw IllegalStateException("no output stream")
-                values.clear()
-                values.put(MediaStore.Downloads.IS_PENDING, 0)
-                resolver.update(uri, values, null, null)
-                uri.toString()
-            } catch (e: Exception) {
-                /* Leave no half-written entry behind in the reader's downloads. */
-                resolver.delete(uri, null, null)
-                throw e
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), folder)
-            dir.mkdirs()
-            val target = File(dir, "$title.mp3")
-            source.copyTo(target, overwrite = true)
-            MediaScannerConnection.scanFile(context, arrayOf(target.absolutePath), arrayOf("audio/mpeg"), null)
-            target.absolutePath
-        }
-    } catch (_: Exception) {
-        null
-    }
-
+    val copy = copyToShared(context, source, "$title.mp3", "audio/mpeg", Environment.DIRECTORY_DOWNLOADS, folder)
     if (copy != null) saved(context).edit { putString("${reciter.id}/$surah", copy) }
     return copy != null
+}
+
+/** A made recitation video copied to Movies/Quran, where the phone's gallery finds it. Blocking. */
+fun saveVideoToPhone(context: Context, video: File): Boolean =
+    copyToShared(context, video, video.name, "video/mp4", Environment.DIRECTORY_MOVIES, "Quran") != null
+
+// Copies [source] into [standard]/[folder] for every app to see; where it now is, or null. Blocking
+private fun copyToShared(context: Context, source: File, name: String, mime: String, standard: String, folder: String): String? = try {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val resolver = context.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.TITLE, name.substringBeforeLast('.'))
+            put(MediaStore.MediaColumns.MIME_TYPE, mime)
+            // Apps may only place files under standard folders
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "$standard/$folder")
+            /* Hidden from other apps until the copy is whole. */
+            put(MediaStore.MediaColumns.IS_PENDING, 1)
+        }
+        val into = if (standard == Environment.DIRECTORY_MOVIES) MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                   else MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val uri = resolver.insert(into, values) ?: throw IllegalStateException("no entry")
+        try {
+            resolver.openOutputStream(uri)?.use { out -> source.inputStream().use { it.copyTo(out) } }
+                ?: throw IllegalStateException("no output stream")
+            values.clear()
+            values.put(MediaStore.MediaColumns.IS_PENDING, 0)
+            resolver.update(uri, values, null, null)
+            uri.toString()
+        } catch (e: Exception) {
+            /* Leave no half-written entry behind. */
+            resolver.delete(uri, null, null)
+            throw e
+        }
+    } else {
+        @Suppress("DEPRECATION")
+        val dir = File(Environment.getExternalStoragePublicDirectory(standard), folder)
+        dir.mkdirs()
+        val target = File(dir, name)
+        source.copyTo(target, overwrite = true)
+        MediaScannerConnection.scanFile(context, arrayOf(target.absolutePath), arrayOf(mime), null)
+        target.absolutePath
+    }
+} catch (_: Exception) {
+    null
 }
 
 /** A surah's file named as a person would look for it: "018 Al-Kahf". */

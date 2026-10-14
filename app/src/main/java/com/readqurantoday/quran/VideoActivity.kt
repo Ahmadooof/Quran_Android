@@ -11,7 +11,14 @@ import java.io.File
 class VideoActivity : CardsActivity(R.string.video_title) {
 
     private var ask = RecitationVideo.Ask(1, 1, 1, "", VideoFrames.Style.LINE)
+        // A change to what is asked leaves the last video made for something else
+        set(value) {
+            if (value != field) made = null
+            field = value
+        }
     private var making = -1
+    private var made: File? = null
+    private val mayKeep = SavePermission(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +75,15 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         ))
         layoutInflater.card(cards, R.string.video_style, listOf(styles()))
         cards.addView(makeButton())
+        made?.let { video ->
+            cards.addView(quietButton(R.string.video_save) { save(video) })
+            cards.addView(quietButton(R.string.video_share) { share(video) })
+        }
+    }
+
+    private fun quietButton(said: Int, act: () -> Unit): View = (layoutInflater.inflate(R.layout.part_quiet_button, cards, false) as TextView).apply {
+        setText(said)
+        setOnClickListener { act() }
     }
 
     private fun pickRow(label: Int, value: String, pick: () -> Unit): View =
@@ -99,6 +115,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
     }
 
     private fun makeButton(): View = (layoutInflater.inflate(R.layout.part_primary_button, cards, false) as TextView).apply {
+        tag = MAKE
         text = if (making >= 0) getString(R.string.video_making, figures(making, resources)) else getString(R.string.video_make)
         isEnabled = making < 0 && ask.reciter.isNotEmpty()
         alpha = if (isEnabled) 1f else WAITING
@@ -111,13 +128,21 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         RecitationVideo.make(this, ask, progress = { done ->
             if (making < 0 || isDestroyed) return@make
             making = done
-            (cards.getChildAt(cards.childCount - 1) as TextView).text = getString(R.string.video_making, figures(done, resources))
+            cards.findViewWithTag<TextView>(MAKE)?.text = getString(R.string.video_making, figures(done, resources))
         }) { file ->
             if (isDestroyed) return@make
             making = -1
+            made = file
             build()
-            if (file == null) notice(getString(R.string.video_failed)) else share(file)
+            if (file == null) notice(getString(R.string.video_failed))
         }
+    }
+
+    private fun save(file: File) = mayKeep.then {
+        Thread {
+            val ok = saveVideoToPhone(this, file)
+            runOnUiThread { notice(getString(if (ok) R.string.video_saved else R.string.dl_save_failed)) }
+        }.start()
     }
 
     private fun share(file: File) {
@@ -132,5 +157,6 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         // A run long enough for any share, short enough to make in a minute or two
         const val MOST_AYAHS = 50
         const val WAITING = 0.6f
+        const val MAKE = "make"
     }
 }
