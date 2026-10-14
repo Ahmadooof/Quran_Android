@@ -111,7 +111,7 @@ class VideoFrames(private val context: Context, private val style: Style) {
 
         if (style == Style.LINE) {
             val cut = Rect(area.left.toInt(), area.top.toInt(), area.right.toInt(), area.bottom.toInt())
-            if (cut.intersect(0, 0, pageW, pageH)) paint(canvas, marksOf(at), cut, place(RectF(cut)), markInk)
+            if (cut.intersect(0, 0, pageW, pageH)) paint(canvas, lineMarks(at, cut, box), null, place(RectF(cut)), markInk)
         }
         words.forEach { (k, word) -> paint(canvas, word.mask, null, place(word.ink), if (k == litKey) lit else ink) }
     }
@@ -150,6 +150,42 @@ class VideoFrames(private val context: Context, private val style: Style) {
         at.view.light(0, 0, -1)
         at.view.draw(Canvas(marks))
         at.marks = marks
+    }
+
+    // This line's ayah marks alone: each mark in [cut] is kept only if its middle sits on the line of [line]
+    private fun lineMarks(at: Drawn, cut: Rect, line: RectF): Bitmap {
+        val w = cut.width()
+        val h = cut.height()
+        val px = IntArray(w * h)
+        marksOf(at).getPixels(px, 0, w, cut.left, cut.top, w, h)
+        val kept = IntArray(w * h)
+        val seen = BooleanArray(w * h)
+        val queue = IntArray(w * h)
+        for (start in px.indices) {
+            if (seen[start] || Color.alpha(px[start]) == 0) continue
+            // One mark, or one piece of it: every touching inked pixel
+            var head = 0
+            var tail = 0
+            queue[tail++] = start
+            seen[start] = true
+            var top = h
+            var bottom = -1
+            while (head < tail) {
+                val i = queue[head++]
+                val x = i % w
+                val y = i / w
+                if (y < top) top = y
+                if (y > bottom) bottom = y
+                for (n in intArrayOf(if (x > 0) i - 1 else -1, if (x < w - 1) i + 1 else -1, if (y > 0) i - w else -1, if (y < h - 1) i + w else -1)) {
+                    if (n >= 0 && !seen[n] && Color.alpha(px[n]) > 0) {
+                        seen[n] = true
+                        queue[tail++] = n
+                    }
+                }
+            }
+            if (cut.top + (top + bottom) / 2f in line.top..line.bottom) for (j in 0 until tail) kept[queue[j]] = px[queue[j]]
+        }
+        return createBitmap(w, h).apply { setPixels(kept, 0, w, 0, 0, w, h) }
     }
 
     private fun paint(canvas: Canvas, white: Bitmap, from: Rect?, to: RectF, colour: Int) {
