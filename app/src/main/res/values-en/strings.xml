@@ -419,4 +419,5 @@
     <string name="shape_tall">Upright</string>
     <string name="shape_square">Square</string>
     <string name="shape_wide">Wide</string>
+    <string name="shape_post">Post</string>
 </resources>

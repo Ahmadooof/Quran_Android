@@ -160,14 +160,16 @@ class VideoActivity : CardsActivity(R.string.video_title) {
     private fun shapes(): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
         background = null
         val face = findViewById<TextView>(R.id.seg_1).typeface
-        findViewById<View>(R.id.seg_4).visibility = View.GONE
         listOf(
             R.id.seg_1 to (RecitationVideo.Shape.TALL to R.string.shape_tall),
-            R.id.seg_2 to (RecitationVideo.Shape.SQUARE to R.string.shape_square),
-            R.id.seg_3 to (RecitationVideo.Shape.WIDE to R.string.shape_wide)
+            R.id.seg_2 to (RecitationVideo.Shape.POST to R.string.shape_post),
+            R.id.seg_3 to (RecitationVideo.Shape.SQUARE to R.string.shape_square),
+            R.id.seg_4 to (RecitationVideo.Shape.WIDE to R.string.shape_wide)
         ).forEach { (id, choice) ->
             findViewById<TextView>(id).apply {
-                setText(choice.second)
+                // The name, and beside it the proportions the apps ask for
+                text = getString(R.string.shape_said, getString(choice.second),
+                    getString(R.string.shape_ratio, figures(choice.first.w, resources), figures(choice.first.h, resources)))
                 markSegment(ask.shape == choice.first, face)
                 setOnClickListener {
                     ask = ask.copy(shape = choice.first)

@@ -491,4 +491,7 @@
     <string name="shape_tall">طولي</string>
     <string name="shape_square">مربع</string>
     <string name="shape_wide">عرضي</string>
+    <string name="shape_post">منشور</string>
+    <string name="shape_said" translatable="false">%1$s %2$s</string>
+    <string name="shape_ratio" translatable="false">%1$s:%2$s</string>
 </resources>
