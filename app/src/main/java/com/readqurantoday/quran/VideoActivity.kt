@@ -138,8 +138,13 @@ class VideoActivity : CardsActivity(R.string.video_title) {
                 setText(choice.second)
                 markSegment(ask.style == choice.first, face)
                 setOnClickListener {
-                    // A strip holds one line only; another style goes back to upright
-                    val shape = if (ask.shape in shapesFor(choice.first)) ask.shape else RecitationVideo.Shape.TALL
+                    // Line by line opens on the one-line strip; another style, which a strip cannot hold, on upright
+                    val shape = when {
+                        choice.first == ask.style -> ask.shape
+                        choice.first == VideoFrames.Style.LINE -> RecitationVideo.Shape.STRIP
+                        ask.shape in shapesFor(choice.first) -> ask.shape
+                        else -> RecitationVideo.Shape.TALL
+                    }
                     ask = ask.copy(style = choice.first, shape = shape)
                     build()
                 }
