@@ -406,4 +406,12 @@
     <string name="video_share">Share</string>
     <string name="video_save">Save to phone</string>
     <string name="video_saved">The video was saved to Movies/⁠Quran on the phone</string>
+    <string name="video_colors">Colours</string>
+    <string name="look_reader">Reader</string>
+    <string name="look_light">Light</string>
+    <string name="look_dark">Dark</string>
+    <string name="look_green">Green</string>
+    <string name="video_paper">Background</string>
+    <string name="video_ink">Text</string>
+    <string name="video_lit">Recited word</string>
 </resources>

@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import androidx.annotation.OptIn
+import androidx.core.content.edit
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -26,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @OptIn(UnstableApi::class)
 object RecitationVideo {
 
-    data class Ask(val surah: Int, val from: Int, val to: Int, val reciter: String, val style: VideoFrames.Style)
+    data class Ask(val surah: Int, val from: Int, val to: Int, val reciter: String, val style: VideoFrames.Style, val look: VideoLook)
 
     private data class Lit(val at: Int, val ayah: Int, val word: Int)
 
@@ -42,11 +43,27 @@ object RecitationVideo {
         val worker = HandlerThread(FRAMES).apply { start() }
         Handler(worker.looper).post {
             // The screen's own context draws the pages, so their heads are in the app's chosen language
-            val made = runCatching { pictures(app, VideoFrames(context, ask.style), ask) { main.post { progress(it * DRAWN / 100) } } }.getOrNull()
+            val made = runCatching { pictures(app, VideoFrames(context, ask.style, ask.look), ask) { main.post { progress(it * DRAWN / 100) } } }.getOrNull()
             worker.quitSafely()
             if (made == null || stopped.get()) main.post { done(null) }
             else main.post { join(app, ask, made, progress, done) }
         }
+    }
+
+    /** The last video asked for, so the screen opens on it again; null before the first. */
+    fun lastAsk(context: Context): Ask? {
+        val kept = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE)
+        if (!kept.contains(SURAH)) return null
+        val style = VideoFrames.Style.entries.getOrNull(kept.getInt(STYLE, -1)) ?: VideoFrames.Style.LINE
+        return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style, VideoLook.of(context))
+    }
+
+    fun keepAsk(context: Context, ask: Ask) = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE).edit {
+        putInt(SURAH, ask.surah)
+        putInt(FROM, ask.from)
+        putInt(TO, ask.to)
+        putString(VOICE, ask.reciter)
+        putInt(STYLE, ask.style.ordinal)
     }
 
     fun stop() {
@@ -161,6 +178,12 @@ object RecitationVideo {
     }
 
     const val VIDEOS = "video"
+    private const val ASKED = "video-ask"
+    private const val SURAH = "surah"
+    private const val FROM = "from"
+    private const val TO = "to"
+    private const val VOICE = "reciter"
+    private const val STYLE = "style"
     private const val FRAMES = "video_frames"
     private const val FRAME_RATE = 30
     private const val QUALITY = 92

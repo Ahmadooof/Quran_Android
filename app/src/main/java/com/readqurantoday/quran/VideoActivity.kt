@@ -1,8 +1,10 @@
 package com.readqurantoday.quran
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.FileProvider
 import java.io.File
@@ -10,11 +12,12 @@ import java.io.File
 /** A recitation video: a surah, its ayahs from and to, a reciter, and how the words are shown. */
 class VideoActivity : CardsActivity(R.string.video_title) {
 
-    private var ask = RecitationVideo.Ask(1, 1, 1, "", VideoFrames.Style.LINE)
+    private var ask = RecitationVideo.Ask(1, 1, 1, "", VideoFrames.Style.LINE, VideoLook(0, 0, 0))
         // A change to what is asked leaves the last video made for something else
         set(value) {
             if (value != field) made = null
             field = value
+            RecitationVideo.keepAsk(this, value)
         }
     private var making = -1
     private var made: File? = null
@@ -24,9 +27,13 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         super.onCreate(savedInstanceState)
         Surahs.load(this)
         Recite.load(this)
-        // Opens on the surah last read, with the reciter last chosen
-        val surah = Surahs.ofPage(Settings.lastPage(this)) ?: Surahs.list().first()
-        ask = ask.copy(surah = surah.id, from = 1, to = minOf(surah.ayahs, START_AYAHS), reciter = reciterFor(surah.id, Recite.chosen(this)?.id))
+        // Opens on the last video asked for; the first time, on the surah last read with the reciter last chosen
+        val last = RecitationVideo.lastAsk(this)
+        val surah = Surahs.list().firstOrNull { it.id == last?.surah } ?: Surahs.ofPage(Settings.lastPage(this)) ?: Surahs.list().first()
+        val from = (last?.from ?: 1).coerceIn(1, surah.ayahs)
+        val to = (last?.to ?: START_AYAHS).coerceIn(from, minOf(surah.ayahs, from + MOST_AYAHS - 1))
+        ask = RecitationVideo.Ask(surah.id, from, to, reciterFor(surah.id, last?.reciter ?: Recite.chosen(this)?.id),
+            last?.style ?: VideoFrames.Style.LINE, VideoLook.of(this))
         build()
         sayBars()
     }
@@ -74,6 +81,13 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             }
         ))
         layoutInflater.card(cards, R.string.video_style, listOf(styles()))
+        val reader = VideoLook.ofReader(this)
+        layoutInflater.card(cards, R.string.video_colors, listOf(
+            looks(reader),
+            colorRow(R.string.video_paper, ask.look.paper, reader.paper, PAPER_PICKS) { ask.look.copy(paper = it) },
+            colorRow(R.string.video_ink, ask.look.ink, reader.ink, INK_PICKS) { ask.look.copy(ink = it) },
+            colorRow(R.string.video_lit, ask.look.lit, reader.lit, ACCENT_PICKS) { ask.look.copy(lit = it) }
+        ))
         cards.addView(makeButton())
         made?.let { video ->
             cards.addView(quietButton(R.string.video_save) { save(video) })
@@ -112,6 +126,44 @@ class VideoActivity : CardsActivity(R.string.video_title) {
                 }
             }
         }
+    }
+
+    // Ready-made colours a tap away: the reader's own, light, dark and green
+    private fun looks(reader: VideoLook): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
+        background = null
+        val face = findViewById<TextView>(R.id.seg_1).typeface
+        listOf(
+            R.id.seg_1 to (reader to R.string.look_reader),
+            R.id.seg_2 to (VideoLook.LIGHT to R.string.look_light),
+            R.id.seg_3 to (VideoLook.DARK to R.string.look_dark),
+            R.id.seg_4 to (VideoLook.GREEN to R.string.look_green)
+        ).forEach { (id, choice) ->
+            findViewById<TextView>(id).apply {
+                setText(choice.second)
+                markSegment(ask.look == choice.first, face)
+                setOnClickListener { setLook(choice.first) }
+            }
+        }
+    }
+
+    // One of the video's colours: the picker shows it on a line of the page, with the others as they stand
+    private fun colorRow(label: Int, current: Int, reader: Int, picks: IntArray, with: (Int) -> VideoLook): View =
+        layoutInflater.inflate(R.layout.row_setting_color, cards, false).apply {
+            findViewById<TextView>(R.id.set_label).setText(label)
+            findViewById<ImageView>(R.id.set_dot).imageTintList = ColorStateList.valueOf(current)
+            setOnClickListener {
+                val inUse = intArrayOf(ask.look.paper, ask.look.ink, ask.look.lit)
+                colorSheet(getString(label), this@VideoActivity, current, reader, picks, inUse, trial = { line, c ->
+                    with(c).let { line.tryOn(lit = it.lit, mark = it.ink, ink = it.ink, paper = it.paper) }
+                }) { setLook(with(it)) }
+            }
+            findViewById<View>(R.id.set_reset).setOnClickListener { setLook(with(reader)) }
+        }
+
+    private fun setLook(look: VideoLook) {
+        VideoLook.keep(this, look)
+        ask = ask.copy(look = look)
+        build()
     }
 
     private fun makeButton(): View = (layoutInflater.inflate(R.layout.part_primary_button, cards, false) as TextView).apply {

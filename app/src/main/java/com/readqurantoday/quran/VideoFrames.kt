@@ -16,7 +16,7 @@ import androidx.core.graphics.createBitmap
  * Draws a recitation video's pictures. The page is drawn whole as the reader shows it; for a line or a word, each
  * word is drawn alone, every other ink clear, so nothing of the lines above and below or of the next word shows.
  */
-class VideoFrames(private val context: Context, private val style: Style) {
+class VideoFrames(private val context: Context, private val style: Style, look: VideoLook) {
 
     enum class Style { WORD, LINE, PAGE }
 
@@ -25,10 +25,9 @@ class VideoFrames(private val context: Context, private val style: Style) {
         var marks: Bitmap? = null
     }
 
-    private val paper = Settings.paperColor(context)
-    private val ink = Settings.inkColor(context)
-    private val lit = Settings.highlightColor(context)
-    private val markInk = Settings.resolvedAyahColor(context)
+    private val paper = look.paper
+    private val ink = look.ink
+    private val lit = look.lit
     // The word alone is drawn from a page twice as large, so it stays sharp shown big
     private val scale = if (style == Style.WORD) 2 else 1
     private val pageW = WIDE * scale
@@ -88,7 +87,7 @@ class VideoFrames(private val context: Context, private val style: Style) {
         val litKey = key(surah, ayah, word)
         val box = at.boxes[litKey]
         if (style == Style.PAGE || box == null) {
-            at.view.tryOn()
+            at.view.tryOn(lit = lit, mark = ink, ink = ink, paper = paper)
             at.view.light(surah, ayah, word)
             at.view.draw(canvas)
             return
@@ -111,7 +110,7 @@ class VideoFrames(private val context: Context, private val style: Style) {
 
         if (style == Style.LINE) {
             val cut = Rect(area.left.toInt(), area.top.toInt(), area.right.toInt(), area.bottom.toInt())
-            if (cut.intersect(0, 0, pageW, pageH)) paint(canvas, lineMarks(at, cut, box), null, place(RectF(cut)), markInk)
+            if (cut.intersect(0, 0, pageW, pageH)) paint(canvas, lineMarks(at, cut, box), null, place(RectF(cut)), ink)
         }
         words.forEach { (k, word) -> paint(canvas, word.mask, null, place(word.ink), if (k == litKey) lit else ink) }
     }
