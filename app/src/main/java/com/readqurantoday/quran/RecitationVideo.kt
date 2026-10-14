@@ -29,7 +29,9 @@ object RecitationVideo {
 
     data class Ask(
         val surah: Int, val from: Int, val to: Int, val reciter: String,
-        val style: VideoFrames.Style, val look: VideoLook, val shape: Shape = Shape.TALL
+        val style: VideoFrames.Style, val look: VideoLook, val shape: Shape = Shape.TALL,
+        // The pronunciation over the lit word, for the full page
+        val phonetics: Boolean = false
     )
 
     /** Upright for status and reels, four by five and square for posts, wide for YouTube, and a strip for one line; [w]:[h] is said with it. */
@@ -51,7 +53,7 @@ object RecitationVideo {
         val worker = HandlerThread(FRAMES).apply { start() }
         Handler(worker.looper).post {
             // The screen's own context draws the pages, so their heads are in the app's chosen language
-            val made = runCatching { pictures(app, VideoFrames(context, ask.style, ask.look), ask) { main.post { progress(it * DRAWN / 100) } } }.getOrNull()
+            val made = runCatching { pictures(app, VideoFrames(context, ask.style, ask.look, ask.phonetics), ask) { main.post { progress(it * DRAWN / 100) } } }.getOrNull()
             worker.quitSafely()
             if (made == null || stopped.get()) main.post { done(null) }
             else main.post { join(app, ask, made, progress, done) }
@@ -67,7 +69,8 @@ object RecitationVideo {
                 Surahs.load(context)
                 val timing = Timing.of(context, ask.surah, ask.reciter) ?: return@runCatching null
                 val lit = lits(timing, ask).first()
-                val frames = VideoFrames(context, ask.style, ask.look)
+                if (ask.phonetics) Translit.load(context)
+                val frames = VideoFrames(context, ask.style, ask.look, ask.phonetics)
                 val page = frames.pageOf(ask.surah, lit.ayah, lit.word)
                 val out = createBitmap(ask.shape.wide, ask.shape.tall)
                 if (page > 0) frames.draw(page, ask.surah, lit.ayah, lit.word, out)
@@ -85,7 +88,8 @@ object RecitationVideo {
         if (!kept.contains(SURAH)) return null
         val style = VideoFrames.Style.entries.getOrNull(kept.getInt(STYLE, -1)) ?: VideoFrames.Style.LINE
         val shape = Shape.entries.getOrNull(kept.getInt(SHAPE, -1)) ?: Shape.TALL
-        return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style, VideoLook.of(context), shape)
+        return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style,
+            VideoLook.of(context), shape, kept.getBoolean(PHONETICS, false))
     }
 
     fun keepAsk(context: Context, ask: Ask) = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE).edit {
@@ -95,6 +99,7 @@ object RecitationVideo {
         putString(VOICE, ask.reciter)
         putInt(STYLE, ask.style.ordinal)
         putInt(SHAPE, ask.shape.ordinal)
+        putBoolean(PHONETICS, ask.phonetics)
     }
 
     fun stop() {
@@ -114,6 +119,7 @@ object RecitationVideo {
     private fun pictures(app: Context, frames: VideoFrames, ask: Ask, drawn: (Int) -> Unit): Pictures? {
         Mushaf.load(app)
         Surahs.load(app)
+        if (ask.phonetics) Translit.load(app)
         val timing = Timing.of(app, ask.surah, ask.reciter) ?: return null
         val lits = lits(timing, ask)
         val fromMs = timing.startOf(ask.from).toLong()
@@ -216,6 +222,7 @@ object RecitationVideo {
     private const val VOICE = "reciter"
     private const val STYLE = "style"
     private const val SHAPE = "shape"
+    private const val PHONETICS = "phonetics"
     private const val FRAMES = "video_frames"
     private const val FRAME_RATE = 30
     private const val QUALITY = 92

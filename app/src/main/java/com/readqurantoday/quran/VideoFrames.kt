@@ -1,6 +1,7 @@
 package com.readqurantoday.quran
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -16,7 +17,7 @@ import androidx.core.graphics.createBitmap
  * Draws a recitation video's pictures. The page is drawn whole as the reader shows it; for a line or a word, each
  * word is drawn alone, every other ink clear, so nothing of the lines above and below or of the next word shows.
  */
-class VideoFrames(private val context: Context, private val style: Style, look: VideoLook) {
+class VideoFrames(context: Context, private val style: Style, look: VideoLook, phonetics: Boolean) {
 
     enum class Style { WORD, LINE, PAGE }
 
@@ -25,6 +26,10 @@ class VideoFrames(private val context: Context, private val style: Style, look: 
         var marks: Bitmap? = null
     }
 
+    // The pages are drawn with the video's own choice of pronunciation, whatever the reader's
+    private val context = object : ContextWrapper(context), Settings.OwnPhonetics {
+        override val phonetics = phonetics && style == Style.PAGE
+    }
     private val paper = look.paper
     private val ink = look.ink
     private val lit = look.lit

@@ -43,7 +43,8 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         val to = (last?.to ?: START_AYAHS).coerceIn(from, minOf(surah.ayahs, from + MOST_AYAHS - 1))
         ask = RecitationVideo.Ask(surah.id, from, to, reciterFor(surah.id, last?.reciter ?: Recite.chosen(this)?.id),
             last?.style ?: VideoFrames.Style.LINE, VideoLook.of(this),
-            last?.shape?.takeIf { it in shapesFor(last.style) } ?: RecitationVideo.Shape.TALL)
+            last?.shape?.takeIf { it in shapesFor(last.style) } ?: RecitationVideo.Shape.TALL,
+            last?.phonetics ?: Settings.translit(this))
         build()
         sayBars()
     }
@@ -90,7 +91,13 @@ class VideoActivity : CardsActivity(R.string.video_title) {
                 }
             }
         ))
-        layoutInflater.card(cards, R.string.video_style, listOf(styles(), shapeRow()))
+        // The full page can carry the lit word's pronunciation over it, as the reader does
+        val phonetics = layoutInflater.switchRow(cards, getString(R.string.video_phonetics), ask.phonetics) {
+            ask = ask.copy(phonetics = it)
+            build()
+        }
+        layoutInflater.card(cards, R.string.video_style,
+            if (ask.style == VideoFrames.Style.PAGE) listOf(styles(), shapeRow(), phonetics) else listOf(styles(), shapeRow()))
         val reader = VideoLook.ofReader(this)
         layoutInflater.card(cards, R.string.video_colors, listOf(
             looks(reader),

@@ -145,7 +145,10 @@ object Settings {
     private const val TRANSLIT = "translit"
 
     /* A Latin reading over the lit word; on until the reader turns it off. */
-    fun translit(context: Context) = store(context).getBoolean(TRANSLIT, true)
+    /** A context that decides pronunciation for itself, as a video's drawing does, rather than by this setting. */
+    interface OwnPhonetics { val phonetics: Boolean }
+
+    fun translit(context: Context) = (context as? OwnPhonetics)?.phonetics ?: store(context).getBoolean(TRANSLIT, true)
 
     fun setTranslit(context: Context, on: Boolean) {
         store(context).edit { putBoolean(TRANSLIT, on) }
