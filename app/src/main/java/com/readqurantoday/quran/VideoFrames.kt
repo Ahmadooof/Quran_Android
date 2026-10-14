@@ -33,8 +33,11 @@ class VideoFrames(private val context: Context, private val style: Style) {
     private val scale = if (style == Style.WORD) 2 else 1
     private val pageW = WIDE * scale
     private val pageH = TALL * scale
+    // A word alone: its ink in white on clear, and where that ink sits on the page
+    private class Alone(val mask: Bitmap, val ink: RectF)
+
     private val drawn = LinkedHashMap<Int, Drawn>()
-    private val alone = HashMap<Long, Bitmap>()
+    private val alone = HashMap<Long, Alone>()
     private val scratch by lazy { createBitmap(pageW, pageH) }
     private val tint = Paint(Paint.FILTER_BITMAP_FLAG)
     private var last = 0
@@ -91,10 +94,13 @@ class VideoFrames(private val context: Context, private val style: Style) {
             return
         }
         // The line: every word at the lit word's height, with the ayah marks between them
-        val words = if (style == Style.LINE) at.boxes.filter { it.value.centerY() in box.top..box.bottom } else mapOf(litKey to box)
-        val area = RectF(grown(box))
-        words.values.forEach { area.union(grown(it)) }
-        if (style == Style.LINE) area.inset(-box.height() * MARK_ROOM, 0f)
+        val words = (if (style == Style.LINE) at.boxes.filter { it.value.centerY() in box.top..box.bottom } else mapOf(litKey to box))
+            .mapValues { (k, b) -> aloneOf(at, k, b) }
+        // As tall and wide as the ink itself, every mark above and below included
+        val area = RectF(words.getValue(litKey).ink)
+        words.values.forEach { area.union(it.ink) }
+        if (style == Style.LINE) area.inset(-box.height() * MARK_ROOM, -box.height() * BREATH)
+        else area.inset(-box.height() * BREATH, -box.height() * BREATH)
 
         val fit = if (style == Style.LINE) minOf(out.width * LINE_WIDE / area.width(), out.height * LINE_TALL / area.height())
                   else minOf(out.width * WORD_WIDE / area.width(), out.height * WORD_TALL / area.height())
@@ -107,24 +113,35 @@ class VideoFrames(private val context: Context, private val style: Style) {
             val cut = Rect(area.left.toInt(), area.top.toInt(), area.right.toInt(), area.bottom.toInt())
             if (cut.intersect(0, 0, pageW, pageH)) paint(canvas, marksOf(at), cut, place(RectF(cut)), markInk)
         }
-        words.forEach { (k, b) ->
-            val g = grown(b)
-            paint(canvas, aloneOf(at, k, g), null, place(g), if (k == litKey) lit else ink)
-        }
+        words.forEach { (k, word) -> paint(canvas, word.mask, null, place(word.ink), if (k == litKey) lit else ink) }
     }
 
-    // A word's marks above and below reach a little past the box it answers taps in
-    private fun grown(box: RectF) = RectF(box.left, box.top - box.height() * GROW, box.right, box.bottom + box.height() * GROW)
-
-    // The page drawn with only this word in ink, white on clear, cut to its grown box
-    private fun aloneOf(at: Drawn, k: Long, grownBox: RectF): Bitmap = alone.getOrPut(k) {
+    // The page drawn with only this word, in white, all else clear; its ink is measured, not guessed, so no mark is cut
+    private fun aloneOf(at: Drawn, k: Long, box: RectF): Alone = alone.getOrPut(k) {
         scratch.eraseColor(Color.TRANSPARENT)
         at.view.tryOn(lit = Color.WHITE, mark = Color.TRANSPARENT, ink = Color.TRANSPARENT, paper = Color.TRANSPARENT)
         at.view.light((k / 1_000_000).toInt(), (k / 1000 % 1000).toInt(), (k % 1000).toInt())
         at.view.draw(Canvas(scratch))
-        val cut = Rect(grownBox.left.toInt(), grownBox.top.toInt(), grownBox.right.toInt(), grownBox.bottom.toInt())
-        if (!cut.intersect(0, 0, pageW, pageH)) return@getOrPut createBitmap(1, 1)
-        Bitmap.createBitmap(scratch, cut.left, cut.top, cut.width(), cut.height())
+        // Looked for well past the tap box: nothing else is drawn, so only this word's ink is found there
+        val reach = box.height() * LOOK
+        val look = Rect((box.left - reach).toInt(), (box.top - reach).toInt(), (box.right + reach).toInt(), (box.bottom + reach).toInt())
+        if (!look.intersect(0, 0, pageW, pageH)) return@getOrPut Alone(createBitmap(1, 1), RectF(box))
+        val w = look.width()
+        val h = look.height()
+        val px = IntArray(w * h)
+        scratch.getPixels(px, 0, w, look.left, look.top, w, h)
+        // The word is white; the transliteration label over it is dark, and left out
+        var l = w; var t = h; var r = -1; var b = -1
+        for (y in 0 until h) for (x in 0 until w) {
+            val c = px[y * w + x]
+            val a = Color.alpha(c) * Color.red(c) / 255
+            px[y * w + x] = Color.argb(a, 255, 255, 255)
+            if (a > 0) { if (x < l) l = x; if (x > r) r = x; if (y < t) t = y; if (y > b) b = y }
+        }
+        if (r < 0) return@getOrPut Alone(createBitmap(1, 1), RectF(box))
+        val mask = createBitmap(r - l + 1, b - t + 1)
+        mask.setPixels(px, t * w + l, w, 0, 0, r - l + 1, b - t + 1)
+        Alone(mask, RectF((look.left + l).toFloat(), (look.top + t).toFloat(), (look.left + r + 1).toFloat(), (look.top + b + 1).toFloat()))
     }
 
     // The page's ayah marks alone, white on clear
@@ -143,7 +160,7 @@ class VideoFrames(private val context: Context, private val style: Style) {
     fun release() {
         drawn.values.forEach { it.marks?.recycle() }
         drawn.clear()
-        alone.values.forEach { it.recycle() }
+        alone.values.forEach { it.mask.recycle() }
         alone.clear()
     }
 
@@ -155,8 +172,10 @@ class VideoFrames(private val context: Context, private val style: Style) {
         const val TALL = 1920
         private const val GRID = 6
         private const val KEPT = 3
-        // How far a word's marks reach past its tap box, as a share of the box's height
-        private const val GROW = 0.18f
+        // How far past its tap box a word's ink is looked for, as a share of the box's height
+        private const val LOOK = 1f
+        // Room around the ink, as a share of a line's height
+        private const val BREATH = 0.25f
         // Room each side of a line for an ayah mark that ends it, as a share of the line's height
         private const val MARK_ROOM = 1f
         private const val LINE_WIDE = 0.94f
