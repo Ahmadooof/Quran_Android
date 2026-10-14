@@ -42,7 +42,8 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         val from = (last?.from ?: 1).coerceIn(1, surah.ayahs)
         val to = (last?.to ?: START_AYAHS).coerceIn(from, minOf(surah.ayahs, from + MOST_AYAHS - 1))
         ask = RecitationVideo.Ask(surah.id, from, to, reciterFor(surah.id, last?.reciter ?: Recite.chosen(this)?.id),
-            last?.style ?: VideoFrames.Style.LINE, VideoLook.of(this), last?.shape ?: RecitationVideo.Shape.TALL)
+            last?.style ?: VideoFrames.Style.LINE, VideoLook.of(this),
+            last?.shape?.takeIf { it in shapesFor(last.style) } ?: RecitationVideo.Shape.TALL)
         build()
         sayBars()
     }
@@ -89,8 +90,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
                 }
             }
         ))
-        layoutInflater.card(cards, R.string.video_style, listOf(styles()))
-        layoutInflater.card(cards, R.string.video_shape, listOf(shapes()))
+        layoutInflater.card(cards, R.string.video_style, listOf(styles(), shapeRow()))
         val reader = VideoLook.ofReader(this)
         layoutInflater.card(cards, R.string.video_colors, listOf(
             looks(reader),
@@ -138,7 +138,9 @@ class VideoActivity : CardsActivity(R.string.video_title) {
                 setText(choice.second)
                 markSegment(ask.style == choice.first, face)
                 setOnClickListener {
-                    ask = ask.copy(style = choice.first)
+                    // A strip holds one line only; another style goes back to upright
+                    val shape = if (ask.shape in shapesFor(choice.first)) ask.shape else RecitationVideo.Shape.TALL
+                    ask = ask.copy(style = choice.first, shape = shape)
                     build()
                 }
             }
@@ -165,26 +167,19 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         tag = PREVIEW
     }
 
-    // Upright, square or wide, for where the video will go
-    private fun shapes(): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
-        background = null
-        val face = findViewById<TextView>(R.id.seg_1).typeface
-        listOf(
-            R.id.seg_1 to (RecitationVideo.Shape.TALL to R.string.shape_tall),
-            R.id.seg_2 to (RecitationVideo.Shape.POST to R.string.shape_post),
-            R.id.seg_3 to (RecitationVideo.Shape.SQUARE to R.string.shape_square),
-            R.id.seg_4 to (RecitationVideo.Shape.WIDE to R.string.shape_wide)
-        ).forEach { (id, choice) ->
-            findViewById<TextView>(id).apply {
-                // The name, and beside it the proportions the apps ask for
-                text = getString(R.string.shape_said, getString(choice.second),
-                    getString(R.string.shape_ratio, figures(choice.first.w, resources), figures(choice.first.h, resources)))
-                markSegment(ask.shape == choice.first, face)
-                setOnClickListener {
-                    ask = ask.copy(shape = choice.first)
-                    build()
-                }
-            }
+    // The shapes on offer: the one-line strip only for line by line, which is all it can hold
+    private fun shapesFor(style: VideoFrames.Style) =
+        RecitationVideo.Shape.entries.filter { it != RecitationVideo.Shape.STRIP || style == VideoFrames.Style.LINE }
+
+    private fun shapeSaid(shape: RecitationVideo.Shape): String = getString(R.string.shape_said, getString(SHAPE_NAMES.getValue(shape)),
+        getString(R.string.shape_ratio, figures(shape.w, resources), figures(shape.h, resources)))
+
+    // Upright, a post, square, wide or one line: chosen from a list, each with the proportions the apps ask for
+    private fun shapeRow(): View = pickRow(R.string.video_shape, shapeSaid(ask.shape)) {
+        val shapes = shapesFor(ask.style)
+        sheet(getString(R.string.video_shape), shapes.map { Choice(shapeSaid(it), on = it == ask.shape) }) { i ->
+            ask = ask.copy(shape = shapes[i])
+            build()
         }
     }
 
@@ -279,5 +274,10 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         const val WAITING = 0.6f
         const val MAKE = "make"
         const val PREVIEW = "preview"
+        val SHAPE_NAMES = mapOf(
+            RecitationVideo.Shape.TALL to R.string.shape_tall, RecitationVideo.Shape.POST to R.string.shape_post,
+            RecitationVideo.Shape.SQUARE to R.string.shape_square, RecitationVideo.Shape.WIDE to R.string.shape_wide,
+            RecitationVideo.Shape.STRIP to R.string.shape_strip
+        )
     }
 }

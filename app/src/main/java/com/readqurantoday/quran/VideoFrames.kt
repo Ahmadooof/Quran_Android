@@ -108,7 +108,9 @@ class VideoFrames(private val context: Context, private val style: Style, look: 
         if (style == Style.LINE) area.inset(-box.height() * MARK_ROOM, -box.height() * BREATH)
         else area.inset(-box.height() * BREATH, -box.height() * BREATH)
 
-        val fit = if (style == Style.LINE) minOf(out.width * LINE_WIDE / area.width(), out.height * LINE_TALL / area.height())
+        // In a strip the line is the whole picture; elsewhere it keeps to a band across the middle
+        val lineTall = if (out.width > out.height * STRIP_FROM) STRIP_TALL else LINE_TALL
+        val fit = if (style == Style.LINE) minOf(out.width * LINE_WIDE / area.width(), out.height * lineTall / area.height())
                   else minOf(out.width * WORD_WIDE / area.width(), out.height * WORD_TALL / area.height())
         val left = (out.width - area.width() * fit) / 2f
         val top = (out.height - area.height() * fit) / 2f
@@ -222,6 +224,8 @@ class VideoFrames(private val context: Context, private val style: Style, look: 
         private const val MARK_ROOM = 1f
         private const val LINE_WIDE = 0.94f
         private const val LINE_TALL = 0.3f
+        private const val STRIP_TALL = 0.9f
+        private const val STRIP_FROM = 3
         private const val WORD_WIDE = 0.85f
         private const val WORD_TALL = 0.4f
     }

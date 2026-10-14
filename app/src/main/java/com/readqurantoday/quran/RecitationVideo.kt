@@ -32,9 +32,9 @@ object RecitationVideo {
         val style: VideoFrames.Style, val look: VideoLook, val shape: Shape = Shape.TALL
     )
 
-    /** Upright for status and reels, four by five and square for posts, wide for YouTube; [w]:[h] is said with it. */
+    /** Upright for status and reels, four by five and square for posts, wide for YouTube, and a strip for one line; [w]:[h] is said with it. */
     enum class Shape(val wide: Int, val tall: Int, val w: Int, val h: Int) {
-        TALL(1080, 1920, 9, 16), POST(1080, 1350, 4, 5), SQUARE(1080, 1080, 1, 1), WIDE(1920, 1080, 16, 9)
+        TALL(1080, 1920, 9, 16), POST(1080, 1350, 4, 5), SQUARE(1080, 1080, 1, 1), WIDE(1920, 1080, 16, 9), STRIP(1920, 400, 24, 5)
     }
 
     private data class Lit(val at: Int, val ayah: Int, val word: Int)
