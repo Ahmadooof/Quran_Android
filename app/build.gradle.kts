@@ -99,6 +99,8 @@ dependencies {
     implementation("androidx.core:core-ktx:1.19.0")
     // ExoPlayer seeks accurately in VBR MP3s, where MediaPlayer.seekTo() fails silently
     implementation("androidx.media3:media3-exoplayer:1.11.1")
+    // Recitation videos: the pictures and the clipped recitation made into one MP4 on the phone
+    implementation("androidx.media3:media3-transformer:1.11.1")
     // MediaSession and MediaStyle for the player notification
     implementation("androidx.media:media:1.8.0")
     // HSV colour picker with a hex field

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Downloaded recitations other apps may be handed, through AudioShare -->
+<!-- Downloaded recitations and made recitation videos other apps may be handed, through AudioShare -->
 <paths>
     <external-files-path name="audio" path="audio/" />
+    <external-files-path name="video" path="video/" />
 </paths>

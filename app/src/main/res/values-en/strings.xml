@@ -392,4 +392,16 @@
     <string name="remove_short">Remove</string>
     <string name="hifz_known_surahs">Memorised surahs</string>
     <string name="volume_off">The volume is all the way down; turn it up to listen</string>
+    <string name="video_title">Recitation video</string>
+    <string name="video_surah">Surah</string>
+    <string name="video_from">From ayah</string>
+    <string name="video_to">To ayah</string>
+    <string name="video_style">Show</string>
+    <string name="video_word">Word by word</string>
+    <string name="video_line">Line by line</string>
+    <string name="video_page">Full page</string>
+    <string name="video_make">Make the video</string>
+    <string name="video_making">Making… %1$s%%</string>
+    <string name="video_failed">The video could not be made. Check the internet connection, or download the surah first.</string>
+    <string name="video_share">Share the video</string>
 </resources>

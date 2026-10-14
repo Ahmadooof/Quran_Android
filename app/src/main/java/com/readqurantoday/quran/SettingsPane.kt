@@ -53,6 +53,7 @@ class SettingsPane(private val host: Activity, private val into: LinearLayout) {
             rows.add(linkRow(R.string.set_group_reading, openStyle,
                 listOf(Settings.highlightColor(host), Settings.resolvedAyahColor(host))))
             rows.add(linkRow(R.string.set_downloads, openDownloads, emptyList()))
+            rows.add(linkRow(R.string.video_title, { host.startActivity(Intent(host, VideoActivity::class.java)) }, emptyList()))
         }
 
         group(R.string.set_group_help) { rows ->

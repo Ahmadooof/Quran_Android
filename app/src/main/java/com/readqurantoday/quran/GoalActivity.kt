@@ -135,26 +135,8 @@ class GoalActivity : CardsActivity(R.string.goal_title) {
         }
     }
 
-    // Minus and plus for a step at a time; the number itself opens a box to type any amount in range
     private fun stepper(label: Int, value: Int, range: IntRange, set: (Int) -> Unit): View =
-        layoutInflater.inflate(R.layout.row_stepper, cards, false).apply {
-            val tint = ColorStateList.valueOf(getColor(R.color.accent))
-            findViewById<TextView>(R.id.step_label).setText(label)
-            findViewById<TextView>(R.id.step_value).apply {
-                text = figures(value, resources)
-                contentDescription = getString(label) + " " + figures(value, resources)
-                setOnClickListener {
-                    askNumber(getString(label), getString(R.string.hifz_keep), value, range) { set(it); build() }
-                }
-            }
-            for ((id, step) in listOf(R.id.step_less to -1, R.id.step_more to 1)) findViewById<ImageView>(id).apply {
-                val next = value + step
-                imageTintList = tint
-                isEnabled = next in range
-                alpha = if (isEnabled) 1f else DISABLED
-                setOnClickListener { set(next); build() }
-            }
-        }
+        stepperRow(cards, label, value, range) { set(it); build() }
 
     private fun surahRow(): View = layoutInflater.inflate(R.layout.row_progress, cards, false).apply {
         findViewById<TextView>(R.id.prog_label).setText(R.string.goal_amount_surah)

@@ -72,6 +72,10 @@
             android:name=".MemorizedActivity"
             android:exported="false"
             android:theme="@style/Theme.Quran.Index" />
+        <activity
+            android:name=".VideoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Quran.Index" />
 
         <!-- Reading style: a step further into settings, so it wears the index's theme. -->
         <activity

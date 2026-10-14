@@ -66,6 +66,13 @@ class Timing private constructor(
         return null
     }
 
+    /** Each word of [ayah] as it is recited, a repeat coming again: its start in the recording's time, and the word. */
+    fun wordTimes(ayah: Int): List<Pair<Int, Int>> {
+        val run = words.getOrNull(ayah - 1) ?: return emptyList()
+        val opens = startOf(ayah)
+        return (0 until run.size / 2).map { opens + run[2 * it] to run[2 * it + 1] }
+    }
+
     fun startOf(ayah: Int) = ayat.getOrNull(ayah - 1)?.get(0) ?: 0
     fun endOf(ayah: Int) = ayat.getOrNull(ayah - 1)?.get(1) ?: 0
 
