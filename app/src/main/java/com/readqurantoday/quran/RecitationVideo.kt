@@ -27,7 +27,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 @OptIn(UnstableApi::class)
 object RecitationVideo {
 
-    data class Ask(val surah: Int, val from: Int, val to: Int, val reciter: String, val style: VideoFrames.Style, val look: VideoLook)
+    data class Ask(
+        val surah: Int, val from: Int, val to: Int, val reciter: String,
+        val style: VideoFrames.Style, val look: VideoLook, val shape: Shape = Shape.TALL
+    )
+
+    /** Upright for status and reels, square for posts, wide for YouTube. */
+    enum class Shape(val wide: Int, val tall: Int) { TALL(1080, 1920), SQUARE(1080, 1080), WIDE(1920, 1080) }
 
     private data class Lit(val at: Int, val ayah: Int, val word: Int)
 
@@ -61,7 +67,7 @@ object RecitationVideo {
                 val lit = lits(timing, ask).first()
                 val frames = VideoFrames(context, ask.style, ask.look)
                 val page = frames.pageOf(ask.surah, lit.ayah, lit.word)
-                val out = createBitmap(VideoFrames.WIDE, VideoFrames.TALL)
+                val out = createBitmap(ask.shape.wide, ask.shape.tall)
                 if (page > 0) frames.draw(page, ask.surah, lit.ayah, lit.word, out)
                 frames.release()
                 out
@@ -76,7 +82,8 @@ object RecitationVideo {
         val kept = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE)
         if (!kept.contains(SURAH)) return null
         val style = VideoFrames.Style.entries.getOrNull(kept.getInt(STYLE, -1)) ?: VideoFrames.Style.LINE
-        return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style, VideoLook.of(context))
+        val shape = Shape.entries.getOrNull(kept.getInt(SHAPE, -1)) ?: Shape.TALL
+        return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style, VideoLook.of(context), shape)
     }
 
     fun keepAsk(context: Context, ask: Ask) = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE).edit {
@@ -85,6 +92,7 @@ object RecitationVideo {
         putInt(TO, ask.to)
         putString(VOICE, ask.reciter)
         putInt(STYLE, ask.style.ordinal)
+        putInt(SHAPE, ask.shape.ordinal)
     }
 
     fun stop() {
@@ -111,7 +119,7 @@ object RecitationVideo {
         if (lits.isEmpty() || toMs <= fromMs) return null
 
         val dir = File(app.cacheDir, FRAMES).apply { deleteRecursively(); mkdirs() }
-        val out = createBitmap(VideoFrames.WIDE, VideoFrames.TALL)
+        val out = createBitmap(ask.shape.wide, ask.shape.tall)
         val files = ArrayList<File>()
         val held = ArrayList<Long>()
         try {
@@ -205,6 +213,7 @@ object RecitationVideo {
     private const val TO = "to"
     private const val VOICE = "reciter"
     private const val STYLE = "style"
+    private const val SHAPE = "shape"
     private const val FRAMES = "video_frames"
     private const val FRAME_RATE = 30
     private const val QUALITY = 92

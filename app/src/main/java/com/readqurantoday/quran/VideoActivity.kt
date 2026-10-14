@@ -39,7 +39,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         val from = (last?.from ?: 1).coerceIn(1, surah.ayahs)
         val to = (last?.to ?: START_AYAHS).coerceIn(from, minOf(surah.ayahs, from + MOST_AYAHS - 1))
         ask = RecitationVideo.Ask(surah.id, from, to, reciterFor(surah.id, last?.reciter ?: Recite.chosen(this)?.id),
-            last?.style ?: VideoFrames.Style.LINE, VideoLook.of(this))
+            last?.style ?: VideoFrames.Style.LINE, VideoLook.of(this), last?.shape ?: RecitationVideo.Shape.TALL)
         build()
         sayBars()
     }
@@ -87,6 +87,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             }
         ))
         layoutInflater.card(cards, R.string.video_style, listOf(styles()))
+        layoutInflater.card(cards, R.string.video_shape, listOf(shapes()))
         val reader = VideoLook.ofReader(this)
         layoutInflater.card(cards, R.string.video_colors, listOf(
             looks(reader),
@@ -153,6 +154,27 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             }
         }
         tag = PREVIEW
+    }
+
+    // Upright, square or wide, for where the video will go
+    private fun shapes(): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
+        background = null
+        val face = findViewById<TextView>(R.id.seg_1).typeface
+        findViewById<View>(R.id.seg_4).visibility = View.GONE
+        listOf(
+            R.id.seg_1 to (RecitationVideo.Shape.TALL to R.string.shape_tall),
+            R.id.seg_2 to (RecitationVideo.Shape.SQUARE to R.string.shape_square),
+            R.id.seg_3 to (RecitationVideo.Shape.WIDE to R.string.shape_wide)
+        ).forEach { (id, choice) ->
+            findViewById<TextView>(id).apply {
+                setText(choice.second)
+                markSegment(ask.shape == choice.first, face)
+                setOnClickListener {
+                    ask = ask.copy(shape = choice.first)
+                    build()
+                }
+            }
+        }
     }
 
     // Ready-made colours a tap away: the reader's own, light, dark and green

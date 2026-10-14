@@ -487,4 +487,8 @@
     <string name="video_ink">النص</string>
     <string name="video_lit">الكلمة المقروءة</string>
     <string name="video_preview">معاينة</string>
+    <string name="video_shape">شكل الفيديو</string>
+    <string name="shape_tall">طولي</string>
+    <string name="shape_square">مربع</string>
+    <string name="shape_wide">عرضي</string>
 </resources>

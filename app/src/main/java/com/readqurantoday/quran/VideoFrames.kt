@@ -39,6 +39,7 @@ class VideoFrames(private val context: Context, private val style: Style, look: 
     private val alone = HashMap<Long, Alone>()
     private val scratch by lazy { createBitmap(pageW, pageH) }
     private val tint = Paint(Paint.FILTER_BITMAP_FLAG)
+    private val plain = Paint(Paint.FILTER_BITMAP_FLAG)
     private var last = 0
 
     private fun drawnPage(page: Int): Drawn = drawn.getOrPut(page) {
@@ -89,7 +90,13 @@ class VideoFrames(private val context: Context, private val style: Style, look: 
         if (style == Style.PAGE || box == null) {
             at.view.tryOn(lit = lit, mark = ink, ink = ink, paper = paper)
             at.view.light(surah, ayah, word)
-            at.view.draw(canvas)
+            // The upright page fitted whole into the picture, whatever its shape
+            scratch.eraseColor(paper)
+            at.view.draw(Canvas(scratch))
+            val fit = minOf(out.width.toFloat() / pageW, out.height.toFloat() / pageH)
+            val left = (out.width - pageW * fit) / 2f
+            val top = (out.height - pageH * fit) / 2f
+            canvas.drawBitmap(scratch, null, RectF(left, top, left + pageW * fit, top + pageH * fit), plain)
             return
         }
         // The line: every word at the lit word's height, with the ayah marks between them
@@ -202,9 +209,9 @@ class VideoFrames(private val context: Context, private val style: Style, look: 
     private fun key(surah: Int, ayah: Int, word: Int) = (surah * 1000L + ayah) * 1000L + word
 
     companion object {
-        /** The video's own size: upright, as a phone holds it. */
-        const val WIDE = 1080
-        const val TALL = 1920
+        // The page is drawn upright at this size, whatever the video's shape
+        private const val WIDE = 1080
+        private const val TALL = 1920
         private const val GRID = 6
         private const val KEPT = 3
         // How far past its tap box a word's ink is looked for, as a share of the box's height

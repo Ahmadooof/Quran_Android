@@ -415,4 +415,8 @@
     <string name="video_ink">Text</string>
     <string name="video_lit">Recited word</string>
     <string name="video_preview">Preview</string>
+    <string name="video_shape">Shape</string>
+    <string name="shape_tall">Upright</string>
+    <string name="shape_square">Square</string>
+    <string name="shape_wide">Wide</string>
 </resources>
