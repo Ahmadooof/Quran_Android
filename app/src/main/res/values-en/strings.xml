@@ -414,4 +414,5 @@
     <string name="video_paper">Background</string>
     <string name="video_ink">Text</string>
     <string name="video_lit">Recited word</string>
+    <string name="video_preview">Preview</string>
 </resources>

@@ -156,4 +156,6 @@
     <dimen name="scroll_bubble_text">@dimen/text_body</dimen>
     <!-- Each of a download row's three buttons: save to phone, share, download -->
     <dimen name="dl_button">60dp</dimen>
+    <!-- The recitation video screen's preview of the first picture -->
+    <dimen name="video_preview_height">300dp</dimen>
 </resources>

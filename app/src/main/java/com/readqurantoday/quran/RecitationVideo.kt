@@ -50,6 +50,27 @@ object RecitationVideo {
         }
     }
 
+    /** The video's first picture as [ask] would make it, drawn off the main thread; [done] hears it on the main thread. */
+    fun preview(context: Context, ask: Ask, done: (Bitmap?) -> Unit) {
+        val worker = HandlerThread(FRAMES).apply { start() }
+        Handler(worker.looper).post {
+            val shot = runCatching {
+                Mushaf.load(context)
+                Surahs.load(context)
+                val timing = Timing.of(context, ask.surah, ask.reciter) ?: return@runCatching null
+                val lit = lits(timing, ask).first()
+                val frames = VideoFrames(context, ask.style, ask.look)
+                val page = frames.pageOf(ask.surah, lit.ayah, lit.word)
+                val out = createBitmap(VideoFrames.WIDE, VideoFrames.TALL)
+                if (page > 0) frames.draw(page, ask.surah, lit.ayah, lit.word, out)
+                frames.release()
+                out
+            }.getOrNull()
+            worker.quitSafely()
+            main.post { done(shot) }
+        }
+    }
+
     /** The last video asked for, so the screen opens on it again; null before the first. */
     fun lastAsk(context: Context): Ask? {
         val kept = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE)

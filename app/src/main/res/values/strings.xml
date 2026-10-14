@@ -486,4 +486,5 @@
     <string name="video_paper">الخلفية</string>
     <string name="video_ink">النص</string>
     <string name="video_lit">الكلمة المقروءة</string>
+    <string name="video_preview">معاينة</string>
 </resources>

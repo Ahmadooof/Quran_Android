@@ -3,7 +3,9 @@ package com.readqurantoday.quran
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.graphics.Bitmap
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.FileProvider
@@ -20,6 +22,10 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             RecitationVideo.keepAsk(this, value)
         }
     private var making = -1
+    // The preview as last drawn, and what it was drawn for; a newer ask redraws it
+    private var shown: Bitmap? = null
+    private var shownFor: RecitationVideo.Ask? = null
+    private var drawing: RecitationVideo.Ask? = null
     private var made: File? = null
     private val mayKeep = SavePermission(this)
 
@@ -88,6 +94,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             colorRow(R.string.video_ink, ask.look.ink, reader.ink, INK_PICKS) { ask.look.copy(ink = it) },
             colorRow(R.string.video_lit, ask.look.lit, reader.lit, ACCENT_PICKS) { ask.look.copy(lit = it) }
         ))
+        layoutInflater.card(cards, R.string.video_preview, listOf(preview()))
         cards.addView(makeButton())
         made?.let { video ->
             cards.addView(quietButton(R.string.video_save) { save(video) })
@@ -126,6 +133,26 @@ class VideoActivity : CardsActivity(R.string.video_title) {
                 }
             }
         }
+    }
+
+    // The first picture of the video as it stands, upright as it will be shared; drawn again as the choices change
+    private fun preview(): View = ImageView(this).apply {
+        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, resources.getDimensionPixelSize(R.dimen.video_preview_height))
+        scaleType = ImageView.ScaleType.FIT_CENTER
+        contentDescription = getString(R.string.video_preview)
+        shown?.let { setImageBitmap(it) }
+        val wanted = ask
+        if (wanted != shownFor && wanted != drawing && wanted.reciter.isNotEmpty()) {
+            drawing = wanted
+            RecitationVideo.preview(this@VideoActivity, wanted) { shot ->
+                if (isDestroyed) return@preview
+                drawing = null
+                shown = shot
+                shownFor = wanted
+                if (ask == wanted) cards.findViewWithTag<ImageView>(PREVIEW)?.setImageBitmap(shot) else build()
+            }
+        }
+        tag = PREVIEW
     }
 
     // Ready-made colours a tap away: the reader's own, light, dark and green
@@ -210,5 +237,6 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         const val MOST_AYAHS = 50
         const val WAITING = 0.6f
         const val MAKE = "make"
+        const val PREVIEW = "preview"
     }
 }
