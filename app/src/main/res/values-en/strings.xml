@@ -404,7 +404,6 @@
     <string name="video_making">Making… %1$s%%</string>
     <string name="video_failed">The video could not be made. Check the internet connection, or download the surah first.</string>
     <string name="video_share">Share</string>
-    <string name="video_save">Save to phone</string>
     <string name="video_saved">The video was saved to Movies/⁠Quran on the phone</string>
     <string name="video_colors">Colours</string>
     <string name="look_reader">As mushaf</string>
@@ -420,4 +419,5 @@
     <string name="shape_square">Square</string>
     <string name="shape_wide">Wide</string>
     <string name="shape_post">Post</string>
+    <string name="video_saving">Saving the video to the phone…</string>
 </resources>

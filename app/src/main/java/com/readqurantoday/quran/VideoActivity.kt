@@ -27,6 +27,9 @@ class VideoActivity : CardsActivity(R.string.video_title) {
     private var shownFor: RecitationVideo.Ask? = null
     private var drawing: RecitationVideo.Ask? = null
     private var made: File? = null
+    // Where the made video stands on its way to the phone's own folder
+    private enum class Kept { SAVING, SAVED, NOT }
+    private var kept = Kept.NOT
     private val mayKeep = SavePermission(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,16 +99,22 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             colorRow(R.string.video_lit, ask.look.lit, reader.lit, ACCENT_PICKS) { ask.look.copy(lit = it) }
         ))
         layoutInflater.card(cards, R.string.video_preview, listOf(preview()))
-        cards.addView(makeButton())
-        made?.let { video ->
-            cards.addView(quietButton(R.string.video_save) { save(video) })
-            cards.addView(quietButton(R.string.video_share) { share(video) })
+        // Made: where it was saved, and a way to send it; a change to any choice brings back the button to make one
+        val video = made
+        if (video == null) {
+            cards.addView(makeButton())
+            return
         }
-    }
-
-    private fun quietButton(said: Int, act: () -> Unit): View = (layoutInflater.inflate(R.layout.part_quiet_button, cards, false) as TextView).apply {
-        setText(said)
-        setOnClickListener { act() }
+        val said = when (kept) {
+            Kept.SAVING -> R.string.video_saving
+            Kept.SAVED -> R.string.video_saved
+            Kept.NOT -> R.string.dl_save_failed
+        }
+        layoutInflater.card(cards, 0, listOf((layoutInflater.inflate(R.layout.row_setting_note, cards, false) as TextView).apply { setText(said) }))
+        cards.addView((layoutInflater.inflate(R.layout.part_primary_button, cards, false) as TextView).apply {
+            setText(R.string.video_share)
+            setOnClickListener { share(video) }
+        })
     }
 
     private fun pickRow(label: Int, value: String, pick: () -> Unit): View =
@@ -236,15 +245,23 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             if (isDestroyed) return@make
             making = -1
             made = file
+            kept = Kept.NOT
             build()
-            if (file == null) notice(getString(R.string.video_failed))
+            if (file == null) notice(getString(R.string.video_failed)) else save(file)
         }
     }
 
+    // Every video is kept in the phone's own folder, where the gallery shows it and it can be deleted
     private fun save(file: File) = mayKeep.then {
+        kept = Kept.SAVING
+        build()
         Thread {
             val ok = saveVideoToPhone(this, file)
-            runOnUiThread { notice(getString(if (ok) R.string.video_saved else R.string.dl_save_failed)) }
+            runOnUiThread {
+                if (made != file || isDestroyed) return@runOnUiThread
+                kept = if (ok) Kept.SAVED else Kept.NOT
+                build()
+            }
         }.start()
     }
 

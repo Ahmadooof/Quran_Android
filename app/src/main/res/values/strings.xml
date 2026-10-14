@@ -476,7 +476,6 @@
     <string name="video_making">جارٍ الإنشاء… %1$s٪</string>
     <string name="video_failed">تعذّر إنشاء الفيديو. تحقق من الاتصال بالإنترنت، أو نزّل السورة أولًا.</string>
     <string name="video_share">مشاركة</string>
-    <string name="video_save">حفظ في الهاتف</string>
     <string name="video_saved">حُفظ الفيديو في الهاتف في مجلد ⁦Movies/⁠Quran⁩</string>
     <string name="video_colors">الألوان</string>
     <string name="look_reader">كالمصحف</string>
@@ -494,4 +493,5 @@
     <string name="shape_post">منشور</string>
     <string name="shape_said" translatable="false">%1$s %2$s</string>
     <string name="shape_ratio" translatable="false">%1$s:%2$s</string>
+    <string name="video_saving">جارٍ حفظ الفيديو في الهاتف…</string>
 </resources>
