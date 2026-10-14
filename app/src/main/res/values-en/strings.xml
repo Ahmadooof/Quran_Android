@@ -392,7 +392,7 @@
     <string name="remove_short">Remove</string>
     <string name="hifz_known_surahs">Memorised surahs</string>
     <string name="volume_off">The volume is all the way down; turn it up to listen</string>
-    <string name="video_title">Recitation video</string>
+    <string name="video_title">Make a recitation video</string>
     <string name="video_surah">Surah</string>
     <string name="video_from">From ayah</string>
     <string name="video_to">To ayah</string>

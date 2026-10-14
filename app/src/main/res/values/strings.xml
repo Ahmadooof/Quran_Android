@@ -464,7 +464,7 @@
     <string name="hifz_known_surahs">السور المحفوظة</string>
     <string name="chart_goal_day" translatable="false">%1$s %2$s</string>
     <string name="volume_off">الصوت منخفض تمامًا، ارفع مستوى الصوت للاستماع</string>
-    <string name="video_title">فيديو التلاوة</string>
+    <string name="video_title">إنشاء فيديو للتلاوة</string>
     <string name="video_surah">السورة</string>
     <string name="video_from">من الآية</string>
     <string name="video_to">إلى الآية</string>
