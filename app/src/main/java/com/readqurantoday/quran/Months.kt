@@ -29,3 +29,9 @@ fun dateSaid(ctx: Context, day: Long): String {
     return localDigits(DateUtils.formatDateTime(ctx, Stats.noonOf(day), flags), ctx.resources)
 }
 
+/** [day] with its weekday: "Tue, 14 Oct" / «الثلاثاء، ١٤ أكتوبر». */
+fun weekdayDateSaid(ctx: Context, day: Long): String {
+    val flags = DateUtils.FORMAT_SHOW_WEEKDAY or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR
+    return localDigits(DateUtils.formatDateTime(ctx, Stats.noonOf(day), flags), ctx.resources)
+}
+

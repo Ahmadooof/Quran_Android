@@ -7,10 +7,10 @@
     android:layoutDirection="locale"
     android:background="@drawable/tip_ground"
     android:elevation="@dimen/elevation_chrome"
-    android:paddingStart="14dp"
-    android:paddingEnd="14dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <TextView
         android:id="@+id/tip_title"
@@ -24,7 +24,7 @@
         android:id="@+id/tip_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:scrollbars="vertical">
 
         <LinearLayout

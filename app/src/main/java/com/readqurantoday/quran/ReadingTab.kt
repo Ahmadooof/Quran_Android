@@ -88,7 +88,7 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
             onHold = { i ->
                 val on = Stats.today() - (week.size - 1 - i)
                 picked = i
-                tip.show(centreOf(i), if (on == Stats.today()) host.getString(R.string.chart_today) else dateSaid(host, on), dayLines(week[i], on, goals[i]))
+                tip.show(centreOf(i), if (on == Stats.today()) host.getString(R.string.chart_today) else weekdayDateSaid(host, on), dayLines(week[i], on, goals[i]))
             }
             onLetGo = {
                 picked = -1

@@ -2,6 +2,6 @@
 <!-- The floating day card: the page's colours turned over, its corners as the cards' -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <corners android:radius="14dp" />
+    <corners android:radius="12dp" />
     <solid android:color="@color/tip_ground" />
 </shape>

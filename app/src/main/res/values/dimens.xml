@@ -162,8 +162,8 @@
     <!-- The surah picker's list: tall enough for several rows, short enough to keep the search in reach -->
     <dimen name="picker_list_height">420dp</dimen>
     <!-- The week chart's floating day card: its width, and the height past which it scrolls -->
-    <dimen name="day_tip_wide">240dp</dimen>
-    <dimen name="day_tip_tall">260dp</dimen>
+    <dimen name="day_tip_wide">196dp</dimen>
+    <dimen name="day_tip_tall">220dp</dimen>
     <!-- Between the held bar and its card beside it -->
-    <dimen name="day_tip_gap">20dp</dimen>
+    <dimen name="day_tip_gap">16dp</dimen>
 </resources>
