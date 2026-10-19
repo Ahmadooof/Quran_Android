@@ -102,6 +102,11 @@ object RecitationVideo {
             kept.getInt(WIDE, Shape.TALL.wide), kept.getInt(TALL, Shape.TALL.tall), kept.getInt(WORDS, 1))
     }
 
+    /** The shape last used with [style]; at first the best for it: the one-line strip for lines, upright for the rest. */
+    fun shapeFor(context: Context, style: VideoFrames.Style): Shape =
+        Shape.entries.getOrNull(context.getSharedPreferences(ASKED, Context.MODE_PRIVATE).getInt(SHAPE + style.ordinal, -1))
+            ?: if (style == VideoFrames.Style.LINE) Shape.STRIP else Shape.TALL
+
     fun keepAsk(context: Context, ask: Ask) = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE).edit {
         putInt(SURAH, ask.surah)
         putInt(FROM, ask.from)
@@ -109,6 +114,7 @@ object RecitationVideo {
         putString(VOICE, ask.reciter)
         putInt(STYLE, ask.style.ordinal)
         putInt(SHAPE, ask.shape.ordinal)
+        putInt(SHAPE + ask.style.ordinal, ask.shape.ordinal)
         putBoolean(PHONETICS, ask.phonetics)
         putInt(WIDE, ask.customWide)
         putInt(TALL, ask.customTall)

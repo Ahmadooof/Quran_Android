@@ -153,13 +153,8 @@ class VideoActivity : CardsActivity(R.string.video_title) {
                 setText(choice.second)
                 markSegment(ask.style == choice.first, face)
                 setOnClickListener {
-                    // Line by line opens on the one-line strip; another style, which a strip cannot hold, on upright
-                    val shape = when {
-                        choice.first == ask.style -> ask.shape
-                        choice.first == VideoFrames.Style.LINE -> RecitationVideo.Shape.STRIP
-                        ask.shape in shapesFor(choice.first) -> ask.shape
-                        else -> RecitationVideo.Shape.TALL
-                    }
+                    // Each style opens on its own shape: the one last used with it, or the best for it
+                    val shape = if (choice.first == ask.style) ask.shape else RecitationVideo.shapeFor(this@VideoActivity, choice.first)
                     ask = ask.copy(style = choice.first, shape = shape)
                     build()
                 }
