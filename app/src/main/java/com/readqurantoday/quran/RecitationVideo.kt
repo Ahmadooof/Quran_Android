@@ -37,14 +37,9 @@ object RecitationVideo {
         // How many words are shown together in the words style
         val words: Int = 1,
         // The recited word in its own colour, or every word alike
-        val highlight: Boolean = true,
-        // A pure green ground an editor can key out, leaving only the words
-        val greenScreen: Boolean = false
+        val highlight: Boolean = true
     ) {
-        val drawnLook get() = look.copy(
-            paper = if (greenScreen) CHROMA_GREEN else look.paper,
-            lit = if (highlight) look.lit else look.ink
-        )
+        val drawnLook get() = if (highlight) look else look.copy(lit = look.ink)
         val wide get() = if (shape == Shape.CUSTOM) customWide else shape.wide
         val tall get() = if (shape == Shape.CUSTOM) customTall else shape.tall
     }
@@ -107,7 +102,7 @@ object RecitationVideo {
         val shape = Shape.entries.getOrNull(kept.getInt(SHAPE, -1)) ?: Shape.TALL
         return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style,
             VideoLook.of(context), shape, kept.getBoolean(PHONETICS, false),
-            kept.getInt(WIDE, Shape.TALL.wide), kept.getInt(TALL, Shape.TALL.tall), kept.getInt(WORDS, 1), kept.getBoolean(HIGHLIGHT, true), kept.getBoolean(GREEN_SCREEN, false))
+            kept.getInt(WIDE, Shape.TALL.wide), kept.getInt(TALL, Shape.TALL.tall), kept.getInt(WORDS, 1), kept.getBoolean(HIGHLIGHT, true))
     }
 
     /** The shape last used with [style]; at first the best for it: the one-line strip for lines, upright for the rest. */
@@ -128,7 +123,6 @@ object RecitationVideo {
         putInt(TALL, ask.customTall)
         putInt(WORDS, ask.words)
         putBoolean(HIGHLIGHT, ask.highlight)
-        putBoolean(GREEN_SCREEN, ask.greenScreen)
     }
 
     fun stop() {
@@ -263,8 +257,6 @@ object RecitationVideo {
     private const val TALL = "custom-tall"
     private const val WORDS = "words"
     private const val HIGHLIGHT = "highlight"
-    private const val GREEN_SCREEN = "green-screen"
-    private const val CHROMA_GREEN = 0xFF00FF00.toInt()
     private const val FRAMES = "video_frames"
     private const val FRAME_RATE = 30
     private const val QUALITY = 92

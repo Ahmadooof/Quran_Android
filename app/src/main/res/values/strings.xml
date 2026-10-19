@@ -493,7 +493,6 @@
     <string name="shape_ratio" translatable="false">%1$s:%2$s</string>
     <string name="video_saving">جارٍ حفظ الفيديو في الهاتف…</string>
     <string name="shape_strip">سطر واحد</string>
-    <string name="video_green_screen">خلفية خضراء تُزال في برامج المونتاج</string>
     <string name="video_highlight">تلوين الكلمة المقروءة</string>
     <string name="video_phonetics">إظهار النطق فوق الكلمة</string>
     <string name="goal_surahs_today">قراءة سور الهدف اليوم</string>
