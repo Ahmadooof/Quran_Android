@@ -111,9 +111,15 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             ask = ask.copy(highlight = it)
             build()
         }
+        val greenScreen = layoutInflater.switchRow(cards, getString(R.string.video_green_screen), ask.greenScreen) {
+            ask = ask.copy(greenScreen = it)
+            build()
+        }
+        // On a green screen the ground is the editor's to fill, so no ground is offered here
         layoutInflater.card(cards, R.string.video_colors, listOfNotNull(
-            looks(reader),
-            colorRow(R.string.video_paper, ask.look.paper, reader.paper, PAPER_PICKS) { ask.look.copy(paper = it) },
+            greenScreen,
+            if (ask.greenScreen) null else looks(reader),
+            if (ask.greenScreen) null else colorRow(R.string.video_paper, ask.look.paper, reader.paper, PAPER_PICKS) { ask.look.copy(paper = it) },
             colorRow(R.string.video_ink, ask.look.ink, reader.ink, INK_PICKS) { ask.look.copy(ink = it) },
             highlight,
             if (ask.highlight) colorRow(R.string.video_lit, ask.look.lit, reader.lit, ACCENT_PICKS) { ask.look.copy(lit = it) } else null
