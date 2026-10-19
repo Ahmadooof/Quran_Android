@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A step button: outlined like any choice, with a ripple so each tap shows -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/accent_soft">
+    <item android:drawable="@drawable/choice_off" />
+</ripple>
