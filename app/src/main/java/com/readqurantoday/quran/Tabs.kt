@@ -89,9 +89,7 @@ class ViewPages(private val views: List<View>) : RecyclerView.Adapter<ViewPages.
     // One view type a page, so each made view is handed out once and only once
     override fun getItemViewType(position: Int) = position
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Page(views[viewType].apply {
-        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-    })
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Page(DirectionFirst(parent.context, views[viewType]))
 
     override fun onBindViewHolder(holder: Page, position: Int) = Unit
 }

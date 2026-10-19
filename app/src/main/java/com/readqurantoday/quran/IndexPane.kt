@@ -78,7 +78,7 @@ class IndexPane(
 
     private inner class Lists : RecyclerView.Adapter<Lists.Page>() {
 
-        inner class Page(val list: RecyclerView) : RecyclerView.ViewHolder(list)
+        inner class Page(val list: RecyclerView) : RecyclerView.ViewHolder(DirectionFirst(list.context, list))
 
         override fun getItemCount() = lists.size
 
