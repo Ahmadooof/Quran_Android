@@ -5,13 +5,14 @@ import android.os.SystemClock
 
 private fun nowSec() = SystemClock.elapsedRealtime() / 1000L
 
-/** Times the page in view while the reader is in front; each stay is credited when it ends. */
+/** Times the page in view while the reader is in front and no recitation sounds; each stay is credited when it ends. */
 class PageClock(context: Context) {
 
     private val app = context.applicationContext
     private var page = 0
     private var since = 0L
     private var running = false
+    private var listening = false
 
     fun show(page: Int) {
         credit()
@@ -28,10 +29,17 @@ class PageClock(context: Context) {
         running = false
     }
 
+    /** While a recitation sounds the page is heard, not read: that time counts as listening only. */
+    fun listening(on: Boolean) {
+        if (on == listening) return
+        credit()
+        listening = on
+    }
+
     private fun credit() {
         val now = nowSec()
         val sec = (now - since).coerceAtMost(Stats.STAY_CAP_SEC.toLong()).toInt()
-        if (running && page > 0) Stats.addRead(app, page, sec)
+        if (running && !listening && page > 0) Stats.addRead(app, page, sec)
         since = now
     }
 }

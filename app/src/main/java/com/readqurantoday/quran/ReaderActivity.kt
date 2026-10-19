@@ -69,6 +69,7 @@ class ReaderActivity : LanguageActivity() {
     // Kept as one instance so the reader can tell whether Recite's single listener slot still holds it
     private val heard: () -> Unit = {
         if (Recite.wantsToPlay()) rc.follow()
+        clock.listening(Recite.isPlaying())
         controls.say()
     }
 
@@ -685,6 +686,7 @@ class ReaderActivity : LanguageActivity() {
         rc.syncWithRecite()
 
         Recite.onChange = heard
+        clock.listening(Recite.isPlaying())
         // The page opens clear even mid-recitation; the lit word shows where it is, a tap brings the player
         if (Recite.playing != 0) {
             rc.follow()
