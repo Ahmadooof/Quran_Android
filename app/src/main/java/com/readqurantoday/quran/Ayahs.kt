@@ -13,7 +13,7 @@ object Ayahs {
     /** The shortest query searched at all. One letter is in nearly every ayah. */
     const val FLOOR = 2
 
-    // Shorter queries must be whole words, or they match inside too many longer words
+    // Shorter queries match only where a word begins, or they match inside too many longer words
     private const val LOOSE_FROM = 3
 
     class Ayah(
@@ -67,13 +67,13 @@ object Ayahs {
     // Matches that open a word come before ones buried inside a word
     fun find(folded: String): List<Found> {
         if (folded.length < FLOOR || all.isEmpty()) return emptyList()
-        val whole = folded.length < LOOSE_FROM
+        val starts = folded.length < LOOSE_FROM
 
         val opens = ArrayList<Found>(LIMIT)
         val buried = ArrayList<Found>(LIMIT)
 
         for (a in all) {
-            val at = firstMatch(a.folded, folded, whole)
+            val at = firstMatch(a.folded, folded, starts)
             if (at < 0) continue
             if (opensWord(a.folded, at)) opens.add(Found(a, at)) else buried.add(Found(a, at))
             if (opens.size >= LIMIT) break
@@ -83,23 +83,19 @@ object Ayahs {
         return opens + buried.take(LIMIT - opens.size)
     }
 
-    // Prefers a whole-word or word-opening match so the row marks the word that was meant
-    private fun firstMatch(text: String, q: String, whole: Boolean): Int {
+    // Prefers a word-opening match so the row marks the word that was meant; [starts] takes no other
+    private fun firstMatch(text: String, q: String, starts: Boolean): Int {
         var from = 0
         var buried = -1
         while (true) {
             val at = text.indexOf(q, from)
-            if (at < 0) return if (whole) -1 else buried
-            if (opensWord(text, at)) {
-                if (!whole || closesWord(text, at + q.length)) return at
-            } else if (!whole && buried < 0) {
-                buried = at
-            }
+            if (at < 0) return if (starts) -1 else buried
+            if (opensWord(text, at)) return at
+            if (!starts && buried < 0) buried = at
             from = at + 1
         }
     }
 
     private fun opensWord(text: String, at: Int) = at == 0 || text[at - 1] == ' '
 
-    private fun closesWord(text: String, end: Int) = end == text.length || text[end] == ' '
 }
