@@ -21,6 +21,14 @@ class DayBars(context: Context) : View(context) {
     /** Hears a tapped day, by its place in the week, oldest first. */
     var onDay: ((Int) -> Unit)? = null
 
+    /** Where the bar of day [i] stands along the chart, for a card floated over it. */
+    fun centreOf(i: Int): Float {
+        val left = paddingLeft.toFloat()
+        val slot = (width - paddingRight - left) / pages.size.coerceAtLeast(1)
+        val at = if (layoutDirection == LAYOUT_DIRECTION_RTL) pages.size - 1 - i else i
+        return left + (at + 0.5f) * slot
+    }
+
     /** The day whose details are open, marked by a dot under its name; -1 for none. */
     var picked = -1
         set(value) {
