@@ -1,7 +1,9 @@
 package com.readqurantoday.quran
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.readqurantoday.quran.StatCards.Companion.WEEK
@@ -18,6 +20,11 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
 
     fun fill(into: LinearLayout, today: Stats.Day, goal: Int, week: List<Stats.Day>) {
         blow.card(into, 0, goalRows(today, goal, into))
+        // The goal's own surahs today, each with how much of it is read
+        val surahs = Stats.goalPlan(host).surahsOn(weekdayOf(Stats.today()))
+        if (surahs.isNotEmpty()) blow.card(into, R.string.goal_surahs_today, surahs.mapNotNull { id ->
+            Surahs.list().firstOrNull { it.id == id }?.let { surahRow(it, today, into) }
+        })
         blow.card(into, R.string.stats_today, todayRows(today))
         val thisMonth = Stats.monthDays(host)
         val monthPages = thisMonth.withIndex().sumOf { (i, d) -> d.counted(goalOn(Stats.today() - (thisMonth.size - 1 - i), goal)) }
@@ -76,6 +83,7 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         val chart = DayBars(host).apply {
             setPadding(pad, pad, pad, pad)
             show(counts, goals, ::dayName, grow = cards.growing)
+            onDay = { i -> showDay(week[i], Stats.today() - (week.size - 1 - i), goals[i]) }
             contentDescription = host.getString(R.string.stats_chart_desc, figures(week.size, res), pagesSaid(counts.max(), res))
         }
         // The chart and the key to its colours are one row, with no seam between them
@@ -99,6 +107,45 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
             .map { host.getString(R.string.chart_goal_day, dayName(last - it), figures(goals[it], res)) }
         return (listOf(said) + others).joinToString(host.getString(R.string.list_join))
     }
+
+    // A goal surah: a tick once every page of it is read today, else how far, with its bar
+    private fun surahRow(surah: Surahs.Surah, today: Stats.Day, into: LinearLayout): View =
+        blow.inflate(R.layout.row_place, into, false).apply {
+            isClickable = false
+            val all = surah.to - surah.from + 1
+            val read = today.readOf(surah)
+            findViewById<ImageView>(R.id.place_icon).apply {
+                setImageResource(if (read == all) R.drawable.ic_check else R.drawable.ic_surahs)
+                imageTintList = ColorStateList.valueOf(host.getColor(R.color.accent))
+            }
+            fillSurahTitle(findViewById(R.id.place_title), surah.id, R.dimen.surah_title_row)
+            findViewById<TextView>(R.id.place_detail).text = surahSaid(read, all)
+            findViewById<View>(R.id.place_track).fillTrack(read.toFloat(), all.toFloat())
+        }
+
+    private fun surahSaid(read: Int, all: Int): String =
+        if (read == all) host.getString(R.string.surah_done) else host.getString(R.string.of_count, figures(read, res), pagesSaid(all, res))
+
+    // A day of the chart, tapped: its pages, its goal, its goal surahs, and every other surah it read whole
+    private fun showDay(day: Stats.Day, on: Long, goal: Int) {
+        val rows = mutableListOf(Choice(host.getString(R.string.chart_read), pagesSaid(day.pages.size, res)))
+        if (goal > 0) rows += Choice(host.getString(R.string.chart_goal_of, pagesSaid(goal, res)),
+            if (day.counted(goal) >= goal) host.getString(R.string.goal_met) else "", on = day.counted(goal) >= goal)
+        val goalSurahs = Stats.goalPlan(host).surahsOn(weekdayOf(on))
+        for (id in goalSurahs) {
+            val s = Surahs.list().firstOrNull { it.id == id } ?: continue
+            val all = s.to - s.from + 1
+            val read = day.readOf(s)
+            rows += Choice(host.getString(R.string.surah_named, s.name), surahSaid(read, all), on = read == all)
+        }
+        for (s in day.wholeSurahs()) if (s.id !in goalSurahs) {
+            rows += Choice(host.getString(R.string.surah_named, s.name), host.getString(R.string.surah_done), on = true)
+        }
+        val title = if (on == Stats.today()) host.getString(R.string.chart_today) else dateSaid(host, on)
+        host.sheet(title, rows) {}
+    }
+
+    private fun weekdayOf(day: Long): Int = Calendar.getInstance().apply { timeInMillis = Stats.noonOf(day) }.get(Calendar.DAY_OF_WEEK)
 
     // A day's goal by its weekday; a khatma's pages a day are only known for today
     private fun goalOn(day: Long, todayGoal: Int): Int {

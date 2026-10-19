@@ -12,7 +12,7 @@ import kotlin.random.Random
  *
  *     adb shell am broadcast -n com.readqurantoday.quran.dev/com.readqurantoday.quran.SampleStats --es as steady
  *
- * as = new | steady | heavy, then restore to put the real numbers back exactly.
+ * as = new | steady | heavy | surahs, then restore to put the real numbers back exactly.
  */
 class SampleStats : BroadcastReceiver() {
 
@@ -30,6 +30,7 @@ class SampleStats : BroadcastReceiver() {
             "new" -> keepThen(stats, saved) { }
             "steady" -> keepThen(stats, saved) { steady(context) }
             "heavy" -> keepThen(stats, saved) { heavy(context) }
+            "surahs" -> keepThen(stats, saved) { surahs(context) }
         }
     }
 
@@ -73,6 +74,32 @@ class SampleStats : BroadcastReceiver() {
         Stats.writeDay(ctx, today, Stats.Day((1..220).associateWith { rnd.nextInt(20, 91) }, mapOf(2 to 3700, 36 to 900)))
         Stats.setGoalPlan(ctx, Goal(Goal.Kind.JUZ, 2, emptyList(), Goal.ALL_DAYS, kahf = true))
         Stats.writeKhatma(ctx, (1..554).toSet(), today - 3, done = 3)
+    }
+
+    // The default goal, Al-Baqarah and Al-Imran with Al-Kahf on Friday, met, missed and passed by in every way a week holds
+    private fun surahs(ctx: Context) {
+        val today = Stats.today()
+        Stats.writeSince(ctx, today - 6)
+        Stats.setGoalPlan(ctx, Goal.DEFAULT)
+        fun read(vararg runs: IntRange) = runs.flatMap { it.toList() }.associateWith { 40 }
+        val baqarah = 2..49
+        val imran = 50..76
+        val kahf = 293..304
+        val days = mapOf(
+            0L to Stats.Day(read(baqarah, 50..62), emptyMap()),
+            1L to Stats.Day(read(baqarah, imran), emptyMap()),
+            2L to Stats.Day(read(400..415), emptyMap()),
+            4L to Stats.Day(read(2..20), emptyMap(), doneByHand = true, handFrom = 19),
+            5L to Stats.Day(read(baqarah, 582..604), emptyMap()),
+            6L to Stats.Day(read(imran), emptyMap())
+        )
+        for (ago in 0L..6L) {
+            val day = today - ago
+            val friday = java.util.Calendar.getInstance().apply { timeInMillis = Stats.noonOf(day) }
+                .get(java.util.Calendar.DAY_OF_WEEK) == java.util.Calendar.FRIDAY
+            val record = if (friday && ago > 0) Stats.Day(read(baqarah, imran, kahf), emptyMap()) else days[ago] ?: continue
+            Stats.writeDay(ctx, day, record)
+        }
     }
 
     // Written at once, not in the background: the real numbers must be safe before the sample replaces them

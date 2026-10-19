@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.content.res.AppCompatResources
@@ -16,6 +17,9 @@ class DayBars(context: Context) : View(context) {
     private var pages: List<Int> = emptyList()
     private var goals: List<Int> = emptyList()
     private var dayName: (Int) -> String = { "" }
+
+    /** Hears a tapped day, by its place in the week, oldest first. */
+    var onDay: ((Int) -> Unit)? = null
 
     // 0 to 1 across the whole rise; each bar takes its own slice of it, oldest first
     private var grown = 1f
@@ -79,6 +83,25 @@ class DayBars(context: Context) : View(context) {
         val tall = resources.getDimensionPixelSize(R.dimen.chart_height) + paddingTop + paddingBottom + (over() + under()).toInt()
         setMeasuredDimension(getDefaultSize(suggestedMinimumWidth, widthSpec), resolveSize(tall, heightSpec))
     }
+
+    // A tap names the day under it; a drag is left to the scroll around the chart
+    override fun onTouchEvent(e: MotionEvent): Boolean {
+        val heard = onDay ?: return super.onTouchEvent(e)
+        if (pages.isEmpty()) return false
+        when (e.actionMasked) {
+            MotionEvent.ACTION_DOWN -> return true
+            MotionEvent.ACTION_UP -> {
+                val left = paddingLeft.toFloat()
+                val slot = (width - paddingRight - left) / pages.size
+                val at = ((e.x - left) / slot).toInt().coerceIn(0, pages.size - 1)
+                heard(if (layoutDirection == LAYOUT_DIRECTION_RTL) pages.size - 1 - at else at)
+                performClick()
+            }
+        }
+        return true
+    }
+
+    override fun performClick(): Boolean = super.performClick()
 
     override fun onDraw(canvas: Canvas) {
         if (pages.isEmpty()) return

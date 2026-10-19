@@ -18,6 +18,12 @@ data class Goal(val kind: Kind, val amount: Int, val surahs: List<Int>, val days
 
     fun pagesToday(): Int = pagesOn(Calendar.getInstance().get(Calendar.DAY_OF_WEEK))
 
+    /** The surahs to read whole on [weekday]: the goal's own on its days, and Al-Kahf on Friday. */
+    fun surahsOn(weekday: Int): List<Int> {
+        val own = if (kind == Kind.SURAHS && days and bit(weekday) != 0) surahs else emptyList()
+        return own + if (kahf && weekday == Calendar.FRIDAY && KAHF !in own) listOf(KAHF) else emptyList()
+    }
+
     fun everyDay() = days == ALL_DAYS
 
     fun basePages(): Int = when (kind) {

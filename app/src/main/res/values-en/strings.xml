@@ -422,4 +422,7 @@
     <string name="video_saving">Saving the video to the phone…</string>
     <string name="shape_strip">One line</string>
     <string name="video_phonetics">Show pronunciation over the word</string>
+    <string name="goal_surahs_today">Goal surahs today</string>
+    <string name="surah_done">Completed</string>
+    <string name="goal_met">Done</string>
 </resources>
