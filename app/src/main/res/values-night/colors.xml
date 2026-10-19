@@ -25,4 +25,8 @@
     <color name="ink_lit">#FFD479</color>
     <!-- Quieter than the lit word, so the markers never read as the recited one -->
     <color name="ayah_mark">#579FD1</color>
+    <!-- The week chart's floating day card: the page's colours turned over, so it stands apart from the cards -->
+    <color name="tip_ground">#DDE2E7</color>
+    <color name="tip_ink">#16283A</color>
+    <color name="tip_mute">#55687A</color>
 </resources>

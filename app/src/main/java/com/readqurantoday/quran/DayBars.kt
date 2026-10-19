@@ -18,8 +18,16 @@ class DayBars(context: Context) : View(context) {
     private var goals: List<Int> = emptyList()
     private var dayName: (Int) -> String = { "" }
 
-    /** Hears a tapped day, by its place in the week, oldest first. */
-    var onDay: ((Int) -> Unit)? = null
+    /** Hears the day held, by its place in the week, oldest first, as a finger lands and slides along the bars. */
+    var onHold: ((Int) -> Unit)? = null
+
+    /** Hears the finger lift, or the touch go to the scroll around the chart. */
+    var onLetGo: (() -> Unit)? = null
+
+    private val slop = android.view.ViewConfiguration.get(context).scaledTouchSlop
+    private var downX = 0f
+    private var downY = 0f
+    private var held = -1
 
     /** Where the bar of day [i] stands along the chart, for a card floated over it. */
     fun centreOf(i: Int): Float {
@@ -102,20 +110,47 @@ class DayBars(context: Context) : View(context) {
     }
 
     // A tap names the day under it; a drag is left to the scroll around the chart
+    // A finger held on the chart names the day under it, and the next as it slides; lifted, it lets go
     override fun onTouchEvent(e: MotionEvent): Boolean {
-        val heard = onDay ?: return super.onTouchEvent(e)
+        val hold = onHold ?: return super.onTouchEvent(e)
         if (pages.isEmpty()) return false
         when (e.actionMasked) {
-            MotionEvent.ACTION_DOWN -> return true
-            MotionEvent.ACTION_UP -> {
-                val left = paddingLeft.toFloat()
-                val slot = (width - paddingRight - left) / pages.size
-                val at = ((e.x - left) / slot).toInt().coerceIn(0, pages.size - 1)
-                heard(if (layoutDirection == LAYOUT_DIRECTION_RTL) pages.size - 1 - at else at)
-                performClick()
+            MotionEvent.ACTION_DOWN -> {
+                downX = e.x
+                downY = e.y
+                held = dayAt(e.x)
+                hold(held)
             }
+            MotionEvent.ACTION_MOVE -> {
+                // Sliding along the bars keeps the touch here, rather than turning the tab
+                if (kotlin.math.abs(e.x - downX) > slop && kotlin.math.abs(e.x - downX) > kotlin.math.abs(e.y - downY)) {
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                val now = dayAt(e.x)
+                if (now != held) {
+                    held = now
+                    hold(now)
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                performClick()
+                letGo()
+            }
+            MotionEvent.ACTION_CANCEL -> letGo()
         }
         return true
+    }
+
+    private fun letGo() {
+        held = -1
+        onLetGo?.invoke()
+    }
+
+    private fun dayAt(x: Float): Int {
+        val left = paddingLeft.toFloat()
+        val slot = (width - paddingRight - left) / pages.size
+        val at = ((x - left) / slot).toInt().coerceIn(0, pages.size - 1)
+        return if (layoutDirection == LAYOUT_DIRECTION_RTL) pages.size - 1 - at else at
     }
 
     override fun performClick(): Boolean = super.performClick()

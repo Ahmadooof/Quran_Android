@@ -83,7 +83,17 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         val chart = DayBars(host).apply {
             setPadding(pad, pad, pad, pad)
             show(counts, goals, ::dayName, grow = cards.growing)
-            onDay = { i -> showDay(this, i, week[i], Stats.today() - (week.size - 1 - i), goals[i]) }
+            // A day held shows its card beside the finger, and the card goes when the finger lifts
+            val tip = DayTip(this)
+            onHold = { i ->
+                val on = Stats.today() - (week.size - 1 - i)
+                picked = i
+                tip.show(centreOf(i), if (on == Stats.today()) host.getString(R.string.chart_today) else dateSaid(host, on), dayLines(week[i], on, goals[i]))
+            }
+            onLetGo = {
+                picked = -1
+                tip.hide()
+            }
             contentDescription = host.getString(R.string.stats_chart_desc, figures(week.size, res), pagesSaid(counts.max(), res))
         }
         // The chart and the key to its colours are one row, with no seam between them
@@ -126,35 +136,22 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
     private fun surahSaid(read: Int, all: Int): String =
         if (read == all) host.getString(R.string.surah_done) else host.getString(R.string.of_count, figures(read, res), pagesSaid(all, res))
 
-    // The day whose card last closed, and when: the tap that closed it must not open it again
-    private var closedDay = -1
-    private var closedAt = 0L
-
-    // A day of the chart, tapped: a card over its bar with its pages, its goal, its goal surahs, and every other surah
-    // it read whole; a second tap on the same bar closes it
-    private fun showDay(chart: DayBars, i: Int, day: Stats.Day, on: Long, goal: Int) {
-        if (i == closedDay && android.os.SystemClock.uptimeMillis() - closedAt < SAME_TAP_MS) return
+    // A day of the chart: its pages, its goal, its goal surahs, and every other surah it read whole
+    private fun dayLines(day: Stats.Day, on: Long, goal: Int): List<Pair<String, String>> {
         val lines = mutableListOf(host.getString(R.string.chart_read) to pagesSaid(day.pages.size, res))
         if (goal > 0) lines += host.getString(R.string.chart_goal_of, pagesSaid(goal, res)) to
             if (day.counted(goal) >= goal) host.getString(R.string.goal_met)
             else host.getString(R.string.of_count, figures(day.counted(goal), res), figures(goal, res))
         val goalSurahs = Stats.goalPlan(host).surahsOn(weekdayOf(on))
         for (s in goalSurahs.mapNotNull { id -> Surahs.list().firstOrNull { it.id == id } }) {
-            val all = s.to - s.from + 1
-            lines += host.getString(R.string.surah_named, s.name) to surahSaid(day.readOf(s), all)
+            lines += host.getString(R.string.surah_named, s.name) to surahSaid(day.readOf(s), s.to - s.from + 1)
         }
         val others = day.wholeSurahs().filter { it.id !in goalSurahs }
         if (others.isNotEmpty()) {
             lines += host.getString(R.string.day_other_whole) to figures(others.size, res)
             lines += others.joinToString(host.getString(R.string.list_join)) { it.name } to ""
         }
-        val title = if (on == Stats.today()) host.getString(R.string.chart_today) else dateSaid(host, on)
-        chart.picked = i
-        showDayTip(chart, chart.centreOf(i), title, lines) {
-            if (chart.picked == i) chart.picked = -1
-            closedDay = i
-            closedAt = android.os.SystemClock.uptimeMillis()
-        }
+        return lines
     }
 
     private fun weekdayOf(day: Long): Int = Calendar.getInstance().apply { timeInMillis = Stats.noonOf(day) }.get(Calendar.DAY_OF_WEEK)
@@ -178,8 +175,6 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
     }
 
     private companion object {
-        // A tap this soon after a day's card closed was the tap that closed it
-        const val SAME_TAP_MS = 400L
         const val KEY = "today"
         const val SWITCH_SETTLE_MS = 250L
     }

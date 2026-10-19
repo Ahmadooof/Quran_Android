@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A day of the week chart, floating over its bar: the day, then its lines; it scrolls when a day holds many -->
+<!-- A day of the week chart, beside the bar held: the day, then its lines; it scrolls when a day holds many -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/day_tip_wide"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layoutDirection="locale"
-    android:background="@drawable/card_group"
+    android:background="@drawable/tip_ground"
     android:elevation="@dimen/elevation_chrome"
     android:paddingStart="14dp"
     android:paddingEnd="14dp"
@@ -16,7 +16,7 @@
         android:id="@+id/tip_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/text"
+        android:textColor="@color/tip_ink"
         android:textSize="@dimen/text_body"
         android:textStyle="bold" />
 

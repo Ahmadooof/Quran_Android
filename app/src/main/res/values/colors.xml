@@ -29,4 +29,8 @@
     <color name="ink_lit">#A4161A</color>
     <!-- The ayah markers on the page, until the reader picks a colour: the accent. -->
     <color name="ayah_mark">@color/accent</color>
+    <!-- The week chart's floating day card: the page's colours turned over, so it stands apart from the cards -->
+    <color name="tip_ground">#16283A</color>
+    <color name="tip_ink">#FFFFFF</color>
+    <color name="tip_mute">#AEBBC7</color>
 </resources>
