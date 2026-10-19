@@ -21,7 +21,7 @@ fun fillSurahTitle(title: View, surah: Int, @DimenRes size: Int) {
     word.text = String(Character.toChars(Mushaf.SURAH_WORD))
     name.text = String(Character.toChars(Mushaf.nameCode(surah)))
     word.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-    Surahs.list().firstOrNull { it.id == surah }?.let {
+    Surahs.of(surah)?.let {
         name.contentDescription = title.resources.getString(R.string.surah_named, it.name)
     }
 }

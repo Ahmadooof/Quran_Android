@@ -86,7 +86,7 @@ class RecitationController(
         loop?.let { return it }
         val surah = readingSurah
         val page = Ayat.pageOf(surah, litAyah)
-        val count = Surahs.list().firstOrNull { it.id == surah }?.ayahs ?: litAyah
+        val count = Surahs.of(surah)?.ayahs ?: litAyah
         var first = litAyah
         var last = litAyah
         if (page > 0) {

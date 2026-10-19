@@ -1,7 +1,6 @@
 package com.readqurantoday.quran
 
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.core.graphics.drawable.toDrawable
 
 /** A small card beside a held point of [anchor]: shown while a finger is down there, moved and refilled as it slides. */
 class DayTip(private val anchor: View) {
@@ -27,7 +27,7 @@ class DayTip(private val anchor: View) {
     // Never touched itself: the finger stays on the chart
     private val popup = PopupWindow(card, wide, ViewGroup.LayoutParams.WRAP_CONTENT, false).apply {
         isTouchable = false
-        setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         elevation = res.getDimension(R.dimen.elevation_chrome)
     }
 

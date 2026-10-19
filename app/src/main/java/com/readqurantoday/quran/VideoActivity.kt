@@ -38,7 +38,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         Recite.load(this)
         // Opens on the last video asked for; the first time, on the surah last read with the reciter last chosen
         val last = RecitationVideo.lastAsk(this)
-        val surah = Surahs.list().firstOrNull { it.id == last?.surah } ?: Surahs.ofPage(Settings.lastPage(this)) ?: Surahs.list().first()
+        val surah = last?.let { Surahs.of(it.surah) } ?: Surahs.ofPage(Settings.lastPage(this)) ?: Surahs.list().first()
         val from = (last?.from ?: 1).coerceIn(1, surah.ayahs)
         val to = (last?.to ?: START_AYAHS).coerceIn(from, minOf(surah.ayahs, from + MOST_AYAHS - 1))
         ask = RecitationVideo.Ask(surah.id, from, to, reciterFor(surah.id, last?.reciter ?: Recite.chosen(this)?.id),
@@ -54,7 +54,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         super.onDestroy()
     }
 
-    private fun surah() = Surahs.list().first { it.id == ask.surah }
+    private fun surah() = checkNotNull(Surahs.of(ask.surah))
 
     // Only reciters with word timings for the surah can light its words
     private fun voices(surah: Int) = Recite.reciters().filter { Timing.of(this, surah, it.id) != null }
@@ -70,7 +70,7 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         layoutInflater.card(cards, 0, listOf(
             pickRow(R.string.video_surah, surah().name) {
                 pickSurah(getString(R.string.video_surah), ask.surah) { id ->
-                    val s = Surahs.list().first { it.id == id }
+                    val s = checkNotNull(Surahs.of(id))
                     ask = ask.copy(surah = s.id, from = 1, to = minOf(s.ayahs, START_AYAHS), reciter = reciterFor(s.id, ask.reciter))
                     build()
                 }

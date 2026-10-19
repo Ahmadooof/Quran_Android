@@ -140,7 +140,7 @@ class GoalActivity : CardsActivity(R.string.goal_title) {
 
     private fun surahRow(): View = layoutInflater.inflate(R.layout.row_progress, cards, false).apply {
         findViewById<TextView>(R.id.prog_label).setText(R.string.goal_amount_surah)
-        findViewById<TextView>(R.id.prog_value).text = draft.surahs.mapNotNull { id -> Surahs.list().firstOrNull { it.id == id }?.name }
+        findViewById<TextView>(R.id.prog_value).text = draft.surahs.mapNotNull { Surahs.of(it)?.name }
             .joinToString(getString(R.string.and_join))
         opens {
             sheet(getString(R.string.goal_amount_surah), Surahs.list().map { Choice(it.name, on = draft.surahs == listOf(it.id)) }) { i ->

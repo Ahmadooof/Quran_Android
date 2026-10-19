@@ -23,7 +23,7 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         // The goal's own surahs today, each with how much of it is read
         val surahs = Stats.goalPlan(host).surahsOn(weekdayOf(Stats.today()))
         if (surahs.isNotEmpty()) blow.card(into, R.string.goal_surahs_today, surahs.mapNotNull { id ->
-            Surahs.list().firstOrNull { it.id == id }?.let { surahRow(it, today, into) }
+            Surahs.of(id)?.let { surahRow(it, today, into) }
         })
         blow.card(into, R.string.stats_today, todayRows(today))
         val thisMonth = Stats.monthDays(host)
@@ -145,7 +145,7 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
             if (day.counted(goal) >= goal) host.getString(R.string.goal_met)
             else host.getString(R.string.of_count, figures(day.counted(goal), res), figures(goal, res))
         val goalSurahs = Stats.goalPlan(host).surahsOn(weekdayOf(on))
-        for (s in goalSurahs.mapNotNull { id -> Surahs.list().firstOrNull { it.id == id } }) {
+        for (s in goalSurahs.mapNotNull(Surahs::of)) {
             lines += host.getString(R.string.surah_named, s.name) to surahSaid(day.readOf(s), s.to - s.from + 1)
         }
         val others = day.wholeSurahs().filter { it.id !in goalSurahs }

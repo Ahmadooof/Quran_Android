@@ -88,7 +88,7 @@ private fun copyToShared(context: Context, source: File, name: String, mime: Str
 
 /** A surah's file named as a person would look for it: "018 Al-Kahf". */
 fun surahFileTitle(surah: Int): String {
-    val english = Surahs.list().firstOrNull { it.id == surah }?.english.orEmpty()
+    val english = Surahs.of(surah)?.english.orEmpty()
     return "${surah.toString().padStart(3, '0')} $english".trim()
 }
 

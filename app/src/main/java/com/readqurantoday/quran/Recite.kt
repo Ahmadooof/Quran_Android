@@ -256,7 +256,7 @@ object Recite {
         val surah = playing
         if (surah == 0) return 0
         val page = if (Ayat.ready) Ayat.pageOf(surah, playingAyah(context)) else 0
-        return if (page > 0) page else Surahs.list().firstOrNull { it.id == surah }?.from ?: 0
+        return if (page > 0) page else Surahs.of(surah)?.from ?: 0
     }
 
     /** Recite [surah] from [ayah]: an ayah is a stretch of its surah's recording. */

@@ -87,7 +87,7 @@ class PlacesPane(
 
     private fun surahRow(row: View, read: Settings.Read) {
         place(row, R.drawable.ic_surahs, read.page)
-        val surah = Surahs.list().firstOrNull { it.id == read.surah }
+        val surah = Surahs.of(read.surah)
         fillSurahTitle(row.findViewById(R.id.place_title), read.surah, R.dimen.surah_title)
 
         // Progress as a bar only; a second page number in words read as a contradiction

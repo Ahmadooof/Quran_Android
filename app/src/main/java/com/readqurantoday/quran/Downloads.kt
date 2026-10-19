@@ -110,7 +110,7 @@ object Downloads {
         // An empty leftover would make DownloadManager save under another name
         if (target.exists() && target.length() == 0L) target.delete()
 
-        val name = Surahs.list().firstOrNull { it.id == surah }?.name.orEmpty()
+        val name = Surahs.of(surah)?.name.orEmpty()
         val request = DownloadManager.Request(Recite.urlFor(context, surah, reciter).toUri())
             .setTitle(context.getString(R.string.app_name))
             // Named by surah, not page, in the notification

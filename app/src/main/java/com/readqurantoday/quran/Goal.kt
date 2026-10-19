@@ -40,7 +40,7 @@ data class Goal(val kind: Kind, val amount: Int, val surahs: List<Int>, val days
         val what = when (kind) {
             Kind.PAGES -> pagesSaid(amount, res)
             Kind.JUZ -> res.getQuantityString(R.plurals.juz_count, amount, figures(amount, res))
-            Kind.SURAHS -> surahs.mapNotNull { id -> Surahs.list().firstOrNull { it.id == id }?.name }
+            Kind.SURAHS -> surahs.mapNotNull { Surahs.of(it)?.name }
                 .joinToString(res.getString(R.string.and_join))
             Kind.KHATMA -> ""
         }
@@ -88,6 +88,6 @@ data class Goal(val kind: Kind, val amount: Int, val surahs: List<Int>, val days
         fun weekdayName(weekday: Int, res: Resources): String =
             res.getStringArray(R.array.weekdays)[weekday - Calendar.SUNDAY]
 
-        private fun surahPages(id: Int): Int = Surahs.list().firstOrNull { it.id == id }?.let { it.to - it.from + 1 } ?: 0
+        private fun surahPages(id: Int): Int = Surahs.of(id)?.let { it.to - it.from + 1 } ?: 0
     }
 }

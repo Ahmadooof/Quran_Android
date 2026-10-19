@@ -257,7 +257,7 @@ class SurahListActivity : LanguageActivity() {
     private fun pageOfAyah(surah: Int, ayah: Int): Int {
         val exact = if (Ayat.ready) Ayat.pageOf(surah, ayah) else 0
         if (exact in 1..604) return exact
-        return Surahs.list().firstOrNull { it.id == surah }?.from ?: 1
+        return Surahs.of(surah)?.from ?: 1
     }
 
     private fun wireSearch() {

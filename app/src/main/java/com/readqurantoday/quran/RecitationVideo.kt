@@ -205,8 +205,8 @@ object RecitationVideo {
             MediaItem.ClippingConfiguration.Builder().setStartPositionMs(made.fromMs).setEndPositionMs(made.toMs).build()
         ).build()
         val composition = Composition.Builder(
-            EditedMediaItemSequence.Builder(video).build(),
-            EditedMediaItemSequence.Builder(EditedMediaItem.Builder(sound).setRemoveVideo(true).build()).build()
+            EditedMediaItemSequence.withVideoFrom(video),
+            EditedMediaItemSequence.withAudioFrom(listOf(EditedMediaItem.Builder(sound).setRemoveVideo(true).build()))
         ).build()
 
         val file = outFile(app, ask)
@@ -245,7 +245,7 @@ object RecitationVideo {
     // "Al-Kahf 1-10.mp4": readable wherever it is shared or saved. Only the latest is kept here; the phone keeps them all
     private fun outFile(app: Context, ask: Ask): File {
         val dir = File(app.getExternalFilesDir(null), VIDEOS).apply { deleteRecursively(); mkdirs() }
-        val name = Surahs.list().firstOrNull { it.id == ask.surah }?.english ?: ask.surah.toString()
+        val name = Surahs.of(ask.surah)?.english ?: ask.surah.toString()
         val clean = name.replace(Regex("[^A-Za-z0-9-]"), "")
         return File(dir, "$clean ${ask.from}-${ask.to}.mp4")
     }

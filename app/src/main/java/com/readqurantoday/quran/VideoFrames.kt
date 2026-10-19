@@ -76,7 +76,7 @@ class VideoFrames(context: Context, private val style: Style, look: VideoLook, p
 
     /** The page [word] of [surah]:[ayah] is on, looked for from the last one found. */
     fun pageOf(surah: Int, ayah: Int, word: Int): Int {
-        val from = Surahs.list().firstOrNull { it.id == surah } ?: return 0
+        val from = Surahs.of(surah) ?: return 0
         val start = if (last in from.from..from.to) last else Ayat.pageOf(surah, ayah).takeIf { it > 0 } ?: from.from
         val found = (start..from.to).firstOrNull { drawnPage(it).view.holds(surah, ayah, word) }
             ?: (from.from until start).firstOrNull { drawnPage(it).view.holds(surah, ayah, word) }

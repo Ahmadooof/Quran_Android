@@ -56,6 +56,9 @@ object Surahs {
 
     fun list(): List<Surah> = all
 
+    /** Surah number [id], or null before the list is loaded. */
+    fun of(id: Int): Surah? = all.getOrNull(id - 1)?.takeIf { it.id == id } ?: all.firstOrNull { it.id == id }
+
     /** The surah whose first page is this page or earlier. */
     fun ofPage(page: Int): Surah? {
         var found: Surah? = null

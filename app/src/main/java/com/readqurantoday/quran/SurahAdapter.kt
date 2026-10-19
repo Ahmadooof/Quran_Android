@@ -102,13 +102,13 @@ class SurahAdapter(
             body.text = a.text
         }
 
-        val name = Surahs.list().firstOrNull { it.id == a.surah }?.name.orEmpty()
+        val name = Surahs.of(a.surah)?.name.orEmpty()
         row.findViewById<TextView>(R.id.ayah_ref).text =
             ctx.getString(R.string.search_ayah_ref, name, figures(a.ayah, ctx.resources))
 
         row.setOnClickListener { onVerse(a.surah, a.ayah) }
         row.findViewById<View>(R.id.btn_play).setOnClickListener { onPlayVerse(a.surah, a.ayah) }
-        Surahs.list().firstOrNull { it.id == a.surah }?.let { s ->
+        Surahs.of(a.surah)?.let { s ->
             row.findViewById<View>(R.id.btn_reciter).setOnClickListener { onReciter(s) }
         }
         val here = Recite.playing == a.surah && Recite.playingAyah(ctx) == a.ayah
