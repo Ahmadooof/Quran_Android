@@ -340,6 +340,7 @@
         <item>Sat</item>
     </string-array>
     <string name="chart_read">Pages read</string>
+    <string name="day_done_by_hand">Including the goal marked done by hand</string>
     <string name="chart_goal_word">Goal</string>
     <string name="chart_goal_of">Goal %1$s</string>
     <string name="ring_days_met">Days goal met</string>

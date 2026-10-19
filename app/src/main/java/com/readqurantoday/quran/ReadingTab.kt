@@ -138,7 +138,9 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
 
     // A day of the chart: its pages, its goal, its goal surahs, and every other surah it read whole
     private fun dayLines(day: Stats.Day, on: Long, goal: Int): List<Pair<String, String>> {
-        val lines = mutableListOf(host.getString(R.string.chart_read) to pagesSaid(day.pages.size, res))
+        // The same count as the bar: a goal marked done by hand counts as read
+        val lines = mutableListOf(host.getString(R.string.chart_read) to pagesSaid(day.counted(goal), res))
+        if (day.doneByHand && goal > 0) lines += host.getString(R.string.day_done_by_hand) to ""
         if (goal > 0) lines += host.getString(R.string.chart_goal_of, pagesSaid(goal, res)) to
             if (day.counted(goal) >= goal) host.getString(R.string.goal_met)
             else host.getString(R.string.of_count, figures(day.counted(goal), res), figures(goal, res))
