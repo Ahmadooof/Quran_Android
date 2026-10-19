@@ -37,10 +37,7 @@ class SurahRow(v: View, names: Typeface?) : RecyclerView.ViewHolder(v) {
         english.text = res.getString(R.string.surah_english, s.english)
 
         // Where it lies: its juz, then the pages it spans
-        val from = Surahs.juzOfPage(s.from)
-        val to = Surahs.juzOfPage(s.to)
-        val juz = if (from == to) juzNamed(from, res)
-            else res.getString(R.string.juz_range, figures(from, res), figures(to, res))
+        val juz = juzOfSurah(s, res)
         val pages = if (s.from == s.to) pageNamed(s.from, res)
             else res.getString(R.string.pages_range, figures(s.from, res), figures(s.to, res))
         // The juz is for finding your way, so it takes the accent

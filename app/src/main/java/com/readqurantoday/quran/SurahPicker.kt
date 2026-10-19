@@ -45,6 +45,8 @@ private class SurahChoices(private val current: Int, private val picked: (Int) -
     class Row(v: View) : RecyclerView.ViewHolder(v) {
         val num: TextView = v.findViewById(R.id.pick_num)
         val title: View = v.findViewById(R.id.pick_title)
+        val english: TextView = v.findViewById(R.id.pick_english)
+        val juz: TextView = v.findViewById(R.id.pick_juz)
         val ayahs: TextView = v.findViewById(R.id.pick_ayahs)
         val tick: ImageView = v.findViewById(R.id.pick_tick)
     }
@@ -73,6 +75,8 @@ private class SurahChoices(private val current: Int, private val picked: (Int) -
         val res = holder.itemView.resources
         holder.num.text = figures(s.id, res)
         fillSurahTitle(holder.title, s.id, R.dimen.surah_title_row)
+        holder.english.text = res.getString(R.string.surah_english, s.english)
+        holder.juz.text = juzOfSurah(s, res)
         holder.ayahs.text = res.getQuantityString(R.plurals.ayahs_count, s.ayahs, figures(s.ayahs, res))
         holder.tick.visibility = if (s.id == current) View.VISIBLE else View.INVISIBLE
         holder.itemView.setOnClickListener { picked(s.id) }

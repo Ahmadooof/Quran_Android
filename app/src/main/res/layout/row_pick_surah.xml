@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A surah to choose: its number, its name in the mushaf's hand, how many ayahs, and a tick on the one chosen -->
+<!-- A surah to choose, laid out as the surah list's rows: its number, its name in the mushaf's hand over its English
+     name, where it lies and how many ayahs, and a tick on the one chosen -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,9 +10,10 @@
     android:background="@drawable/row_flat"
     android:clickable="true"
     android:focusable="true"
-    android:minHeight="56dp"
     android:paddingStart="@dimen/screen_margin"
-    android:paddingEnd="@dimen/screen_margin">
+    android:paddingEnd="@dimen/screen_margin"
+    android:paddingTop="@dimen/row_pad_v"
+    android:paddingBottom="@dimen/row_pad_v">
 
     <TextView
         android:id="@+id/pick_num"
@@ -24,26 +26,62 @@
         android:textStyle="bold"
         android:includeFontPadding="false" />
 
-    <include
-        android:id="@+id/pick_title"
-        layout="@layout/part_surah_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp" />
-
-    <TextView
-        android:id="@+id/pick_ayahs"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="12dp"
-        android:textColor="@color/text_mute"
-        android:textSize="@dimen/text_meta" />
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/pick_title"
+            layout="@layout/part_surah_title" />
+
+        <TextView
+            android:id="@+id/pick_english"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAlignment="viewStart"
+            android:textColor="@color/text_mute"
+            android:textSize="@dimen/text_meta"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/pick_juz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_mute"
+            android:textSize="@dimen/text_meta"
+            android:includeFontPadding="false"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/pick_ayahs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/meta_stack_gap"
+            android:textColor="@color/text_mute"
+            android:textSize="@dimen/text_meta"
+            android:includeFontPadding="false"
+            android:maxLines="1" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/pick_tick"
         android:layout_width="@dimen/icon_nav"
         android:layout_height="@dimen/icon_nav"
+        android:layout_marginStart="8dp"
         android:src="@drawable/ic_check"
         android:contentDescription="@null" />
 </LinearLayout>

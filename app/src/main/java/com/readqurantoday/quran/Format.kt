@@ -27,6 +27,14 @@ fun pageNamed(page: Int, resources: Resources): String = resources.getString(R.s
 /** "Juz 1" / «الجزء ١». */
 fun juzNamed(juz: Int, resources: Resources): String = resources.getString(R.string.head_juz, figures(juz, resources))
 
+/** The juz [surah] lies in: «الجزء ٢», or «الجزء ١–٣» for one that runs through several. */
+fun juzOfSurah(surah: Surahs.Surah, resources: Resources): String {
+    val from = Surahs.juzOfPage(surah.from)
+    val to = Surahs.juzOfPage(surah.to)
+    return if (from == to) juzNamed(from, resources)
+        else resources.getString(R.string.juz_range, figures(from, resources), figures(to, resources))
+}
+
 /** A file's size in one short style for every size, so a small file and a large one read alike. */
 fun fileSize(bytes: Long, resources: Resources): String {
     val tenths = (bytes + 50_000_000L) / 100_000_000L
