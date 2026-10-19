@@ -201,7 +201,6 @@ class SurahListActivity : LanguageActivity() {
         findViewById<RecyclerView>(R.id.search_list).apply {
             layoutManager = LinearLayoutManager(this@SurahListActivity)
             adapter = found
-            addHandle()
         }
     }
 

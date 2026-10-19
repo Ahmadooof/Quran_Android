@@ -128,7 +128,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:clipToPadding="false"
-                android:paddingBottom="@dimen/list_end_pad" />
+                android:paddingBottom="@dimen/list_end_pad"
+                android:scrollbars="vertical" />
         </LinearLayout>
 
         <!-- Places: pages read, surahs read and saved pages, a swipe apart; filled by PlacesPane -->

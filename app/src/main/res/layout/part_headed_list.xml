@@ -9,10 +9,13 @@
         android:id="@+id/list_head"
         layout="@layout/item_list_head" />
 
-    <include
+    <!-- The app's thin scrollbar; the big handle is the index lists' own -->
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_rows"
-        layout="@layout/part_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/list_end_pad"
+        android:scrollbars="vertical" />
 </LinearLayout>
