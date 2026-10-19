@@ -107,11 +107,16 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             VideoFrames.Style.LINE -> listOf(shapeRow())
         })
         val reader = VideoLook.ofReader(this)
-        layoutInflater.card(cards, R.string.video_colors, listOf(
+        val highlight = layoutInflater.switchRow(cards, getString(R.string.video_highlight), ask.highlight) {
+            ask = ask.copy(highlight = it)
+            build()
+        }
+        layoutInflater.card(cards, R.string.video_colors, listOfNotNull(
             looks(reader),
             colorRow(R.string.video_paper, ask.look.paper, reader.paper, PAPER_PICKS) { ask.look.copy(paper = it) },
             colorRow(R.string.video_ink, ask.look.ink, reader.ink, INK_PICKS) { ask.look.copy(ink = it) },
-            colorRow(R.string.video_lit, ask.look.lit, reader.lit, ACCENT_PICKS) { ask.look.copy(lit = it) }
+            highlight,
+            if (ask.highlight) colorRow(R.string.video_lit, ask.look.lit, reader.lit, ACCENT_PICKS) { ask.look.copy(lit = it) } else null
         ))
         layoutInflater.card(cards, R.string.video_preview, listOf(preview()))
         // Made: where it was saved, and a way to send it; a change to any choice brings back the button to make one

@@ -35,8 +35,11 @@ object RecitationVideo {
         // A size of one's own, for the custom shape
         val customWide: Int = Shape.TALL.wide, val customTall: Int = Shape.TALL.tall,
         // How many words are shown together in the words style
-        val words: Int = 1
+        val words: Int = 1,
+        // The recited word in its own colour, or every word alike
+        val highlight: Boolean = true
     ) {
+        val drawnLook get() = if (highlight) look else look.copy(lit = look.ink)
         val wide get() = if (shape == Shape.CUSTOM) customWide else shape.wide
         val tall get() = if (shape == Shape.CUSTOM) customTall else shape.tall
     }
@@ -61,7 +64,7 @@ object RecitationVideo {
         val worker = HandlerThread(FRAMES).apply { start() }
         Handler(worker.looper).post {
             // The screen's own context draws the pages, so their heads are in the app's chosen language
-            val made = runCatching { pictures(app, VideoFrames(context, ask.style, ask.look, ask.phonetics), ask) { main.post { progress(it * DRAWN / 100) } } }.getOrNull()
+            val made = runCatching { pictures(app, VideoFrames(context, ask.style, ask.drawnLook, ask.phonetics), ask) { main.post { progress(it * DRAWN / 100) } } }.getOrNull()
             worker.quitSafely()
             if (made == null || stopped.get()) main.post { done(null) }
             else main.post { join(app, ask, made, progress, done) }
@@ -78,7 +81,7 @@ object RecitationVideo {
                 val timing = Timing.of(context, ask.surah, ask.reciter) ?: return@runCatching null
                 val lit = lits(timing, ask).first()
                 if (ask.phonetics) Translit.load(context)
-                val frames = VideoFrames(context, ask.style, ask.look, ask.phonetics)
+                val frames = VideoFrames(context, ask.style, ask.drawnLook, ask.phonetics)
                 val page = frames.pageOf(ask.surah, lit.ayah, lit.word)
                 val out = createBitmap(ask.wide, ask.tall)
                 if (ask.style == VideoFrames.Style.WORD) frames.drawWords(group(lits(timing, ask), 0, ask.words, frames, ask.surah), 0, out)
@@ -99,7 +102,7 @@ object RecitationVideo {
         val shape = Shape.entries.getOrNull(kept.getInt(SHAPE, -1)) ?: Shape.TALL
         return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style,
             VideoLook.of(context), shape, kept.getBoolean(PHONETICS, false),
-            kept.getInt(WIDE, Shape.TALL.wide), kept.getInt(TALL, Shape.TALL.tall), kept.getInt(WORDS, 1))
+            kept.getInt(WIDE, Shape.TALL.wide), kept.getInt(TALL, Shape.TALL.tall), kept.getInt(WORDS, 1), kept.getBoolean(HIGHLIGHT, true))
     }
 
     /** The shape last used with [style]; at first the best for it: the one-line strip for lines, upright for the rest. */
@@ -119,6 +122,7 @@ object RecitationVideo {
         putInt(WIDE, ask.customWide)
         putInt(TALL, ask.customTall)
         putInt(WORDS, ask.words)
+        putBoolean(HIGHLIGHT, ask.highlight)
     }
 
     fun stop() {
@@ -252,6 +256,7 @@ object RecitationVideo {
     private const val WIDE = "custom-wide"
     private const val TALL = "custom-tall"
     private const val WORDS = "words"
+    private const val HIGHLIGHT = "highlight"
     private const val FRAMES = "video_frames"
     private const val FRAME_RATE = 30
     private const val QUALITY = 92
