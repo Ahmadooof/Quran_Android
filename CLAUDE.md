@@ -49,7 +49,7 @@
 
 ### Dimensions
 - Hardcoded dp/sp values that appear in more than one layout belong in `res/values/dimens.xml`.
-- Use `@dimen/name` in XML. Key tokens already defined: `screen_margin`, `row_pad_v`, `card_pad_v`, `icon_nav`, `icon_row`, `chrome_row_height`, `icon_label_gap`, `nav_bar_height`, elevation levels.
+- Use `@dimen/name` in XML. Key tokens already defined: `screen_margin`, `row_pad_v`, `card_pad_v`, `icon_nav`, `chrome_row_height`, `icon_label_gap`, `nav_bar_height`, elevation levels.
 - Add a new token to `dimens.xml` before copy-pasting a raw value into a second layout.
 
 ## Modern

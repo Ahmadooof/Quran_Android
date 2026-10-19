@@ -283,7 +283,6 @@
     <string name="cal_hijri">هجري</string>
     <string name="cal_greg">ميلادي</string>
     <string name="stats_page_times_open">وقت كل صفحة مقروءة</string>
-    <string name="goal_done">اكتمل هدف اليوم</string>
     <string name="time_and">%1$s و%2$s</string>
     <string name="stats_per_hour_note">يظهر بعد قراءة بضع صفحات</string>
     <string name="pt_sort">الترتيب</string>
@@ -496,7 +495,16 @@
     <string name="video_saving">جارٍ حفظ الفيديو في الهاتف…</string>
     <string name="shape_strip">سطر واحد</string>
     <string name="video_phonetics">إظهار النطق فوق الكلمة</string>
-    <string name="goal_surahs_today">سور الهدف اليوم</string>
+    <string name="goal_surahs_today">قراءة سور الهدف اليوم</string>
     <string name="surah_done">مكتملة</string>
     <string name="goal_met">تم</string>
+    <string name="surah_search_hint">اسم السورة أو رقمها</string>
+    <plurals name="ayahs_count">
+        <item quantity="zero">%1$s آية</item>
+        <item quantity="one">آية واحدة</item>
+        <item quantity="two">آيتان</item>
+        <item quantity="few">%1$s آيات</item>
+        <item quantity="many">%1$s آية</item>
+        <item quantity="other">%1$s آية</item>
+    </plurals>
 </resources>

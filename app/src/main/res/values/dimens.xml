@@ -108,7 +108,6 @@
     <dimen name="tile_min_height">118dp</dimen>
     <dimen name="trend_icon">14dp</dimen>
     <dimen name="pill_radius">12dp</dimen>
-    <dimen name="section_title">@dimen/text_heading</dimen>
     <dimen name="section_gap">22dp</dimen>
     <!-- Lines the section title up with the cards' own titles -->
     <dimen name="section_inset">18dp</dimen>
@@ -158,4 +157,6 @@
     <dimen name="dl_button">60dp</dimen>
     <!-- The recitation video screen's preview of the first picture -->
     <dimen name="video_preview_height">300dp</dimen>
+    <!-- The surah picker's list: tall enough for several rows, short enough to keep the search in reach -->
+    <dimen name="picker_list_height">420dp</dimen>
 </resources>

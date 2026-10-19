@@ -69,8 +69,8 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         val ayahs = surah().ayahs
         layoutInflater.card(cards, 0, listOf(
             pickRow(R.string.video_surah, surah().name) {
-                sheet(getString(R.string.video_surah), Surahs.list().map { Choice(it.name, on = it.id == ask.surah) }) { i ->
-                    val s = Surahs.list()[i]
+                pickSurah(getString(R.string.video_surah), ask.surah) { id ->
+                    val s = Surahs.list().first { it.id == id }
                     ask = ask.copy(surah = s.id, from = 1, to = minOf(s.ayahs, START_AYAHS), reciter = reciterFor(s.id, ask.reciter))
                     build()
                 }

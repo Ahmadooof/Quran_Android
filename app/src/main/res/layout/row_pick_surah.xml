@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A surah to choose: its number, its name in the mushaf's hand, how many ayahs, and a tick on the one chosen -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layoutDirection="locale"
+    android:background="@drawable/row_flat"
+    android:clickable="true"
+    android:focusable="true"
+    android:minHeight="56dp"
+    android:paddingStart="@dimen/screen_margin"
+    android:paddingEnd="@dimen/screen_margin">
+
+    <TextView
+        android:id="@+id/pick_num"
+        android:layout_width="@dimen/num_disc"
+        android:layout_height="@dimen/num_disc"
+        android:gravity="center"
+        android:background="@drawable/num_circle"
+        android:textColor="@color/on_dark"
+        android:textSize="@dimen/num_disc_text"
+        android:textStyle="bold"
+        android:includeFontPadding="false" />
+
+    <include
+        android:id="@+id/pick_title"
+        layout="@layout/part_surah_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp" />
+
+    <TextView
+        android:id="@+id/pick_ayahs"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/text_mute"
+        android:textSize="@dimen/text_meta" />
+
+    <ImageView
+        android:id="@+id/pick_tick"
+        android:layout_width="@dimen/icon_nav"
+        android:layout_height="@dimen/icon_nav"
+        android:src="@drawable/ic_check"
+        android:contentDescription="@null" />
+</LinearLayout>

@@ -231,7 +231,6 @@
     <string name="cal_hijri">Hijri</string>
     <string name="cal_greg">Gregorian</string>
     <string name="stats_page_times_open">Time on each page</string>
-    <string name="goal_done">Today\'s goal is done</string>
     <string name="time_and">%1$s %2$s</string>
     <string name="stats_per_hour_note">Shows after a few pages are read</string>
     <string name="pt_sort">Order</string>
@@ -422,7 +421,12 @@
     <string name="video_saving">Saving the video to the phone…</string>
     <string name="shape_strip">One line</string>
     <string name="video_phonetics">Show pronunciation over the word</string>
-    <string name="goal_surahs_today">Goal surahs today</string>
+    <string name="goal_surahs_today">Goal surahs read today</string>
     <string name="surah_done">Completed</string>
     <string name="goal_met">Done</string>
+    <string name="surah_search_hint">Surah name or number</string>
+    <plurals name="ayahs_count">
+        <item quantity="one">%1$s ayah</item>
+        <item quantity="other">%1$s ayahs</item>
+    </plurals>
 </resources>
