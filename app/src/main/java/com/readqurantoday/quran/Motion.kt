@@ -47,10 +47,29 @@ fun View.riseWhole() {
 /** Counts the text from [from] up or down to [to], each step written by [say]. */
 fun TextView.countTo(from: Int, to: Int, say: (Int) -> String) {
     text = say(from)
+    // Held at its widest while counting: a text that changes width lays the whole screen out again every frame
+    val held = layoutParams
+    val wasWide = held?.width
+    if (held != null && wasWide == ViewGroup.LayoutParams.WRAP_CONTENT) {
+        val widest = maxOf(paint.measureText(say(from)), paint.measureText(say(to)))
+        held.width = kotlin.math.ceil(widest + compoundPaddingLeft + compoundPaddingRight + COUNT_SPARE * resources.displayMetrics.density).toInt()
+        layoutParams = held
+    }
     ValueAnimator.ofInt(from, to).apply {
         duration = FILL_MS
         interpolator = DecelerateInterpolator()
         addUpdateListener { text = say(it.animatedValue as Int) }
+        addListener(object : android.animation.AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: android.animation.Animator) {
+                if (held != null && wasWide != null) {
+                    held.width = wasWide
+                    layoutParams = held
+                }
+            }
+        })
         start()
     }
 }
+
+// A little room for a figure narrower or wider than either end, as digits are not all one width
+private const val COUNT_SPARE = 4
