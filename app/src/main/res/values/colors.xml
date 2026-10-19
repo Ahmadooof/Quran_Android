@@ -33,4 +33,6 @@
     <color name="tip_ground">#16283A</color>
     <color name="tip_ink">#FFFFFF</color>
     <color name="tip_mute">#AEBBC7</color>
+    <!-- The disc a list row's number sits in: deep enough that its light figure reads plainly -->
+    <color name="num_ground">@color/accent</color>
 </resources>

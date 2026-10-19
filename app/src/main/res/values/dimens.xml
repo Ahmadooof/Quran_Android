@@ -80,7 +80,7 @@
 
     <!-- The numbered disc that opens a surah, juz or search row -->
     <dimen name="num_disc">32dp</dimen>
-    <dimen name="num_disc_text">@dimen/text_meta</dimen>
+    <dimen name="num_disc_text">@dimen/text_body</dimen>
 
     <!-- A lone icon button inside a row: big enough to hit without a second try -->
     <dimen name="row_button">44dp</dimen>

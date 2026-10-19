@@ -25,7 +25,7 @@
             android:layout_height="@dimen/num_disc"
             android:gravity="center"
             android:background="@drawable/num_circle"
-            android:textColor="@color/accent"
+            android:textColor="@color/on_dark"
             android:textSize="@dimen/num_disc_text"
             android:textStyle="bold"
             android:includeFontPadding="false" />

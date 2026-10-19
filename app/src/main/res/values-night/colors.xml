@@ -29,4 +29,6 @@
     <color name="tip_ground">#DDE2E7</color>
     <color name="tip_ink">#16283A</color>
     <color name="tip_mute">#55687A</color>
+    <!-- The disc a list row's number sits in: deep enough that its light figure reads plainly -->
+    <color name="num_ground">#2B78AB</color>
 </resources>
