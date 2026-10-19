@@ -434,4 +434,5 @@
     <string name="shape_wide_ask">Video width in pixels</string>
     <string name="shape_tall_ask">Video height in pixels</string>
     <string name="pt_by_quick">Quickest first</string>
+    <string name="day_other_whole">Other surahs completed</string>
 </resources>

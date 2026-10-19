@@ -21,6 +21,15 @@ class DayBars(context: Context) : View(context) {
     /** Hears a tapped day, by its place in the week, oldest first. */
     var onDay: ((Int) -> Unit)? = null
 
+    /** The day whose details are open, marked by a dot under its name; -1 for none. */
+    var picked = -1
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    private val dot = resources.getDimension(R.dimen.chart_dot)
+
     // 0 to 1 across the whole rise; each bar takes its own slice of it, oldest first
     private var grown = 1f
 
@@ -77,7 +86,7 @@ class DayBars(context: Context) : View(context) {
 
     // Room for a tick and the pages over the tallest bar, and the day's name beneath the baseline
     private fun over() = tickSize + count.textSize + 2 * gap
-    private fun under() = label.textSize + 2 * gap
+    private fun under() = label.textSize + 3 * gap + 2 * dot
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         val tall = resources.getDimensionPixelSize(R.dimen.chart_height) + paddingTop + paddingBottom + (over() + under()).toInt()
@@ -154,7 +163,8 @@ class DayBars(context: Context) : View(context) {
         val nameY = base + gap + label.textSize * 0.9f
         pages.indices.forEach { i ->
             val centre = if (rtl) right - (i + 0.5f) * slot else left + (i + 0.5f) * slot
-            canvas.drawText(names[i], centre, nameY, if (i == last) todayLabel else label)
+            canvas.drawText(names[i], centre, nameY, if (i == last || i == picked) todayLabel else label)
+            if (i == picked) canvas.drawCircle(centre, nameY + gap + dot, dot, bar)
         }
         label.textSize = dayFull
         todayLabel.textSize = dayFull

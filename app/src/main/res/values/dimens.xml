@@ -130,6 +130,8 @@
     <dimen name="chart_bar">26dp</dimen>
     <dimen name="chart_bar_corner">6dp</dimen>
     <!-- The badge over a day of the week chart that reached its goal -->
+    <!-- The dot under the week chart's day whose details are open -->
+    <dimen name="chart_dot">3dp</dimen>
     <dimen name="chart_tick">20dp</dimen>
     <dimen name="chart_count">13sp</dimen>
     <dimen name="chart_day">@dimen/text_meta</dimen>

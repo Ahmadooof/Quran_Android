@@ -32,7 +32,10 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
             Tile(R.drawable.ic_calendar, if (monthPages == 0) none(res) else pagesSaid(monthPages, res), host.getString(R.string.stats_pages_month)),
             Tile(R.drawable.ic_clock, spent(thisMonth.sumOf { it.readSec }, res), host.getString(R.string.stats_read_month))
         ))
-        blow.card(into, host.getString(R.string.stats_last_days, figures(WEEK, res)), weekRows(week, goal))
+        // A tapped day's details open beneath the chart, and close with a second tap
+        val dayBox = LinearLayout(host).apply { orientation = LinearLayout.VERTICAL }
+        blow.card(into, host.getString(R.string.stats_last_days, figures(WEEK, res)), weekRows(week, goal, dayBox))
+        into.addView(dayBox)
     }
 
     private fun goalRows(today: Stats.Day, goal: Int, into: LinearLayout): List<View> {
@@ -76,14 +79,18 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
     }
 
     // The last seven days, each against its own goal
-    private fun weekRows(week: List<Stats.Day>, goal: Int): List<View> {
+    private fun weekRows(week: List<Stats.Day>, goal: Int, dayBox: LinearLayout): List<View> {
         val goals = week.indices.map { i -> goalOn(Stats.today() - (week.size - 1 - i), goal) }
         val counts = week.mapIndexed { i, d -> d.counted(goals[i]) }
         val pad = res.getDimensionPixelSize(R.dimen.tile_pad)
         val chart = DayBars(host).apply {
             setPadding(pad, pad, pad, pad)
             show(counts, goals, ::dayName, grow = cards.growing)
-            onDay = { i -> showDay(week[i], Stats.today() - (week.size - 1 - i), goals[i]) }
+            onDay = { i ->
+                picked = if (picked == i) -1 else i
+                dayBox.removeAllViews()
+                if (picked >= 0) showDay(dayBox, week[i], Stats.today() - (week.size - 1 - i), goals[i])
+            }
             contentDescription = host.getString(R.string.stats_chart_desc, figures(week.size, res), pagesSaid(counts.max(), res))
         }
         // The chart and the key to its colours are one row, with no seam between them
@@ -108,12 +115,12 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         return (listOf(said) + others).joinToString(host.getString(R.string.list_join))
     }
 
-    // A goal surah: a tick once every page of it is read today, else how far, with its bar
-    private fun surahRow(surah: Surahs.Surah, today: Stats.Day, into: LinearLayout): View =
+    // A goal surah: a tick once every page of it is read that day, else how far, with its bar
+    private fun surahRow(surah: Surahs.Surah, day: Stats.Day, into: LinearLayout): View =
         blow.inflate(R.layout.row_place, into, false).apply {
             isClickable = false
             val all = surah.to - surah.from + 1
-            val read = today.readOf(surah)
+            val read = day.readOf(surah)
             findViewById<ImageView>(R.id.place_icon).apply {
                 setImageResource(if (read == all) R.drawable.ic_check else R.drawable.ic_surahs)
                 imageTintList = ColorStateList.valueOf(host.getColor(R.color.accent))
@@ -127,22 +134,18 @@ class ReadingTab(private val cards: StatCards, private val rings: GoalRings, pri
         if (read == all) host.getString(R.string.surah_done) else host.getString(R.string.of_count, figures(read, res), pagesSaid(all, res))
 
     // A day of the chart, tapped: its pages, its goal, its goal surahs, and every other surah it read whole
-    private fun showDay(day: Stats.Day, on: Long, goal: Int) {
-        val rows = mutableListOf(Choice(host.getString(R.string.chart_read), pagesSaid(day.pages.size, res)))
-        if (goal > 0) rows += Choice(host.getString(R.string.chart_goal_of, pagesSaid(goal, res)),
-            if (day.counted(goal) >= goal) host.getString(R.string.goal_met) else "", on = day.counted(goal) >= goal)
+    private fun showDay(into: LinearLayout, day: Stats.Day, on: Long, goal: Int) {
+        val rows = mutableListOf(cards.row(host.getString(R.string.chart_read), pagesSaid(day.pages.size, res)))
+        if (goal > 0) rows += cards.row(host.getString(R.string.chart_goal_of, pagesSaid(goal, res)),
+            if (day.counted(goal) >= goal) host.getString(R.string.goal_met)
+            else host.getString(R.string.of_count, figures(day.counted(goal), res), figures(goal, res)))
         val goalSurahs = Stats.goalPlan(host).surahsOn(weekdayOf(on))
-        for (id in goalSurahs) {
-            val s = Surahs.list().firstOrNull { it.id == id } ?: continue
-            val all = s.to - s.from + 1
-            val read = day.readOf(s)
-            rows += Choice(host.getString(R.string.surah_named, s.name), surahSaid(read, all), on = read == all)
-        }
-        for (s in day.wholeSurahs()) if (s.id !in goalSurahs) {
-            rows += Choice(host.getString(R.string.surah_named, s.name), host.getString(R.string.surah_done), on = true)
-        }
+        goalSurahs.mapNotNull { id -> Surahs.list().firstOrNull { it.id == id } }.forEach { rows += surahRow(it, day, into) }
+        val others = day.wholeSurahs().filter { it.id !in goalSurahs }
+        if (others.isNotEmpty()) rows += cards.row(host.getString(R.string.day_other_whole), "",
+            others.joinToString(host.getString(R.string.list_join)) { it.name })
         val title = if (on == Stats.today()) host.getString(R.string.chart_today) else dateSaid(host, on)
-        host.sheet(title, rows) {}
+        blow.card(into, title, rows)
     }
 
     private fun weekdayOf(day: Long): Int = Calendar.getInstance().apply { timeInMillis = Stats.noonOf(day) }.get(Calendar.DAY_OF_WEEK)
