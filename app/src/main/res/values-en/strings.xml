@@ -396,7 +396,7 @@
     <string name="video_from">From ayah</string>
     <string name="video_to">To ayah</string>
     <string name="video_style">Show</string>
-    <string name="video_word">Word by word</string>
+    <string name="video_word">Words</string>
     <string name="video_line">Line by line</string>
     <string name="video_page">Full page</string>
     <string name="video_make">Make the video</string>
@@ -429,4 +429,8 @@
         <item quantity="one">%1$s ayah</item>
         <item quantity="other">%1$s ayahs</item>
     </plurals>
+    <string name="video_words">Words at once</string>
+    <string name="shape_custom">Custom</string>
+    <string name="shape_wide_ask">Video width in pixels</string>
+    <string name="shape_tall_ask">Video height in pixels</string>
 </resources>

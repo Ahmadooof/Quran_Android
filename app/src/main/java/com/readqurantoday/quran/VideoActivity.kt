@@ -96,8 +96,16 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             ask = ask.copy(phonetics = it)
             build()
         }
-        layoutInflater.card(cards, R.string.video_style,
-            if (ask.style == VideoFrames.Style.PAGE) listOf(styles(), shapeRow(), phonetics) else listOf(styles(), shapeRow()))
+        // The words style shows as many words together as asked
+        val words = stepperRow(cards, R.string.video_words, ask.words, 1..MOST_WORDS) {
+            ask = ask.copy(words = it)
+            build()
+        }
+        layoutInflater.card(cards, R.string.video_style, listOf(styles()) + when (ask.style) {
+            VideoFrames.Style.PAGE -> listOf(shapeRow(), phonetics)
+            VideoFrames.Style.WORD -> listOf(words, shapeRow())
+            VideoFrames.Style.LINE -> listOf(shapeRow())
+        })
         val reader = VideoLook.ofReader(this)
         layoutInflater.card(cards, R.string.video_colors, listOf(
             looks(reader),
@@ -183,17 +191,35 @@ class VideoActivity : CardsActivity(R.string.video_title) {
     private fun shapesFor(style: VideoFrames.Style) =
         RecitationVideo.Shape.entries.filter { it != RecitationVideo.Shape.STRIP || style == VideoFrames.Style.LINE }
 
+    // Its name with the proportions the apps ask for; a size of one's own says its size
     private fun shapeSaid(shape: RecitationVideo.Shape): String = getString(R.string.shape_said, getString(SHAPE_NAMES.getValue(shape)),
-        getString(R.string.shape_ratio, figures(shape.w, resources), figures(shape.h, resources)))
+        if (shape == RecitationVideo.Shape.CUSTOM) getString(R.string.shape_size, figures(ask.customWide, resources), figures(ask.customTall, resources))
+        else getString(R.string.shape_ratio, figures(shape.w, resources), figures(shape.h, resources)))
 
     // Upright, a post, square, wide or one line: chosen from a list, each with the proportions the apps ask for
     private fun shapeRow(): View = pickRow(R.string.video_shape, shapeSaid(ask.shape)) {
         val shapes = shapesFor(ask.style)
         sheet(getString(R.string.video_shape), shapes.map { Choice(shapeSaid(it), on = it == ask.shape) }) { i ->
-            ask = ask.copy(shape = shapes[i])
-            build()
+            if (shapes[i] == RecitationVideo.Shape.CUSTOM) askSize()
+            else {
+                ask = ask.copy(shape = shapes[i])
+                build()
+            }
         }
     }
+
+    // A size of one's own: the width, then the height, each kept to what a phone's video maker takes
+    private fun askSize() {
+        askNumber(getString(R.string.shape_wide_ask), getString(R.string.hifz_keep), ask.customWide, SIDE) { wide ->
+            askNumber(getString(R.string.shape_tall_ask), getString(R.string.hifz_keep), ask.customTall, SIDE) { tall ->
+                ask = ask.copy(shape = RecitationVideo.Shape.CUSTOM, customWide = evenSide(wide), customTall = evenSide(tall))
+                build()
+            }
+        }
+    }
+
+    // A multiple of sixteen, as video makers handle best
+    private fun evenSide(n: Int) = ((n + SIDE_STEP / 2) / SIDE_STEP * SIDE_STEP).coerceIn(SIDE)
 
     // Ready-made colours a tap away: the reader's own, light, dark and green
     private fun looks(reader: VideoLook): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
@@ -285,11 +311,14 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         const val MOST_AYAHS = 50
         const val WAITING = 0.6f
         const val MAKE = "make"
+        const val MOST_WORDS = 5
+        val SIDE = 240..2160
+        const val SIDE_STEP = 16
         const val PREVIEW = "preview"
         val SHAPE_NAMES = mapOf(
             RecitationVideo.Shape.TALL to R.string.shape_tall, RecitationVideo.Shape.POST to R.string.shape_post,
             RecitationVideo.Shape.SQUARE to R.string.shape_square, RecitationVideo.Shape.WIDE to R.string.shape_wide,
-            RecitationVideo.Shape.STRIP to R.string.shape_strip
+            RecitationVideo.Shape.STRIP to R.string.shape_strip, RecitationVideo.Shape.CUSTOM to R.string.shape_custom
         )
     }
 }

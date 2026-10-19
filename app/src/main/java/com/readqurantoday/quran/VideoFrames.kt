@@ -87,6 +87,7 @@ class VideoFrames(context: Context, private val style: Style, look: VideoLook, p
 
     /** One picture of [out]'s size, with [word] of [surah]:[ayah] lit on [page]. */
     fun draw(page: Int, surah: Int, ayah: Int, word: Int, out: Bitmap) {
+        if (style == Style.WORD) return drawWords(listOf(intArrayOf(page, surah, ayah, word)), 0, out)
         val at = drawnPage(page)
         val canvas = Canvas(out)
         canvas.drawColor(paper)
@@ -127,6 +128,38 @@ class VideoFrames(context: Context, private val style: Style, look: VideoLook, p
             if (cut.intersect(0, 0, pageW, pageH)) paint(canvas, lineMarks(at, cut, box), null, place(RectF(cut)), ink)
         }
         words.forEach { (k, word) -> paint(canvas, word.mask, null, place(word.ink), if (k == litKey) lit else ink) }
+    }
+
+    /** [words], each page, surah, ayah and word, side by side as they are read, the one at [lit] lit. */
+    fun drawWords(words: List<IntArray>, lit: Int, out: Bitmap) {
+        val canvas = Canvas(out)
+        canvas.drawColor(paper)
+        // Each word alone, with its ink placed against the top of its own line, so the words sit on one line together
+        val parts = words.mapIndexedNotNull { i, (page, s, a, w) ->
+            val at = drawnPage(page)
+            val k = key(s, a, w)
+            val box = at.boxes[k] ?: return@mapIndexedNotNull null
+            Triple(i, aloneOf(at, k, box), box)
+        }
+        if (parts.isEmpty()) return
+        val line = parts.maxOf { it.third.height() }
+        val gap = line * WORD_GAP
+        val breath = line * BREATH
+        val top = parts.minOf { (_, word, box) -> word.ink.top - box.top }
+        val bottom = parts.maxOf { (_, word, box) -> word.ink.bottom - box.top }
+        val wide = parts.sumOf { it.second.ink.width().toDouble() }.toFloat() + gap * (parts.size - 1) + 2 * breath
+        val tall = bottom - top + 2 * breath
+        val fit = minOf(out.width * WORD_WIDE / wide, out.height * WORD_TALL / tall)
+        val left = (out.width - wide * fit) / 2f
+        val up = (out.height - tall * fit) / 2f
+        // Read right to left: the first word at the right
+        var right = left + (wide - breath) * fit
+        for ((i, word, box) in parts) {
+            val w = word.ink.width() * fit
+            val y = up + (breath + word.ink.top - box.top - top) * fit
+            paint(canvas, word.mask, null, RectF(right - w, y, right, y + word.ink.height() * fit), if (i == lit) this.lit else ink)
+            right -= w + gap * fit
+        }
     }
 
     // The page drawn with only this word, in white, all else clear; its ink is measured, not guessed, so no mark is cut
@@ -233,5 +266,7 @@ class VideoFrames(context: Context, private val style: Style, look: VideoLook, p
         private const val STRIP_FROM = 3
         private const val WORD_WIDE = 0.85f
         private const val WORD_TALL = 0.4f
+        // Between words shown together, as a share of a line's height
+        private const val WORD_GAP = 0.35f
     }
 }

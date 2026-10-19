@@ -31,12 +31,20 @@ object RecitationVideo {
         val surah: Int, val from: Int, val to: Int, val reciter: String,
         val style: VideoFrames.Style, val look: VideoLook, val shape: Shape = Shape.TALL,
         // The pronunciation over the lit word, for the full page
-        val phonetics: Boolean = false
-    )
+        val phonetics: Boolean = false,
+        // A size of one's own, for the custom shape
+        val customWide: Int = Shape.TALL.wide, val customTall: Int = Shape.TALL.tall,
+        // How many words are shown together in the words style
+        val words: Int = 1
+    ) {
+        val wide get() = if (shape == Shape.CUSTOM) customWide else shape.wide
+        val tall get() = if (shape == Shape.CUSTOM) customTall else shape.tall
+    }
 
     /** Upright for status and reels, four by five and square for posts, wide for YouTube, and a strip for one line; [w]:[h] is said with it. */
     enum class Shape(val wide: Int, val tall: Int, val w: Int, val h: Int) {
-        TALL(1080, 1920, 9, 16), POST(1080, 1350, 4, 5), SQUARE(1080, 1080, 1, 1), WIDE(1920, 1080, 16, 9), STRIP(1920, 400, 24, 5)
+        TALL(1080, 1920, 9, 16), POST(1080, 1350, 4, 5), SQUARE(1080, 1080, 1, 1), WIDE(1920, 1080, 16, 9), STRIP(1920, 400, 24, 5),
+        CUSTOM(0, 0, 0, 0)
     }
 
     private data class Lit(val at: Int, val ayah: Int, val word: Int)
@@ -72,8 +80,9 @@ object RecitationVideo {
                 if (ask.phonetics) Translit.load(context)
                 val frames = VideoFrames(context, ask.style, ask.look, ask.phonetics)
                 val page = frames.pageOf(ask.surah, lit.ayah, lit.word)
-                val out = createBitmap(ask.shape.wide, ask.shape.tall)
-                if (page > 0) frames.draw(page, ask.surah, lit.ayah, lit.word, out)
+                val out = createBitmap(ask.wide, ask.tall)
+                if (ask.style == VideoFrames.Style.WORD) frames.drawWords(group(lits(timing, ask), 0, ask.words, frames, ask.surah), 0, out)
+                else if (page > 0) frames.draw(page, ask.surah, lit.ayah, lit.word, out)
                 frames.release()
                 out
             }.getOrNull()
@@ -89,7 +98,8 @@ object RecitationVideo {
         val style = VideoFrames.Style.entries.getOrNull(kept.getInt(STYLE, -1)) ?: VideoFrames.Style.LINE
         val shape = Shape.entries.getOrNull(kept.getInt(SHAPE, -1)) ?: Shape.TALL
         return Ask(kept.getInt(SURAH, 1), kept.getInt(FROM, 1), kept.getInt(TO, 1), kept.getString(VOICE, "").orEmpty(), style,
-            VideoLook.of(context), shape, kept.getBoolean(PHONETICS, false))
+            VideoLook.of(context), shape, kept.getBoolean(PHONETICS, false),
+            kept.getInt(WIDE, Shape.TALL.wide), kept.getInt(TALL, Shape.TALL.tall), kept.getInt(WORDS, 1))
     }
 
     fun keepAsk(context: Context, ask: Ask) = context.getSharedPreferences(ASKED, Context.MODE_PRIVATE).edit {
@@ -100,6 +110,9 @@ object RecitationVideo {
         putInt(STYLE, ask.style.ordinal)
         putInt(SHAPE, ask.shape.ordinal)
         putBoolean(PHONETICS, ask.phonetics)
+        putInt(WIDE, ask.customWide)
+        putInt(TALL, ask.customTall)
+        putInt(WORDS, ask.words)
     }
 
     fun stop() {
@@ -112,6 +125,12 @@ object RecitationVideo {
     private fun lits(timing: Timing, ask: Ask): List<Lit> = (ask.from..ask.to).flatMap { ayah ->
         timing.wordTimes(ayah).map { (at, word) -> Lit(at, ayah, word) }
             .ifEmpty { listOf(Lit(timing.startOf(ayah), ayah, 0)) }
+    }
+
+    // The words shown together with the one at [i]: its run of [size] in the order recited, each with its page
+    private fun group(lits: List<Lit>, i: Int, size: Int, frames: VideoFrames, surah: Int): List<IntArray> {
+        val from = i / size * size
+        return lits.subList(from, minOf(from + size, lits.size)).map { intArrayOf(frames.pageOf(surah, it.ayah, it.word), surah, it.ayah, it.word) }
     }
 
     private class Pictures(val files: List<File>, val heldMs: List<Long>, val audio: Uri, val fromMs: Long, val toMs: Long)
@@ -127,7 +146,7 @@ object RecitationVideo {
         if (lits.isEmpty() || toMs <= fromMs) return null
 
         val dir = File(app.cacheDir, FRAMES).apply { deleteRecursively(); mkdirs() }
-        val out = createBitmap(ask.shape.wide, ask.shape.tall)
+        val out = createBitmap(ask.wide, ask.tall)
         val files = ArrayList<File>()
         val held = ArrayList<Long>()
         try {
@@ -138,7 +157,8 @@ object RecitationVideo {
                 if (end <= start) return@forEachIndexed
                 val page = frames.pageOf(ask.surah, lit.ayah, lit.word)
                 if (page > 0) {
-                    frames.draw(page, ask.surah, lit.ayah, lit.word, out)
+                    if (ask.style == VideoFrames.Style.WORD) frames.drawWords(group(lits, i, ask.words, frames, ask.surah), i % ask.words, out)
+                    else frames.draw(page, ask.surah, lit.ayah, lit.word, out)
                     val file = File(dir, "%05d.jpg".format(java.util.Locale.ROOT, files.size))
                     file.outputStream().use { out.compress(Bitmap.CompressFormat.JPEG, QUALITY, it) }
                     files += file
@@ -223,6 +243,9 @@ object RecitationVideo {
     private const val STYLE = "style"
     private const val SHAPE = "shape"
     private const val PHONETICS = "phonetics"
+    private const val WIDE = "custom-wide"
+    private const val TALL = "custom-tall"
+    private const val WORDS = "words"
     private const val FRAMES = "video_frames"
     private const val FRAME_RATE = 30
     private const val QUALITY = 92
