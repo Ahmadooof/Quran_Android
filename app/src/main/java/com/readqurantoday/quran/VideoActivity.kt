@@ -109,17 +109,16 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             VideoFrames.Style.WORD -> listOf(words, shapeRow())
             VideoFrames.Style.LINE -> listOf(shapeRow())
         })
-        val reader = VideoLook.ofReader(this)
         val highlight = layoutInflater.switchRow(cards, getString(R.string.video_highlight), ask.highlight) {
             ask = ask.copy(highlight = it)
             build()
         }
         layoutInflater.card(cards, R.string.video_colors, listOfNotNull(
-            looks(reader),
-            colorRow(R.string.video_paper, ask.look.paper, reader.paper, PAPER_PICKS) { ask.look.copy(paper = it) },
-            colorRow(R.string.video_ink, ask.look.ink, reader.ink, INK_PICKS) { ask.look.copy(ink = it) },
+            looks(),
+            colorRow(R.string.video_paper, ask.look.paper, VideoLook.LIGHT.paper, PAPER_PICKS) { ask.look.copy(paper = it) },
+            colorRow(R.string.video_ink, ask.look.ink, VideoLook.LIGHT.ink, INK_PICKS) { ask.look.copy(ink = it) },
             highlight,
-            if (ask.highlight) colorRow(R.string.video_lit, ask.look.lit, reader.lit, ACCENT_PICKS) { ask.look.copy(lit = it) } else null
+            if (ask.highlight) colorRow(R.string.video_lit, ask.look.lit, VideoLook.LIGHT.lit, ACCENT_PICKS) { ask.look.copy(lit = it) } else null
         ))
         layoutInflater.card(cards, R.string.video_preview, listOf(preview()))
         // Made: where it was saved, and a way to send it; a change to any choice brings back the button to make one
@@ -225,11 +224,11 @@ class VideoActivity : CardsActivity(R.string.video_title) {
     private fun evenSide(n: Int) = ((n + SIDE_STEP / 2) / SIDE_STEP * SIDE_STEP).coerceIn(SIDE)
 
     // Ready-made colours a tap away: the reader's own, light, dark and green
-    private fun looks(reader: VideoLook): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
+    private fun looks(): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
         background = null
         val face = findViewById<TextView>(R.id.seg_1).typeface
         listOf(
-            R.id.seg_1 to (reader to R.string.look_reader),
+            R.id.seg_1 to (VideoLook.ofReader(this@VideoActivity) to R.string.look_reader),
             R.id.seg_2 to (VideoLook.LIGHT to R.string.look_light),
             R.id.seg_3 to (VideoLook.DARK to R.string.look_dark),
             R.id.seg_4 to (VideoLook.GREEN to R.string.look_green)
@@ -242,18 +241,21 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         }
     }
 
-    // One of the video's colours: the picker shows it on a line of the page, with the others as they stand
-    private fun colorRow(label: Int, current: Int, reader: Int, picks: IntArray, with: (Int) -> VideoLook): View =
+    // One of the video's colours: the picker shows it on a line of the page, with the others as they stand; reset returns it to the white look's
+    private fun colorRow(label: Int, current: Int, default: Int, picks: IntArray, with: (Int) -> VideoLook): View =
         layoutInflater.inflate(R.layout.row_setting_color, cards, false).apply {
             findViewById<TextView>(R.id.set_label).setText(label)
             findViewById<ImageView>(R.id.set_dot).imageTintList = ColorStateList.valueOf(current)
             setOnClickListener {
                 val inUse = intArrayOf(ask.look.paper, ask.look.ink, ask.look.lit)
-                colorSheet(getString(label), this@VideoActivity, current, reader, picks, inUse, trial = { line, c ->
+                colorSheet(getString(label), this@VideoActivity, current, default, picks, inUse, trial = { line, c ->
                     with(c).let { line.tryOn(lit = it.lit, mark = it.ink, ink = it.ink, paper = it.paper) }
                 }) { setLook(with(it)) }
             }
-            findViewById<View>(R.id.set_reset).setOnClickListener { setLook(with(reader)) }
+            findViewById<View>(R.id.set_reset).apply {
+                visibility = if (current == default) View.INVISIBLE else View.VISIBLE
+                setOnClickListener { setLook(with(default)) }
+            }
         }
 
     private fun setLook(look: VideoLook) {
