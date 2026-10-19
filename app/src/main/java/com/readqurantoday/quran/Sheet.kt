@@ -59,9 +59,9 @@ fun Activity.askNumber(title: String, keep: String, current: Int, range: IntRang
     box.setText(figures(current, resources))
     box.setSelection(box.text.length)
     val save = {
-        // Out of range or empty is not kept; the sheet stays open for another try
+        // Past either end is brought to that end; only an empty box keeps the sheet open
         val n = latinDigits(box.text.toString()).toIntOrNull()
-        if (n != null && n in range) { dialog.dismiss(); done(n) }
+        if (n != null) { dialog.dismiss(); done(n.coerceIn(range)) }
     }
     part.findViewById<TextView>(R.id.sheet_keep).apply {
         text = keep

@@ -105,9 +105,9 @@ class VideoActivity : CardsActivity(R.string.video_title) {
             build()
         }
         layoutInflater.card(cards, R.string.video_style, listOf(styles()) + when (ask.style) {
-            VideoFrames.Style.PAGE -> listOf(shapeRow(), phonetics)
-            VideoFrames.Style.WORD -> listOf(words, shapeRow())
-            VideoFrames.Style.LINE -> listOf(shapeRow())
+            VideoFrames.Style.PAGE -> shapeRows() + phonetics
+            VideoFrames.Style.WORD -> listOf(words) + shapeRows()
+            VideoFrames.Style.LINE -> shapeRows()
         })
         val highlight = layoutInflater.switchRow(cards, getString(R.string.video_highlight), ask.highlight) {
             ask = ask.copy(highlight = it)
@@ -189,9 +189,9 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         tag = PREVIEW
     }
 
-    // The shapes on offer: the one-line strip only for line by line, which is all it can hold
+    // The shapes on offer: the one-line strip for words and lines, never the whole page it cannot hold
     private fun shapesFor(style: VideoFrames.Style) =
-        RecitationVideo.Shape.entries.filter { it != RecitationVideo.Shape.STRIP || style == VideoFrames.Style.LINE }
+        RecitationVideo.Shape.entries.filter { it != RecitationVideo.Shape.STRIP || style != VideoFrames.Style.PAGE }
 
     // Its name with the proportions the apps ask for; a size of one's own says its size
     private fun shapeSaid(shape: RecitationVideo.Shape): String = getString(R.string.shape_said, getString(SHAPE_NAMES.getValue(shape)),
@@ -202,23 +202,23 @@ class VideoActivity : CardsActivity(R.string.video_title) {
     private fun shapeRow(): View = pickRow(R.string.video_shape, shapeSaid(ask.shape)) {
         val shapes = shapesFor(ask.style)
         sheet(getString(R.string.video_shape), shapes.map { Choice(shapeSaid(it), on = it == ask.shape) }) { i ->
-            if (shapes[i] == RecitationVideo.Shape.CUSTOM) askSize()
-            else {
-                ask = ask.copy(shape = shapes[i])
-                build()
-            }
+            ask = ask.copy(shape = shapes[i])
+            build()
         }
     }
 
-    // A size of one's own: the width, then the height, each kept to what a phone's video maker takes
-    private fun askSize() {
-        askNumber(getString(R.string.shape_wide_ask), getString(R.string.hifz_keep), ask.customWide, SIDE) { wide ->
-            askNumber(getString(R.string.shape_tall_ask), getString(R.string.hifz_keep), ask.customTall, SIDE) { tall ->
-                ask = ask.copy(shape = RecitationVideo.Shape.CUSTOM, customWide = evenSide(wide), customTall = evenSide(tall))
-                build()
-            }
+    // A size of one's own: the shape row, then its width and height, each set on its own row
+    private fun shapeRows(): List<View> = if (ask.shape != RecitationVideo.Shape.CUSTOM) listOf(shapeRow()) else listOf(
+        shapeRow(),
+        stepperRow(cards, R.string.shape_wide_ask, ask.customWide, SIDE, SIDE_STEP * 5) {
+            ask = ask.copy(customWide = evenSide(it))
+            build()
+        },
+        stepperRow(cards, R.string.shape_tall_ask, ask.customTall, SIDE, SIDE_STEP * 5) {
+            ask = ask.copy(customTall = evenSide(it))
+            build()
         }
-    }
+    )
 
     // A multiple of sixteen, as video makers handle best
     private fun evenSide(n: Int) = ((n + SIDE_STEP / 2) / SIDE_STEP * SIDE_STEP).coerceIn(SIDE)
