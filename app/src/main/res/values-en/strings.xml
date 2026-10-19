@@ -234,7 +234,7 @@
     <string name="time_and">%1$s %2$s</string>
     <string name="stats_per_hour_note">Shows after a few pages are read</string>
     <string name="pt_sort">Order</string>
-    <string name="pt_by_page">In page order</string>
+    <string name="pt_by_page">By page</string>
     <string name="pt_by_time">Slowest first</string>
     <string name="pt_fastest">Fastest page</string>
     <string name="pt_slowest">Slowest page</string>
@@ -433,4 +433,5 @@
     <string name="shape_custom">Custom</string>
     <string name="shape_wide_ask">Video width in pixels</string>
     <string name="shape_tall_ask">Video height in pixels</string>
+    <string name="pt_by_quick">Quickest first</string>
 </resources>

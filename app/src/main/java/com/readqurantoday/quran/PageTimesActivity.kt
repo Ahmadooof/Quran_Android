@@ -7,7 +7,9 @@ import android.widget.TextView
 /** Every page read today with the time it took: a screen of its own, since a day may hold hundreds. */
 class PageTimesActivity : CardsActivity(R.string.stats_page_times) {
 
-    private var longestFirst = false
+    // The order the pages are listed in, switched with one tap
+    private enum class Order { PAGE, SLOWEST, QUICKEST }
+    private var order = Order.PAGE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,26 +32,36 @@ class PageTimesActivity : CardsActivity(R.string.stats_page_times) {
             row(getString(R.string.pt_slowest), spentExact(longest.value, resources), where(longest.key))
         ))
 
-        layoutInflater.card(cards, 0, listOf(sortRow()))
-
-        val order = if (longestFirst) sec.entries.sortedByDescending { it.value } else sec.entries.sortedBy { it.key }
-        layoutInflater.card(cards, 0, order.map { (page, s) ->
+        val listed = when (order) {
+            Order.PAGE -> sec.entries.sortedBy { it.key }
+            Order.SLOWEST -> sec.entries.sortedByDescending { it.value }
+            Order.QUICKEST -> sec.entries.sortedBy { it.value }
+        }
+        layoutInflater.card(cards, R.string.pt_sort, listOf(orders()) + listed.map { (page, s) ->
             row(pageNamed(page, resources), spentExact(s, resources), Surahs.ofPage(page)?.name.orEmpty())
         })
     }
 
-    private fun sortRow(): View =
-        row(getString(R.string.pt_sort), getString(if (longestFirst) R.string.pt_by_time else R.string.pt_by_page)).apply {
-            opens {
-                sheet(getString(R.string.pt_sort), listOf(
-                    Choice(getString(R.string.pt_by_page), on = !longestFirst),
-                    Choice(getString(R.string.pt_by_time), on = longestFirst)
-                )) { i ->
-                    longestFirst = i == 1
+    // By page, slowest first or quickest first, the one in use marked
+    private fun orders(): View = layoutInflater.inflate(R.layout.part_segments, cards, false).apply {
+        background = null
+        val face = findViewById<TextView>(R.id.seg_1).typeface
+        findViewById<View>(R.id.seg_4).visibility = View.GONE
+        listOf(
+            R.id.seg_1 to (Order.PAGE to R.string.pt_by_page),
+            R.id.seg_2 to (Order.SLOWEST to R.string.pt_by_time),
+            R.id.seg_3 to (Order.QUICKEST to R.string.pt_by_quick)
+        ).forEach { (id, choice) ->
+            findViewById<TextView>(id).apply {
+                setText(choice.second)
+                markSegment(order == choice.first, face)
+                setOnClickListener {
+                    order = choice.first
                     build()
                 }
             }
         }
+    }
 
     // The page, then its surah after an Arabic comma: a dot beside a figure reads as a zero
     private fun where(page: Int): String {

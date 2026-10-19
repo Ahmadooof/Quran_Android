@@ -286,7 +286,7 @@
     <string name="time_and">%1$s و%2$s</string>
     <string name="stats_per_hour_note">يظهر بعد قراءة بضع صفحات</string>
     <string name="pt_sort">الترتيب</string>
-    <string name="pt_by_page">بترتيب الصفحات</string>
+    <string name="pt_by_page">حسب الصفحة</string>
     <string name="pt_by_time">الأبطأ أولًا</string>
     <string name="pt_fastest">أسرع صفحة</string>
     <string name="pt_slowest">أبطأ صفحة</string>
@@ -512,4 +512,5 @@
     <string name="shape_size" translatable="false">%1$s×%2$s</string>
     <string name="shape_wide_ask">عرض الفيديو بالبكسل</string>
     <string name="shape_tall_ask">ارتفاع الفيديو بالبكسل</string>
+    <string name="pt_by_quick">الأسرع أولًا</string>
 </resources>
