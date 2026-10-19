@@ -989,16 +989,13 @@ class MushafPageView @JvmOverloads constructor(
                 drawRun(canvas, face, litIds, litSpots, litN, litPaint, litSpread)
             }
         } else {
-            // API < 31 has no glyph runs, so it falls back to text and fake bold
-            paint.isFakeBoldText = inkSpread > 0f
-            markPaint.isFakeBoldText = markSpread > 0f
+            // API < 31 has no glyph runs, so it falls back to text, thickened by the same nudging
             markPaint.textSize = size
             markPaint.typeface = paint.typeface
             markPaint.textAlign = Paint.Align.LEFT
             litPaint.textSize = size
             litPaint.typeface = paint.typeface
             litPaint.textAlign = Paint.Align.LEFT
-            litPaint.isFakeBoldText = litSpread > 0f
             var wx = start
             var fbSurah = fbSurah0
             var fbAyah  = fbAyah0
@@ -1035,6 +1032,15 @@ class MushafPageView @JvmOverloads constructor(
     private fun drawPart(canvas: Canvas, text: String, right: Float, y: Float, glyphs: Mushaf.Glyphs, size: Float, pen: Paint): Float {
         val w = wordWidth(text, glyphs, size)
         canvas.drawText(text, right - w, y, pen)
+        val spread = when (pen) {
+            litPaint -> litSpread
+            markPaint -> markSpread
+            else -> inkSpread
+        }
+        if (spread > 0f) {
+            val d = size * spread / zoom
+            for ((dx, dy) in NUDGES) canvas.drawText(text, right - w + dx * d, y + dy * d, pen)
+        }
         return right - w
     }
 
@@ -1267,6 +1273,9 @@ class MushafPageView @JvmOverloads constructor(
         private val WEIGHTS = floatArrayOf(0f, 0.006f, 0.011f, BOLD_SPREAD)
 
         /* A weight as a dilation spread; anything unknown draws regular. */
+        // The four ways a glyph is nudged to thicken it
+        private val NUDGES = listOf(1f to 0f, -1f to 0f, 0f to 1f, 0f to -1f)
+
         private fun spread(weight: Int) = WEIGHTS.getOrElse(weight) { 0f }
 
         /** Furthest the page may be pinched. Past 3x the glyphs gain nothing. */
