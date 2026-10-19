@@ -17,34 +17,31 @@ class PlacesPane(
     private val open: (Int) -> Unit
 ) {
 
-    // Recycling lists under fixed headings, so a long history builds only the rows in view
+    // Recycling lists, so a long history builds only the rows in view; each tab's name says what its list holds
     private val lists = List(LISTS) { PlacesList() }
     private val pages = lists.map { list ->
-        host.layoutInflater.inflate(R.layout.part_headed_list, pager, false).apply {
-            findViewById<View>(R.id.list_head).keepToColumn()
-            findViewById<RecyclerView>(R.id.list_rows).apply {
-                layoutManager = LinearLayoutManager(host)
-                adapter = list
-                addItemDecoration(PlacesSeams(list, host.getColor(R.color.line), resources.displayMetrics.density))
-                keepToColumn()
-            }
+        (host.layoutInflater.inflate(R.layout.part_places_list, pager, false) as RecyclerView).apply {
+            layoutManager = LinearLayoutManager(host)
+            adapter = list
+            addItemDecoration(PlacesSeams(list, host.getColor(R.color.line), resources.displayMetrics.density))
+            keepToColumn()
         }
     }
 
     private val tabs = SwipeTabs(
         pager, strip,
-        intArrayOf(R.string.list_pages, R.string.list_surahs, R.string.marks_col_saved),
+        intArrayOf(R.string.places_tab_today, R.string.places_tab_places, R.string.marks_col_saved),
         // The slide between lists is their movement; a rise on top of it blinked the rows out mid-swipe
         ViewPages(pages)
     )
 
     // Rebuilt on every return: reading changes the history and saved pages
     fun build() {
-        fill(PAGES, R.string.places_pages_head, readToday().map { read -> PlacesList.Item.Row { pageRow(it, read) } }, R.string.no_recent_pages)
-        fill(SURAHS, R.string.places_surahs_head, recentSurahs().map { read -> PlacesList.Item.Row { surahRow(it, read) } }, R.string.no_recent)
+        fill(PAGES, readToday().map { read -> PlacesList.Item.Row { pageRow(it, read) } }, R.string.no_recent_pages)
+        fill(SURAHS, recentSurahs().map { read -> PlacesList.Item.Row { surahRow(it, read) } }, R.string.no_recent)
         val saved = Settings.marks(host)
         val clear = if (saved.size > 1) listOf(PlacesList.Item.Action(host.getString(R.string.marks_clear), ::askClear)) else emptyList()
-        fill(SAVED, 0, saved.map { page -> PlacesList.Item.Row { savedRow(it, page) } } + clear, R.string.no_marks)
+        fill(SAVED, saved.map { page -> PlacesList.Item.Row { savedRow(it, page) } } + clear, R.string.no_marks)
     }
 
     // Every saved page goes at once, after a yes: the one delete that asks first
@@ -59,11 +56,7 @@ class PlacesPane(
     /** The list in view comes in, as every tab does when it is opened. */
     fun rise() = pages[tabs.current].riseWhole()
 
-    private fun fill(list: Int, title: Int, rows: List<PlacesList.Item>, none: Int) {
-        pages[list].findViewById<TextView>(R.id.list_head).apply {
-            visibility = if (title != 0) View.VISIBLE else View.GONE
-            if (title != 0) setText(title)
-        }
+    private fun fill(list: Int, rows: List<PlacesList.Item>, none: Int) {
         lists[list].show(rows.ifEmpty { listOf(PlacesList.Item.Empty(host.getString(none))) })
     }
 

@@ -365,8 +365,6 @@
     <string name="step_less">Less</string>
     <string name="step_more">More</string>
     <string name="no_recent_pages">No pages read yet today</string>
-    <string name="places_pages_head">Pages read today</string>
-    <string name="places_surahs_head">Latest place read in each surah</string>
     <string name="heard_each">Listening, surah by surah</string>
     <string name="dl_about">Downloading keeps a recitation in the app to listen without internet. Once downloaded, a surah can be shared or a copy saved to the phone’s Download/Quran folder.</string>
     <string name="dl_get_first">Download the surah first</string>
@@ -435,4 +433,6 @@
     <string name="shape_tall_ask">Video height in pixels</string>
     <string name="pt_by_quick">Quickest first</string>
     <string name="day_other_whole">Other surahs completed</string>
+    <string name="places_tab_today">Pages today</string>
+    <string name="places_tab_places">Last places</string>
 </resources>
