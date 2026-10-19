@@ -51,6 +51,13 @@ object Search {
         .replace('ة', 'ه')
         .trim()
 
+    /** Ayahs holding [folded], each with its match marked. */
+    fun verses(folded: String): List<Hit.Verse> = Ayahs.find(folded).map { f ->
+        // Folding keeps positions, so matches can be marked; if lengths differ the row is left unmarked
+        val at = if (f.ayah.folded.length == f.ayah.text.length) f.at else -1
+        Hit.Verse(f.ayah, at, folded.length)
+    }
+
     /** Rows for [raw]. An empty list means there is nothing to narrow: show the index. */
     fun plan(raw: String, all: List<Surahs.Surah>): List<Hit> {
         val q = digits(raw).trim()
@@ -78,14 +85,10 @@ object Search {
             for (s in found) hits.add(Hit.Name(s))
         }
 
-        val verses = Ayahs.find(folded)
+        val verses = verses(folded)
         if (verses.isNotEmpty()) {
             hits.add(Hit.Head(R.string.search_ayahs))
-            // Folding keeps positions, so matches can be marked; if lengths differ the row is left unmarked
-            for (f in verses) {
-                val at = if (f.ayah.folded.length == f.ayah.text.length) f.at else -1
-                hits.add(Hit.Verse(f.ayah, at, folded.length))
-            }
+            hits.addAll(verses)
         }
 
         return hits.ifEmpty { listOf(Hit.None) }

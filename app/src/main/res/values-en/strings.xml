@@ -425,7 +425,7 @@
     <string name="goal_surahs_today">Goal surahs read today</string>
     <string name="surah_done">Completed</string>
     <string name="goal_met">Done</string>
-    <string name="surah_search_hint">Surah name or number</string>
+    <string name="surah_search_hint">Surah name or number, or words of an ayah</string>
     <plurals name="ayahs_count">
         <item quantity="one">%1$s ayah</item>
         <item quantity="other">%1$s ayahs</item>

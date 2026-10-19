@@ -69,9 +69,12 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         val ayahs = surah().ayahs
         layoutInflater.card(cards, 0, listOf(
             pickRow(R.string.video_surah, surah().name) {
-                pickSurah(getString(R.string.video_surah), ask.surah) { id ->
+                pickSurah(getString(R.string.video_surah), ask.surah) { id, ayah ->
                     val s = checkNotNull(Surahs.of(id))
-                    ask = ask.copy(surah = s.id, from = 1, to = minOf(s.ayahs, START_AYAHS), reciter = reciterFor(s.id, ask.reciter))
+                    // An ayah found by its words opens the span there, as long as the one before
+                    val from = ayah ?: 1
+                    val to = if (ayah == null) minOf(s.ayahs, START_AYAHS) else minOf(s.ayahs, from + (ask.to - ask.from))
+                    ask = ask.copy(surah = s.id, from = from, to = to, reciter = reciterFor(s.id, ask.reciter))
                     build()
                 }
             },

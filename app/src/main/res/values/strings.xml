@@ -499,7 +499,7 @@
     <string name="goal_surahs_today">قراءة سور الهدف اليوم</string>
     <string name="surah_done">مكتملة</string>
     <string name="goal_met">تم</string>
-    <string name="surah_search_hint">اسم السورة أو رقمها</string>
+    <string name="surah_search_hint">اسم السورة أو رقمها أو كلمات من آية</string>
     <plurals name="ayahs_count">
         <item quantity="zero">%1$s آية</item>
         <item quantity="one">آية واحدة</item>
