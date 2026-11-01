@@ -123,7 +123,7 @@ assert len(words_of) == 6236
 
 # --- pages: the same line kinds as before, words from v4 ---
 out_pages = {}
-basmalah = None
+basmalah_fonts = set()
 for p in range(1, 605):
     rows = []
     for li, line in enumerate(pages[p]['lines']):
@@ -131,9 +131,10 @@ for p in range(1, 605):
         if 'surah_header' in types:
             rows.append({'t': 'surah', 's': line['words'][0]['sura']})
         elif 'bismillah' in types:
-            rows.append({'t': 'basmalah'})
+            # Each surah's own Basmalah: compact on the opening pages, long elsewhere, with a shadda after a surah ending in ب
             b = next(w for w in line['words'] if w['type'] == 'bismillah')
-            basmalah = basmalah or (p, b['code'], b['font'])
+            rows.append({'t': 'basmalah', 'v4': chr(b['code'])})
+            basmalah_fonts.add(number(b['font']))
         else:
             rows.append({'t': 'ayah', 'v4': '|'.join(lines.get((p, li), []))})
     out_pages[str(p)] = rows
@@ -171,14 +172,13 @@ for p in range(3, 605):
 widths.sort()
 body = round(widths[int(len(widths) * 0.99)] * 1.0095, 2)
 
-bp, bcode, bfont = basmalah
-assert number(bfont) == number(font_map[str(bp)]) or bp == 1
+assert len(basmalah_fonts) == 1, basmalah_fonts
 data = {
     'fit': {'body': {'v4': body}, 'centreBelow': {'v4': old['fit']['centreBelow']['v2']}},
     'rubPages': old['rubPages'],
     'juzPages': old['juzPages'],
     'fonts': [number(font_map[str(p)]) for p in range(1, 605)],
-    'basmalah': {'font': number(bfont), 'v4': chr(bcode)},
+    'basmalah': {'font': basmalah_fonts.pop()},
     'pages': out_pages,
     'marks': ends,
 }
@@ -190,4 +190,4 @@ for n in range(1, 48):
     table(name, f'gq{n}.txt')
 shutil.copy(os.path.join(FONTS, 'QCF4_QBSML.ttf'), os.path.join(OUT_FONTS, 'qh.ttf'))
 table('QCF4_QBSML', 'gqh.txt')
-print('marks put back', put_back, 'body em', body, 'basmalah', hex(bcode), bfont)
+print('marks put back', put_back, 'body em', body)

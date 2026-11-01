@@ -32,9 +32,7 @@ object Mushaf {
     var centreBelow = 0.92
         private set
 
-    var basmalah: List<String> = emptyList()
-        private set
-    /** A page drawn from the Basmalah's font, so its glyph is read through that page's handles. */
+    /** A page drawn from the Basmalahs' font, so their glyphs are read through that page's handles. */
     var basmalahPage = 1
         private set
 
@@ -74,12 +72,10 @@ object Mushaf {
         marks = root.optJSONObject("marks")
         root.getJSONArray("fonts").let { all -> fontOfPage = IntArray(all.length()) { all.getInt(it) } }
 
-        /* The Basmalah is one glyph of one font, the same wherever it appears. */
+        /* Each Basmalah line holds its own glyph; all of them live in one font. */
         root.optJSONObject("basmalah")?.let { b ->
             val font = b.optInt("font", 1)
             basmalahPage = (fontOfPage.indexOfFirst { it == font } + 1).coerceAtLeast(1)
-            val text = b.optString(EDITION, "")
-            basmalah = if (text.isEmpty()) emptyList() else text.split('|').filter { it.isNotEmpty() }
         }
 
         root.optJSONObject("fit")?.let { fit ->

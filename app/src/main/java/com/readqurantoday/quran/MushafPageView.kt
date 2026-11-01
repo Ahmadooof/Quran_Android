@@ -770,7 +770,7 @@ class MushafPageView @JvmOverloads constructor(
                     atWord = 0
                     title(canvas, line.surah, left + measure / 2f, body, y)
                 }
-                "basmalah" -> basmalah(canvas, left + measure / 2f, body, y)
+                "basmalah" -> basmalah(canvas, lineWords[i], left + measure / 2f, body, y)
                 else -> if (line.words.isNotEmpty()) {
                     drawLine(canvas, lineWords[i], glyphs, left, measure, body, y, step)
                 }
@@ -1119,9 +1119,8 @@ class MushafPageView @JvmOverloads constructor(
         }
     }
 
-    /* Basmalah drawn from the face it lives in. */
-    private fun basmalah(canvas: Canvas, centre: Float, size: Float, y: Float) {
-        val words = Mushaf.basmalah
+    /* The surah's own Basmalah, drawn from the face it lives in. */
+    private fun basmalah(canvas: Canvas, words: List<String>, centre: Float, size: Float, y: Float) {
         if (words.isEmpty()) return
         val from = Mushaf.basmalahPage
         val glyphs = Mushaf.glyphs(context, from) ?: return
