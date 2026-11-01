@@ -68,8 +68,8 @@ class SurahBand {
             }
         }
 
-        // The cartouche: notched ends, the page's own colour, so the title reads as on the page
-        shapeCartouche(centre, mid, half, tall)
+        // The cartouche: the page's own colour, so the title reads as on the page
+        cartouche.cartouche(centre, mid, half, tall * CARTOUCHE, box)
         fill.color = paper
         canvas.drawPath(cartouche, fill)
         line.strokeWidth = edge
@@ -166,36 +166,11 @@ class SurahBand {
         return u * u * u * p0 + 3f * u * u * t * p1 + 3f * u * t * t * p2 + t * t * t * p3
     }
 
-    // A box with rounded corners and a point at each end
-    private fun shapeCartouche(centre: Float, mid: Float, half: Float, tall: Float) {
-        val top = mid - tall * CARTOUCHE / 2f
-        val bottom = mid + tall * CARTOUCHE / 2f
-        val round = tall * NOTCH
-        val left = centre - half
-        val right = centre + half
-        cartouche.reset()
-        cartouche.moveTo(left + round, top)
-        cartouche.lineTo(right - round, top)
-        box.set(right - round * 2f, top, right, top + round * 2f)
-        cartouche.arcTo(box, 270f, 90f)
-        cartouche.lineTo(right + round * 0.55f, mid)
-        box.set(right - round * 2f, bottom - round * 2f, right, bottom)
-        cartouche.arcTo(box, 0f, 90f)
-        cartouche.lineTo(left + round, bottom)
-        box.set(left, bottom - round * 2f, left + round * 2f, bottom)
-        cartouche.arcTo(box, 90f, 90f)
-        cartouche.lineTo(left - round * 0.55f, mid)
-        box.set(left, top, left + round * 2f, top + round * 2f)
-        cartouche.arcTo(box, 180f, 90f)
-        cartouche.close()
-    }
-
     private companion object {
         // Shares of the band's height
         const val FRAME = 0.028f
-        const val CARTOUCHE = 0.72f
-        const val CARTOUCHE_PAD = 0.38f
-        const val NOTCH = 0.15f
+        const val CARTOUCHE = 0.8f
+        const val CARTOUCHE_PAD = 0.55f
         const val RIBBON = 0.035f
         const val RIBBON_EDGE = 0.06f
         const val OUTLINE = 0.0154f

@@ -46,9 +46,11 @@ class MushafPageView @JvmOverloads constructor(
         isLinearText = true
     }
 
-    // The band behind each surah's title, and the page colour its cartouche is filled with
+    // The page's frame and the band behind each surah's title, drawn in the page's own colours only, never a trial's
     private val band = SurahBand()
+    private val frame = PageFrame()
     private var paperColour = 0
+    private val adorned get() = paperTrial == null && markTrial == null
 
     private val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         isSubpixelText = true
@@ -773,9 +775,10 @@ class MushafPageView @JvmOverloads constructor(
                     atSurah = line.surah
                     atAyah = 1
                     atWord = 0
-                    band.draw(canvas, left + measure / 2f, y - centreOffset, measure, step * BAND_TALL,
+                    val mid = y - centreOffset
+                    if (adorned) band.draw(canvas, left + measure / 2f, mid, measure, step * BAND_TALL,
                         titleWidth(line.surah, body), markPaint.color, paperColour)
-                    title(canvas, line.surah, left + measure / 2f, body, y)
+                    title(canvas, line.surah, left + measure / 2f, body, mid + Mushaf.HEAD_RISE * body)
                 }
                 "basmalah" -> basmalah(canvas, lineWords[i], left + measure / 2f, body, y)
                 else -> if (line.words.isNotEmpty()) {
@@ -1070,26 +1073,46 @@ class MushafPageView @JvmOverloads constructor(
     private fun runningHead(canvas: Canvas, left: Float, measure: Float) {
         if (pageNo <= 0) return
         val y = padTop + headBand * 0.62f
-        val titleSize = headBand * 0.82f
+        val tall = headBand * LABEL_TALL
+        val pad = tall * LABEL_PAD
+        // The surah's name the size of the juz and page beside it, not a surah's opening title
+        val titleSize = label.textSize * HEAD_TITLE_MATCH
 
-        // Narrow screens shrink the side labels rather than let them touch the centred name
+        // Narrow screens shrink the side labels rather than let their cartouches touch the centred one
         val full = label.textSize
-        val side = (measure - titleWidth(headSurah, titleSize)) / 2f - full
+        val side = (measure - titleWidth(headSurah, titleSize)) / 2f - pad * 4f - full
         val widest = maxOf(label.measureText(headSide), label.measureText(headJuz))
         if (widest > side && side > 0f) label.textSize = full * side / widest
         thicken()
 
+        // The frame runs from the labels' middle down to the folio's, just outside the text
+        val mid = y + (label.ascent() + label.descent()) / 2f
+        val edge = resources.displayMetrics.density * FRAME_EDGE
+        val ink = markPaint.color
+        if (adorned) frame.frame(canvas, left - padX * FRAME_GAP, mid, left + measure + padX * FRAME_GAP, footMid(), edge, ink)
+
+        label.textAlign = Paint.Align.CENTER
         if (headJuz.isNotEmpty()) {
-            label.textAlign = Paint.Align.RIGHT
-            canvas.drawText(headJuz, left + measure, y, label)
+            val half = label.measureText(headJuz) / 2f + pad
+            if (adorned) frame.label(canvas, left + measure - half, mid, half, tall, edge, ink, paperColour)
+            canvas.drawText(headJuz, left + measure - half, y, label)
         }
 
-        if (headSurah > 0) title(canvas, headSurah, left + measure / 2f, titleSize, y)
+        if (headSurah > 0) {
+            if (adorned) frame.label(canvas, left + measure / 2f, mid, titleWidth(headSurah, titleSize) / 2f + pad, tall, edge, ink, paperColour)
+            title(canvas, headSurah, left + measure / 2f, titleSize, mid + Mushaf.HEAD_RISE * titleSize)
+        }
 
-        label.textAlign = Paint.Align.LEFT
-        canvas.drawText(headSide, left, y, label)
+        if (headSide.isNotEmpty()) {
+            val half = label.measureText(headSide) / 2f + pad
+            if (adorned) frame.label(canvas, left + half, mid, half, tall, edge, ink, paperColour)
+            canvas.drawText(headSide, left + half, y, label)
+        }
         label.textSize = full
     }
+
+    // Where the folio sits: the middle of the foot, which on a scrolling page is below the screen
+    private fun footMid() = pageTall - padBottom / 2f
 
     // The labels' weight as a stroke around each letter, in step with their size: shrunk labels thin with them
     private fun thicken() {
@@ -1181,8 +1204,13 @@ class MushafPageView @JvmOverloads constructor(
         if (pageNo <= 0) return
         thicken()
         label.textAlign = Paint.Align.CENTER
-        /* At the foot of the page, which on a scrolling page is below the screen. */
-        canvas.drawText(folioText, width / 2f, pageTall - padBottom / 2f, label)
+        val mid = footMid()
+        if (adorned) {
+            val tall = headBand * LABEL_TALL
+            val edge = resources.displayMetrics.density * FRAME_EDGE
+            frame.label(canvas, width / 2f, mid, label.measureText(folioText) / 2f + tall * LABEL_PAD, tall, edge, markPaint.color, paperColour)
+        }
+        canvas.drawText(folioText, width / 2f, mid - (label.ascent() + label.descent()) / 2f, label)
     }
 
     private fun lineWidth(words: List<String>, glyphs: Mushaf.Glyphs, size: Float): Float {
@@ -1251,6 +1279,15 @@ class MushafPageView @JvmOverloads constructor(
 
         // A surah's band, as a share of its line's height
         private const val BAND_TALL = 0.86f
+
+        // The frame: its rules' thickness in dp, its gap outside the text as a share of the side margin,
+        // and its label cartouches' height in the head band and padding either side of their words
+        private const val FRAME_EDGE = 1.2f
+        private const val FRAME_GAP = 0.6f
+        private const val LABEL_TALL = 0.9f
+        private const val LABEL_PAD = 0.5f
+        // The titles font's letters stand smaller than the labels' at one size; this evens them
+        private const val HEAD_TITLE_MATCH = 1.25f
 
         /** Furthest the page may be pinched. Past 3x the glyphs gain nothing. */
         const val MAX_ZOOM = 3f
