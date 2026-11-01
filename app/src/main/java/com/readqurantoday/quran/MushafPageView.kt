@@ -768,7 +768,7 @@ class MushafPageView @JvmOverloads constructor(
                     atSurah = line.surah
                     atAyah = 1
                     atWord = 0
-                    title(canvas, line.surah, left + measure / 2f, body, y)
+                    banner(canvas, line.surah, left + measure / 2f, body, y)
                 }
                 "basmalah" -> basmalah(canvas, left + measure / 2f, body, y)
                 else -> if (line.words.isNotEmpty()) {
@@ -1091,19 +1091,31 @@ class MushafPageView @JvmOverloads constructor(
 
     private fun titleWidth(surah: Int, size: Float): Float {
         if (surah <= 0) return 0f
-        val names = Mushaf.names(context) ?: return 0f
-        val scale = size / names.upem
-        return (names.advance(Mushaf.SURAH_WORD) + names.advance(Mushaf.nameCode(surah))) * scale + 0.1f * size
+        val heads = Mushaf.heads(context) ?: return 0f
+        return heads.advance(Mushaf.headCode(surah)) * size / heads.upem
     }
 
     /* The surah's printed title, one glyph of the mushaf's own titles font, at the text's size. */
     private fun title(canvas: Canvas, surah: Int, centre: Float, size: Float, y: Float) {
         val heads = Mushaf.heads(context) ?: return
         val cp = Mushaf.headCode(surah)
+        titlePaint.textSize = size
+        headGlyph(canvas, heads, cp, centre - heads.advance(cp) * size / heads.upem / 2f, y)
+    }
+
+    /* A surah's opening line: its title between the titles font's own pair of end ornaments. */
+    private fun banner(canvas: Canvas, surah: Int, centre: Float, size: Float, y: Float) {
+        val heads = Mushaf.heads(context) ?: return
+        title(canvas, surah, centre, size, y)
+        val scale = size / heads.upem
+        val half = heads.advance(Mushaf.headCode(surah)) * scale / 2f + BANNER_GAP * size
+        headGlyph(canvas, heads, Mushaf.HEAD_END_LEFT, centre - half - heads.advance(Mushaf.HEAD_END_LEFT) * scale, y)
+        headGlyph(canvas, heads, Mushaf.HEAD_END_RIGHT, centre + half, y)
+    }
+
+    private fun headGlyph(canvas: Canvas, heads: Mushaf.Glyphs, cp: Int, x: Float, y: Float) {
         val id = heads.id(cp)
         if (id < 0) return
-        val x = centre - heads.advance(cp) * size / heads.upem / 2f
-        titlePaint.textSize = size
         val face = Mushaf.headFace(context)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && face != null) {
             oneId[0] = id
@@ -1240,6 +1252,9 @@ class MushafPageView @JvmOverloads constructor(
         private val NUDGES = listOf(1f to 0f, -1f to 0f, 0f to 1f, 0f to -1f)
 
         private fun spread(weight: Int) = WEIGHTS.getOrElse(weight) { 0f }
+
+        // Space between a surah title and its end ornaments, in ems
+        private const val BANNER_GAP = 0.15f
 
         /** Furthest the page may be pinched. Past 3x the glyphs gain nothing. */
         const val MAX_ZOOM = 3f

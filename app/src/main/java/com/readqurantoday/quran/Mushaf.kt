@@ -271,6 +271,10 @@ object Mushaf {
     /** Surah N's printed title in the titles font. */
     fun headCode(surah: Int): Int = 0xF100 + surah - 1
 
+    // The titles font's rosette ornaments, one either side of a surah title
+    const val HEAD_END_RIGHT = 0xFAE0
+    const val HEAD_END_LEFT = 0xFAE1
+
     /** Codepoint for surah N in the names face: E004 for surah 4, E114 for 114. */
     fun nameCode(surah: Int): Int = 0xE000 + Integer.parseInt(surah.toString().padStart(3, '0'), 16)
 
