@@ -41,9 +41,10 @@ class VideoActivity : CardsActivity(R.string.video_title) {
         val surah = last?.let { Surahs.of(it.surah) } ?: Surahs.ofPage(Settings.lastPage(this)) ?: Surahs.list().first()
         val from = (last?.from ?: 1).coerceIn(1, surah.ayahs)
         val to = (last?.to ?: START_AYAHS).coerceIn(from, minOf(surah.ayahs, from + MOST_AYAHS - 1))
+        val style = last?.style ?: VideoFrames.Style.LINE
         ask = RecitationVideo.Ask(surah.id, from, to, reciterFor(surah.id, last?.reciter ?: Recite.chosen(this)?.id),
-            last?.style ?: VideoFrames.Style.LINE, VideoLook.of(this),
-            last?.shape?.takeIf { it in shapesFor(last.style) } ?: RecitationVideo.Shape.TALL,
+            style, VideoLook.of(this),
+            last?.shape?.takeIf { it in shapesFor(style) } ?: RecitationVideo.shapeFor(this, style),
             last?.phonetics ?: Settings.translit(this))
         build()
         sayBars()
