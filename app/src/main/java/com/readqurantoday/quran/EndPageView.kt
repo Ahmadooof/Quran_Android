@@ -2,6 +2,7 @@ package com.readqurantoday.quran
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -16,6 +17,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 
 /** One of the mushaf's closing pages, framed as the Quran's pages are, its text scrolling inside the frame. */
 @SuppressLint("ViewConstructor")
@@ -111,12 +113,15 @@ class EndPageView(context: Context, private val tapped: () -> Unit) : FrameLayou
         super.onDraw(canvas)
         val inset = INSET * dp
         val edge = EDGE * dp
-        val ink = Settings.resolvedAyahColor(context)
+        // As on the Quran's pages: the ornament drawn back toward the page by night
+        val night = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        val mark = Settings.resolvedAyahColor(context)
+        val ink = if (night) ColorUtils.blendARGB(mark, Settings.paperColor(context), NIGHT_RECEDE) else mark
         val bottom = height - inset - FOOT * dp / 2f
         frame.frame(canvas, inset, inset, width - inset, bottom, edge, ink)
         // The page's letter in a cartouche on the frame's foot, as a Quran page's number
         label.textSize = LABEL * dp
-        label.color = ink
+        label.color = mark
         val tall = label.textSize * LABEL_TALL
         frame.label(canvas, width / 2f, bottom, label.measureText(letter) / 2f + tall * LABEL_PAD, tall, edge, ink, Settings.paperColor(context))
         canvas.drawText(letter, width / 2f, bottom - (label.ascent() + label.descent()) / 2f, label)
@@ -142,5 +147,6 @@ class EndPageView(context: Context, private val tapped: () -> Unit) : FrameLayou
         // The letter's cartouche: its height over the letter's size, and padding either side
         const val LABEL_TALL = 1.6f
         const val LABEL_PAD = 0.5f
+        const val NIGHT_RECEDE = 0.3f
     }
 }

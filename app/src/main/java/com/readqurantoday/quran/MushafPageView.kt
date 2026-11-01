@@ -3,6 +3,8 @@ package com.readqurantoday.quran
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.core.graphics.ColorUtils
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -779,7 +781,7 @@ class MushafPageView @JvmOverloads constructor(
                     // As large as the text, unless its marks would then touch the cartouche
                     val size = minOf(body, band.titleRoom(step * BAND_TALL) / Mushaf.HEAD_TALL)
                     if (adorned) band.draw(canvas, left + measure / 2f, mid, measure, step * BAND_TALL,
-                        titleWidth(line.surah, size), markPaint.color, paperColour)
+                        titleWidth(line.surah, size), adornInk(), paperColour)
                     title(canvas, line.surah, left + measure / 2f, size, mid + Mushaf.HEAD_RISE * size)
                 }
                 "basmalah" -> basmalah(canvas, lineWords[i], left + measure / 2f, body, y)
@@ -1087,7 +1089,7 @@ class MushafPageView @JvmOverloads constructor(
         // The frame runs from the labels' middle down to the folio's, just outside the text
         val mid = y + (label.ascent() + label.descent()) / 2f
         val edge = resources.displayMetrics.density * FRAME_EDGE
-        val ink = markPaint.color
+        val ink = adornInk()
         if (adorned) frame.frame(canvas, left - padX * FRAME_GAP, mid, left + measure + padX * FRAME_GAP, footMid(), edge, ink)
 
         label.textAlign = Paint.Align.CENTER
@@ -1119,6 +1121,12 @@ class MushafPageView @JvmOverloads constructor(
         // Either side of the centre: half the title, a corner label, three paddings and a gap
         val room = measure / 2f - pad * 3f - pad * HEAD_GAP
         return (room / (label + title / 2f)).coerceAtMost(1f)
+    }
+
+    // The frame's and bands' colour: the ayah marks', drawn back toward the page by night so the ornament stays behind the text
+    private fun adornInk(): Int {
+        val night = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return if (night) ColorUtils.blendARGB(markPaint.color, paperColour, NIGHT_RECEDE) else markPaint.color
     }
 
     // Where the folio sits: the middle of the foot, which on a scrolling page is below the screen
@@ -1219,7 +1227,7 @@ class MushafPageView @JvmOverloads constructor(
             // Within the foot's margin, clear of the last line and of the page's edge
             val tall = padBottom * FOOT_TALL
             val edge = resources.displayMetrics.density * FRAME_EDGE
-            frame.label(canvas, width / 2f, mid, label.measureText(folioText) / 2f + tall * FOOT_PAD, tall, edge, markPaint.color, paperColour)
+            frame.label(canvas, width / 2f, mid, label.measureText(folioText) / 2f + tall * FOOT_PAD, tall, edge, adornInk(), paperColour)
         }
         canvas.drawText(folioText, width / 2f, mid - (label.ascent() + label.descent()) / 2f, label)
     }
@@ -1301,6 +1309,8 @@ class MushafPageView @JvmOverloads constructor(
         private const val LABEL_PAD = 0.28f
         // The juz and page cartouches stand lower than the surah's, which must hold its marks
         private const val SIDE_TALL = 0.82f
+        // How far the ornament's colour is drawn toward the page by night
+        private const val NIGHT_RECEDE = 0.3f
         // The folio's cartouche: its height and middle in the foot's margin, and padding either side of the figure
         private const val FOOT_TALL = 0.75f
         private const val FOOT_MID = 0.55f
