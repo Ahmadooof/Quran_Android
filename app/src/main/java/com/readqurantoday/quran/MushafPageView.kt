@@ -46,6 +46,10 @@ class MushafPageView @JvmOverloads constructor(
         isLinearText = true
     }
 
+    // The band behind each surah's title, and the page colour its cartouche is filled with
+    private val band = SurahBand()
+    private var paperColour = 0
+
     private val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         isSubpixelText = true
         hinting = Paint.HINTING_OFF
@@ -522,7 +526,8 @@ class MushafPageView @JvmOverloads constructor(
     private fun dress() {
         /* Taken before the reads, so a change landing mid-dress is caught next draw. */
         dressedAt = Settings.styleVersion
-        setBackgroundColor(paperTrial ?: Settings.paperColor(context))
+        paperColour = paperTrial ?: Settings.paperColor(context)
+        setBackgroundColor(paperColour)
         paint.color = inkTrial ?: Settings.inkColor(context)
         // The juz and page numbers are the page's own figures, so they take the ayah number's colour
         label.color = markTrial ?: Settings.resolvedAyahColor(context)
@@ -768,6 +773,8 @@ class MushafPageView @JvmOverloads constructor(
                     atSurah = line.surah
                     atAyah = 1
                     atWord = 0
+                    band.draw(canvas, left + measure / 2f, y - centreOffset, measure, step * BAND_TALL,
+                        titleWidth(line.surah, body), markPaint.color, paperColour)
                     title(canvas, line.surah, left + measure / 2f, body, y)
                 }
                 "basmalah" -> basmalah(canvas, lineWords[i], left + measure / 2f, body, y)
@@ -1241,6 +1248,9 @@ class MushafPageView @JvmOverloads constructor(
         private val NUDGES = listOf(1f to 0f, -1f to 0f, 0f to 1f, 0f to -1f)
 
         private fun spread(weight: Int) = WEIGHTS.getOrElse(weight) { 0f }
+
+        // A surah's band, as a share of its line's height
+        private const val BAND_TALL = 0.86f
 
         /** Furthest the page may be pinched. Past 3x the glyphs gain nothing. */
         const val MAX_ZOOM = 3f
