@@ -166,4 +166,7 @@
     <dimen name="day_tip_tall">220dp</dimen>
     <!-- Between the held bar and its card beside it -->
     <dimen name="day_tip_gap">16dp</dimen>
+    <!-- The mushaf's closing pages: their running text, and their titles in place of the print's calligraphy -->
+    <dimen name="end_page_text">@dimen/text_heading</dimen>
+    <dimen name="end_page_title">24sp</dimen>
 </resources>

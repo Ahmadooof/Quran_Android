@@ -170,6 +170,7 @@ class ReaderActivity : LanguageActivity() {
         themeLabel = findViewById(R.id.theme_label)
 
         dressWindow()
+        EndPages.load(this)
         buildPager()
 
         sayThemeBtn()
@@ -183,6 +184,7 @@ class ReaderActivity : LanguageActivity() {
         }
         findViewById<View>(R.id.btn_back).setOnClickListener { toMenu() }
         findViewById<View>(R.id.btn_mark).setOnClickListener {
+            if (page() > pages) return@setOnClickListener
             Settings.toggleMark(this, page())
             sayPage(page())
         }
@@ -288,8 +290,13 @@ class ReaderActivity : LanguageActivity() {
     }
 
     private inner class Pages : RecyclerView.Adapter<Holder>() {
-        override fun getItemCount() = pages
+        // The Quran's pages, then its closing pages أ to ل
+        override fun getItemCount() = pages + EndPages.pages.size
+        override fun getItemViewType(position: Int) = if (position < pages) QURAN_PAGE else END_PAGE
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+            if (viewType == END_PAGE) return Holder(EndPageView(parent.context) { showChrome(!chrome) }.apply {
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            })
             val v = MushafPageView(parent.context)
             v.shots = shots::get
             v.turner = turner
@@ -307,15 +314,18 @@ class ReaderActivity : LanguageActivity() {
             return Holder(v)
         }
         override fun onBindViewHolder(holder: Holder, position: Int) {
-            (holder.itemView as MushafPageView).apply {
-                show(position + 1)
-                markAsNow(this)
+            when (val v = holder.itemView) {
+                is MushafPageView -> {
+                    v.show(position + 1)
+                    markAsNow(v)
+                }
+                is EndPageView -> v.show(position - pages)
             }
         }
 
         // A page kept aside off screen comes back without a bind, still holding the mark it had then
         override fun onViewAttachedToWindow(holder: Holder) {
-            markAsNow(holder.itemView as MushafPageView)
+            (holder.itemView as? MushafPageView)?.let { markAsNow(it) }
         }
     }
 
@@ -340,6 +350,13 @@ class ReaderActivity : LanguageActivity() {
 
     // Runs for swipes and jumps alike, so the top bar and last-read page stay current
     private fun arrived(page: Int, note: Boolean = true) {
+        // A closing page is read about the mushaf, not in it: no reading time, no last place, no shots
+        if (page > pages && page <= pages + EndPages.pages.size) {
+            current = page
+            clock.show(0)
+            sayPage(page)
+            return
+        }
         if (page !in 1..pages) return
         current = page
         clock.show(page)
@@ -382,6 +399,8 @@ class ReaderActivity : LanguageActivity() {
     private fun turnsHere(): Boolean {
         if (!turnPages) return false
         val next = dragNext ?: return false
+        // The closing pages, and the step onto them, slide
+        if (page() >= pages && (next || page() > pages)) return false
         if (!crossesSpread(page(), next)) return false
         val shown = (0 until pager.childCount).mapNotNull { pager.getChildAt(it) as? MushafPageView }
             .firstOrNull { it.page == page() }
@@ -589,6 +608,10 @@ class ReaderActivity : LanguageActivity() {
 
     /* The top bar's account of this page: which surah and where, and whether it is kept. */
     private fun sayPage(page: Int) {
+        if (page > pages) {
+            barPlace.text = EndPages.pages.getOrNull(page - pages - 1)?.letter.orEmpty()
+            return
+        }
         val juz = Surahs.juzOfPage(page)
         val at = pageNamed(page, resources)
         barPlace.text = if (juz > 0) {
@@ -771,6 +794,9 @@ class ReaderActivity : LanguageActivity() {
     }
 
     companion object {
+        // The pager's two kinds of page
+        private const val QURAN_PAGE = 0
+        private const val END_PAGE = 1
         private const val CHROME = "chrome"
         private const val LIT_AYAH = "lit-ayah"
         private const val LIT_WORD = "lit-word"
