@@ -33,7 +33,7 @@ android {
     // Page fonts packaged at the root of assets
     sourceSets {
         getByName("main") {
-            assets.srcDirs("src/main/assets", "src/main/fonts-ttf")
+            assets.srcDirs("src/main/assets", "src/main/fonts-qcf4")
         }
     }
 

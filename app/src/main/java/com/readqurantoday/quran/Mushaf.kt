@@ -6,11 +6,14 @@ import android.os.Build
 import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 
-/** The mushaf: 604 pages of lines and a per-page font. */
+/** The mushaf (QCF v4, Madinah 1441): 604 pages of lines, each drawn from one of 47 fonts. */
 object Mushaf {
 
     /** Pages in the mushaf. */
     const val PAGES = 604
+
+    // The edition's key in mushaf.json
+    private const val EDITION = "v4"
 
     /** A word is a list because some Arabic words contain an internal space (two glyphs). */
     data class Line(val kind: String, val words: List<List<String>>, val surah: Int = 0)
@@ -31,17 +34,23 @@ object Mushaf {
 
     var basmalah: List<String> = emptyList()
         private set
+    /** A page drawn from the Basmalah's font, so its glyph is read through that page's handles. */
     var basmalahPage = 1
         private set
 
     private var pages: JSONObject? = null
     private var marks: JSONObject? = null
-    // Concurrent: pages load on background threads while the pager reads and prunes on main
+    // Which of the 47 fonts each page is drawn from, by page - 1
+    private var fontOfPage = IntArray(0)
+    // Keyed by font; concurrent, as pages load on background threads while the pager reads and prunes on main
     private val faces = ConcurrentHashMap<Int, Typeface>()
     private val tables = ConcurrentHashMap<Int, Glyphs>()
     private var nameTable: Glyphs? = null
     private var nameFont: android.graphics.fonts.Font? = null
     private var nameFamily: Typeface? = null
+    private var headTable: Glyphs? = null
+    private var headFont: android.graphics.fonts.Font? = null
+    private var headFamily: Typeface? = null
     private val fonts = ConcurrentHashMap<Int, android.graphics.fonts.Font>()
 
     /* Parsed lines cached to avoid re-parsing on every page turn. */
@@ -63,17 +72,19 @@ object Mushaf {
 
         pages = root.getJSONObject("pages")
         marks = root.optJSONObject("marks")
+        root.getJSONArray("fonts").let { all -> fontOfPage = IntArray(all.length()) { all.getInt(it) } }
 
-        /* Basmalah is the same four words wherever it appears; stored once. */
+        /* The Basmalah is one glyph of one font, the same wherever it appears. */
         root.optJSONObject("basmalah")?.let { b ->
-            basmalahPage = b.optInt("page", 1)
-            val text = b.optString("v2", "")
+            val font = b.optInt("font", 1)
+            basmalahPage = (fontOfPage.indexOfFirst { it == font } + 1).coerceAtLeast(1)
+            val text = b.optString(EDITION, "")
             basmalah = if (text.isEmpty()) emptyList() else text.split('|').filter { it.isNotEmpty() }
         }
 
         root.optJSONObject("fit")?.let { fit ->
-            fit.optJSONObject("body")?.let { emWidth = it.optDouble("v2", emWidth) }
-            fit.optJSONObject("centreBelow")?.let { centreBelow = it.optDouble("v2", centreBelow) }
+            fit.optJSONObject("body")?.let { emWidth = it.optDouble(EDITION, emWidth) }
+            fit.optJSONObject("centreBelow")?.let { centreBelow = it.optDouble(EDITION, centreBelow) }
         }
     }
 
@@ -88,8 +99,7 @@ object Mushaf {
         for (i in 0 until arr.length()) {
             val o = arr.optJSONObject(i) ?: continue
             val kind = o.optString("t")
-            /* v2 = this edition; the file also carries v1 for the older one. */
-            val text = o.optString("v2", "")
+            val text = o.optString(EDITION, "")
             out.add(
                 Line(
                     kind = kind,
@@ -130,12 +140,16 @@ object Mushaf {
         return out
     }
 
+    // The font a page is drawn from; neighbouring pages mostly share one
+    private fun fontOf(page: Int): Int = fontOfPage.getOrElse(page - 1) { 1 }
+
     @Synchronized
     fun face(context: Context, page: Int): Typeface? {
-        faces[page]?.let { return it }
+        val n = fontOf(page)
+        faces[n]?.let { return it }
         return try {
-            val t = Typeface.createFromAsset(context.assets, "p$page.ttf")
-            faces[page] = t
+            val t = Typeface.createFromAsset(context.assets, "q$n.ttf")
+            faces[n] = t
             t
         } catch (_: RuntimeException) {
             null
@@ -144,9 +158,10 @@ object Mushaf {
 
     @Synchronized
     fun glyphs(context: Context, page: Int): Glyphs? {
-        tables[page]?.let { return it }
-        val g = read(context, "g$page.txt") ?: return null
-        tables[page] = g
+        val n = fontOf(page)
+        tables[n]?.let { return it }
+        val g = read(context, "gq$n.txt") ?: return null
+        tables[n] = g
         return g
     }
 
@@ -180,10 +195,11 @@ object Mushaf {
     @Synchronized
     fun font(context: Context, page: Int): android.graphics.fonts.Font? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
-        fonts[page]?.let { return it }
+        val n = fontOf(page)
+        fonts[n]?.let { return it }
         return try {
-            val f = android.graphics.fonts.Font.Builder(context.assets, "p$page.ttf").build()
-            fonts[page] = f
+            val f = android.graphics.fonts.Font.Builder(context.assets, "q$n.ttf").build()
+            fonts[n] = f
             f
         } catch (_: Exception) {
             null
@@ -221,17 +237,39 @@ object Mushaf {
         return nameFamily
     }
 
-    // بَعْدَ مَا: one printed slot, two recited words; surah*1000+ayah to slot, same list as the web's PAIRS
-    private val pairs = mapOf(2181 to 2, 8006 to 3, 13037 to 7)
-
-    /** Whether the slot reached at [word] is a pair; before the pair, slot and word number agree. */
-    fun isPair(surah: Int, ayah: Int, word: Int) = pairs[surah * 1000 + ayah] == word
-
-    /** Where a pair's second word starts: after its inner gap, or else after its first glyph. */
-    fun pairSplit(word: String): Int {
-        val gap = word.indexOf(' ')
-        return if (gap >= 0) gap + 1 else Character.charCount(word.codePointAt(0))
+    /** The surah titles font (QCF4 BSML): each surah's printed title is one glyph. */
+    @Synchronized
+    fun heads(context: Context): Glyphs? {
+        headTable?.let { return it }
+        headTable = read(context, "gqh.txt")
+        return headTable
     }
+
+    @Synchronized
+    fun headFace(context: Context): android.graphics.fonts.Font? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+        headFont?.let { return it }
+        headFont = try {
+            android.graphics.fonts.Font.Builder(context.assets, "qh.ttf").build()
+        } catch (_: Exception) {
+            null
+        }
+        return headFont
+    }
+
+    @Synchronized
+    fun headTypeface(context: Context): Typeface? {
+        headFamily?.let { return it }
+        headFamily = try {
+            Typeface.createFromAsset(context.assets, "qh.ttf")
+        } catch (_: RuntimeException) {
+            null
+        }
+        return headFamily
+    }
+
+    /** Surah N's printed title in the titles font. */
+    fun headCode(surah: Int): Int = 0xF100 + surah - 1
 
     /** Codepoint for surah N in the names face: E004 for surah 4, E114 for 114. */
     fun nameCode(surah: Int): Int = 0xE000 + Integer.parseInt(surah.toString().padStart(3, '0'), 16)
@@ -239,19 +277,13 @@ object Mushaf {
     /** The word سورة in the names face. */
     const val SURAH_WORD = 0xE000
 
-    /** Release pages outside this range; keep the Basmalah page always. */
+    /** Release the fonts no page in this range uses; keep the Basmalah's always. */
     @Synchronized
     fun keepOnly(near: IntRange) {
-        fun spare(p: Int) = p in near || p == basmalahPage
-
-        val f = faces.keys.iterator()
-        while (f.hasNext()) if (!spare(f.next())) f.remove()
-
-        val o = fonts.keys.iterator()
-        while (o.hasNext()) if (!spare(o.next())) o.remove()
-
-        val t = tables.keys.iterator()
-        while (t.hasNext()) if (!spare(t.next())) t.remove()
+        val used = near.map { fontOf(it) }.toSet() + fontOf(basmalahPage)
+        faces.keys.retainAll(used)
+        fonts.keys.retainAll(used)
+        tables.keys.retainAll(used)
 
         /* Keep a wider window of parsed lines — they're small. */
         val wide = (near.first - 8)..(near.last + 8)

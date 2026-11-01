@@ -768,9 +768,9 @@ class MushafPageView @JvmOverloads constructor(
                     atSurah = line.surah
                     atAyah = 1
                     atWord = 0
-                    title(canvas, line.surah, left + measure / 2f, step * 0.95f, y)
+                    title(canvas, line.surah, left + measure / 2f, body, y)
                 }
-                "basmalah" -> basmalah(canvas, left + measure / 2f, body * 0.86f, y)
+                "basmalah" -> basmalah(canvas, left + measure / 2f, body, y)
                 else -> if (line.words.isNotEmpty()) {
                     drawLine(canvas, lineWords[i], glyphs, left, measure, body, y, step)
                 }
@@ -903,22 +903,14 @@ class MushafPageView @JvmOverloads constructor(
             val ofSurah = atSurah
             val ofAyah = atAyah
             val ofWord = if (isMark) -1 else atWord
-            val pair = !isMark && Mushaf.isPair(ofSurah, ofAyah, ofWord)
-            val split = if (pair) Mushaf.pairSplit(word) else word.length
 
             /* Detect lit word before collecting glyphs so we can route them correctly. */
-            val litHere = !isMark && ofSurah == litSurah && ofAyah == litAyah
-            var isLit = litHere && ofWord == litWord
+            val isLit = !isMark && ofSurah == litSurah && ofAyah == litAyah && ofWord == litWord
 
             val began = x
             var pen = x
-            var splitPen = x
             var i = 0
             while (i < word.length) {
-                if (pair && i == split) {
-                    splitPen = pen
-                    isLit = litHere && ofWord + 1 == litWord
-                }
                 val cp = word.codePointAt(i)
                 i += Character.charCount(cp)
 
@@ -960,14 +952,9 @@ class MushafPageView @JvmOverloads constructor(
                 if (!laidOut) {
                     val top = y - slot * 0.44f
                     val bottom = y + slot * 0.24f
-                    if (pair) {
-                        placed.add(floatArrayOf(splitPen, began, top, bottom, ofSurah.toFloat(), ofAyah.toFloat(), ofWord.toFloat()))
-                        placed.add(floatArrayOf(pen, splitPen, top, bottom, ofSurah.toFloat(), ofAyah.toFloat(), ofWord + 1f))
-                    } else {
-                        placed.add(floatArrayOf(pen, began, top, bottom, ofSurah.toFloat(), ofAyah.toFloat(), ofWord.toFloat()))
-                    }
+                    placed.add(floatArrayOf(pen, began, top, bottom, ofSurah.toFloat(), ofAyah.toFloat(), ofWord.toFloat()))
                 }
-                atWord += if (pair) 2 else 1
+                atWord++
             } else {
                 atAyah++
                 atWord = 0
@@ -1002,28 +989,20 @@ class MushafPageView @JvmOverloads constructor(
             var fbWord  = fbWord0
             for (word in words) {
                 val isMk = word.isNotEmpty() && marks.contains(word)
-                val pair = !isMk && Mushaf.isPair(fbSurah, fbAyah, fbWord)
-                val split = if (pair) Mushaf.pairSplit(word) else word.length
-                val litHere = !isMk && fbSurah == litSurah && fbAyah == litAyah
-                val first = when {
+                val pen = when {
                     isMk -> markPaint
-                    litHere && fbWord == litWord -> litPaint
+                    fbSurah == litSurah && fbAyah == litAyah && fbWord == litWord -> litPaint
                     else -> paint
                 }
-                val second = if (litHere && fbWord + 1 == litWord) litPaint else paint
-                var at = 0
                 for (part in word.split(' ')) {
                     if (part.isNotEmpty()) {
-                        val cut = (split - at).coerceIn(0, part.length)
-                        if (cut > 0) wx = drawPart(canvas, part.substring(0, cut), wx, y, glyphs, size, first)
-                        if (cut < part.length) wx = drawPart(canvas, part.substring(cut), wx, y, glyphs, size, second)
+                        wx = drawPart(canvas, part, wx, y, glyphs, size, pen)
                         wx -= innerSpace * size
                     }
-                    at += part.length + 1
                 }
                 wx += innerSpace * size
                 wx -= gap
-                if (!isMk) fbWord += if (pair) 2 else 1 else { fbAyah++; fbWord = 0 }
+                if (!isMk) fbWord++ else { fbAyah++; fbWord = 0 }
             }
         }
     }
@@ -1031,7 +1010,8 @@ class MushafPageView @JvmOverloads constructor(
     // Draws text right-aligned at [right]; returns where the next text ends
     private fun drawPart(canvas: Canvas, text: String, right: Float, y: Float, glyphs: Mushaf.Glyphs, size: Float, pen: Paint): Float {
         val w = wordWidth(text, glyphs, size)
-        canvas.drawText(text, right - w, y, pen)
+        // A run read right to left, so a pause mark after its word lands where drawGlyphs puts it
+        canvas.drawTextRun(text, 0, text.length, 0, text.length, right - w, y, true, pen)
         val spread = when (pen) {
             litPaint -> litSpread
             markPaint -> markSpread
@@ -1039,7 +1019,7 @@ class MushafPageView @JvmOverloads constructor(
         }
         if (spread > 0f) {
             val d = size * spread / zoom
-            for ((dx, dy) in NUDGES) canvas.drawText(text, right - w + dx * d, y + dy * d, pen)
+            for ((dx, dy) in NUDGES) canvas.drawTextRun(text, 0, text.length, 0, text.length, right - w + dx * d, y + dy * d, true, pen)
         }
         return right - w
     }
@@ -1116,45 +1096,28 @@ class MushafPageView @JvmOverloads constructor(
         return (names.advance(Mushaf.SURAH_WORD) + names.advance(Mushaf.nameCode(surah))) * scale + 0.1f * size
     }
 
-    /* Surah name drawn as glyphs from the names face, not as typed text. */
+    /* The surah's printed title, one glyph of the mushaf's own titles font, at the text's size. */
     private fun title(canvas: Canvas, surah: Int, centre: Float, size: Float, y: Float) {
-        val names = Mushaf.names(context) ?: return
-        val scale = size / names.upem
-
-        val word = Mushaf.SURAH_WORD
-        val name = Mushaf.nameCode(surah)
-        val between = 0.1f * size
-
-        val wordW = names.advance(word) * scale
-        val nameW = names.advance(name) * scale
-        val total = wordW + between + nameW
-        if (total <= 0f) return
-
-        titlePaint.textSize = size
-
-        /* Right to left: «سورة», then the name. */
-        val pen = centre + total / 2f
-        glyph(canvas, names, word, pen - wordW, y)
-        glyph(canvas, names, name, pen - wordW - between - nameW, y)
-    }
-
-    private fun glyph(canvas: Canvas, names: Mushaf.Glyphs, cp: Int, x: Float, y: Float) {
-        val id = names.id(cp)
+        val heads = Mushaf.heads(context) ?: return
+        val cp = Mushaf.headCode(surah)
+        val id = heads.id(cp)
         if (id < 0) return
-        val face = Mushaf.nameFace(context)
+        val x = centre - heads.advance(cp) * size / heads.upem / 2f
+        titlePaint.textSize = size
+        val face = Mushaf.headFace(context)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && face != null) {
             oneId[0] = id
             oneSpot[0] = x
             oneSpot[1] = y
             canvas.drawGlyphs(oneId, 0, oneSpot, 0, 1, face, titlePaint)
         } else {
-            titlePaint.typeface = Mushaf.nameTypeface(context)
+            titlePaint.typeface = Mushaf.headTypeface(context)
             titlePaint.textAlign = Paint.Align.LEFT
             canvas.drawText(String(Character.toChars(cp)), x, y, titlePaint)
         }
     }
 
-    /* Basmalah drawn from page 1's face — its four words live there. */
+    /* Basmalah drawn from the face it lives in. */
     private fun basmalah(canvas: Canvas, centre: Float, size: Float, y: Float) {
         val words = Mushaf.basmalah
         if (words.isEmpty()) return

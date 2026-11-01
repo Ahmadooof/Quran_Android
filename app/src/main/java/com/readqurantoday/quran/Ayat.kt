@@ -47,7 +47,7 @@ object Ayat {
                         w = 0
                     } else {
                         if (w == 0) opensOn.getOrPut(key(s, v)) { p }
-                        w += if (Mushaf.isPair(s, v, w)) 2 else 1
+                        w++
                     }
                 }
             }
