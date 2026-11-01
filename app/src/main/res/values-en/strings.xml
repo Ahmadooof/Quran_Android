@@ -136,7 +136,7 @@
     <string name="dl_folder_failed">Could not open the folder; open the file manager, then Download, then Quran</string>
     <string name="dl_save_failed">Could not save to the phone</string>
     <string name="dl_save_denied">Storage permission is needed to save to the phone</string>
-    <string name="label_locate">Follow</string>
+    <string name="label_tajweed">Tajweed</string>
     <string name="label_repeat">Repeat</string>
     <string name="label_translit">Phonetic</string>
     <string name="label_word">Word</string>

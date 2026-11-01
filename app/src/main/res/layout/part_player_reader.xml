@@ -12,7 +12,7 @@
     android:baselineAligned="false">
 
     <LinearLayout
-        android:id="@+id/p_locate"
+        android:id="@+id/p_tajweed"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -23,15 +23,16 @@
         android:focusable="true">
 
         <ImageView
+            android:id="@+id/p_tajweed_icon"
             android:layout_width="@dimen/icon_nav"
             android:layout_height="@dimen/icon_nav"
-            android:tint="@color/text_mute"
-            android:src="@drawable/ic_locate"
+            android:src="@drawable/ic_tajweed"
             android:contentDescription="@null" />
 
         <TextView
+            android:id="@+id/p_tajweed_label"
             style="@style/IconLabel"
-            android:text="@string/label_locate" />
+            android:text="@string/label_tajweed" />
     </LinearLayout>
 
     <LinearLayout

@@ -42,6 +42,8 @@ class ReaderPlayer(
     private val wordIcon = panel.findViewById<ImageView>(R.id.p_word_icon)
     private val wordLabel = panel.findViewById<TextView>(R.id.p_word_label)
     private val translitIcon = panel.findViewById<ImageView>(R.id.p_translit_icon)
+    private val tajweedIcon = panel.findViewById<ImageView>(R.id.p_tajweed_icon)
+    private val tajweedLabel = panel.findViewById<TextView>(R.id.p_tajweed_label)
     private val translitLabel = panel.findViewById<TextView>(R.id.p_translit_label)
 
     /* Word chosen by long-press but not yet played. */
@@ -163,6 +165,7 @@ class ReaderPlayer(
         wordIcon.imageAlpha = if (WordVoice.loading) 0x66 else 0xFF
         wordLabel.setText(if (WordVoice.loading) R.string.loading else R.string.label_word)
         tint(translitIcon, translitLabel, Settings.translit(host))
+        tint(tajweedIcon, tajweedLabel, Settings.tajweed(host))
     }
 
     private fun tint(icon: ImageView, label: TextView, on: Boolean) {
@@ -180,10 +183,11 @@ class ReaderPlayer(
             reader.go(Ayat.pageOf(rc.readingSurah, rc.litAyah.coerceAtLeast(1)))
         }
         panel.findViewById<View>(R.id.p_play).setOnClickListener { play() }
-        /* Locate: go to the current (or pending) word's page. */
-        panel.findViewById<View>(R.id.p_locate).setOnClickListener {
-            val surah = if (Recite.playing != 0) rc.readingSurah else pendingSurah
-            reader.go(Ayat.pageOf(surah, rc.litAyah.coerceAtLeast(1)))
+        /* Tajweed: the pages in their coloured edition, or plain again. */
+        panel.findViewById<View>(R.id.p_tajweed).setOnClickListener {
+            Settings.setTajweed(host, !Settings.tajweed(host))
+            say()
+            reader.redrawPages()
         }
         panel.findViewById<View>(R.id.p_reciter).setOnClickListener { pickReciter() }
         panel.findViewById<View>(R.id.p_repeat).setOnClickListener { pickRepeat() }

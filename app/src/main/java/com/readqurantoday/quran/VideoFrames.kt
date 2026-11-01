@@ -50,6 +50,8 @@ class VideoFrames(context: Context, private val style: Style, look: VideoLook, p
     private fun drawnPage(page: Int): Drawn = drawn.getOrPut(page) {
         if (drawn.size >= KEPT) drawn.remove(drawn.keys.first())?.marks?.recycle()
         val view = MushafPageView(context).apply {
+            // Its words are cut out by colour, which the coloured edition would confound
+            plainOnly = true
             show(page)
             measure(View.MeasureSpec.makeMeasureSpec(pageW, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(pageH, View.MeasureSpec.EXACTLY))
             layout(0, 0, pageW, pageH)

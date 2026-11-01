@@ -27,9 +27,12 @@ object Ayat {
         var w = 0
 
         for (p in 1..604) {
-            atSurah[p] = s
-            atAyah[p] = v
-            atWord[p] = w
+            // A page that opens with a surah's title starts at that surah, not one past the last ayah of the one before
+            val opening = Mushaf.lines(p).firstOrNull { it.kind == "surah" || it.kind == "ayah" }
+            val opensSurah = opening?.kind == "surah" && opening.surah > 0
+            atSurah[p] = if (opensSurah) opening!!.surah else s
+            atAyah[p] = if (opensSurah) 1 else v
+            atWord[p] = if (opensSurah) 0 else w
 
             val marks = Mushaf.marksOn(p)
             for (line in Mushaf.lines(p)) {

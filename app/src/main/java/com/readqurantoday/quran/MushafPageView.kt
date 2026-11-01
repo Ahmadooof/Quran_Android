@@ -67,8 +67,13 @@ class MushafPageView @JvmOverloads constructor(
         isLinearText = true
     }
 
-    private var lines: List<Mushaf.Line> = emptyList()
-    private var table: Mushaf.Glyphs? = null
+    private var lines: List<Book.Line> = emptyList()
+    // The edition this page is drawn from: Tajweed when asked for and its font is here, else plain
+    private var book: Book = Mushaf.plain
+
+    /** Set where only the plain page will do, as where its words are cut out by colour. */
+    var plainOnly = false
+    private var table: Book.Glyphs? = null
     private var font: android.graphics.fonts.Font? = null
     private var pageNo = 0
 
@@ -492,7 +497,7 @@ class MushafPageView @JvmOverloads constructor(
     private fun layOut() {
         val wide = width - 2 * padX
         if (wide <= 0f) return
-        body = (wide / Mushaf.emWidth).toFloat()
+        body = (wide / book.emWidth).toFloat()
         side = padX
         val top = padTop + headBand
         val fit = (height - top - padBottom) / GRID
@@ -500,7 +505,7 @@ class MushafPageView @JvmOverloads constructor(
         val fitted = fit * TALL_FROM
         if (!previewMode && fit > 0f && body > fitted && fitted >= MIN_FIT_BODY * resources.displayMetrics.density) {
             body = fitted
-            side = (width - body * Mushaf.emWidth.toFloat()) / 2f
+            side = (width - body * book.emWidth.toFloat()) / 2f
         }
         step = if (previewMode || (fit > 0f && body / fit <= TALL_FROM)) fit else body / READING_ROW
         pageTall = if (previewMode) height.toFloat() else top + step * GRID + padBottom
@@ -675,13 +680,7 @@ class MushafPageView @JvmOverloads constructor(
         held = null
         zoom = 1f; panX = 0f; panY = 0f
         pageNo = page
-        lines = Mushaf.lines(page)
-        table = Mushaf.glyphs(context, page)
-        font = Mushaf.font(context, page)
-        paint.typeface = Mushaf.face(context, page)
-
-        lineWords = lines.map { line -> line.words.map { it.joinToString(" ") } }
-        pageMarks = Mushaf.marksOn(page)
+        openBook()
         val juz = Surahs.juzOfPage(page)
         headJuz = if (juz > 0) context.getString(R.string.head_juz, figures(juz, resources)) else ""
         headPage = context.getString(R.string.head_page, figures(page, resources))
@@ -717,9 +716,33 @@ class MushafPageView @JvmOverloads constructor(
         revealPending = litWord >= 0
     }
 
+    // The page's lines and fonts from the edition it should be drawn from now
+    private fun openBook() {
+        book = bookFor(pageNo)
+        lines = book.lines(pageNo)
+        table = book.glyphs(context, pageNo)
+        font = book.font(context, pageNo)
+        paint.typeface = book.face(context, pageNo)
+        lineWords = lines.map { line -> line.words.map { it.joinToString(" ") } }
+        pageMarks = book.marksOn(pageNo)
+        laidOut = false
+        step = 0f
+    }
+
+    // Tajweed once this page's font and the Basmalahs' are here; until then it is asked for and the plain page stands in
+    private fun bookFor(page: Int): Book {
+        if (plainOnly || previewMode || !Settings.tajweed(context)) return Mushaf.plain
+        val need = listOf(page, Mushaf.tajweed.basmalahPage)
+        if (need.all { TajweedFonts.has(context, it) }) return Mushaf.tajweed
+        TajweedFonts.fetch(context, need + (1..Mushaf.AHEAD).flatMap { listOf(page + it, page - it) })
+        return Mushaf.plain
+    }
+
     override fun onDraw(canvas: Canvas) {
         // The view may have been cached when the style changed, with no bind to tell it
         if (dressedAt != Settings.styleVersion) dress()
+        // Tajweed switched, or a page's coloured font just arrived
+        if (pageNo > 0 && bookFor(pageNo) !== book) openBook()
         val glyphs = table ?: return
         if (lines.isEmpty()) return
 
@@ -728,7 +751,7 @@ class MushafPageView @JvmOverloads constructor(
 
         if (previewMode) {
             /* Type size = width / ems-per-full-line. Every line starts here and shrinks from it. */
-            drawPreviewLine(canvas, glyphs, padX, wide, (wide / Mushaf.emWidth).toFloat())
+            drawPreviewLine(canvas, glyphs, padX, wide, (wide / book.emWidth).toFloat())
             return
         }
 
@@ -821,7 +844,7 @@ class MushafPageView @JvmOverloads constructor(
     }
 
     /* Renders exactly one line (the first text line) centered vertically — used in settings preview. */
-    private fun drawPreviewLine(canvas: Canvas, glyphs: Mushaf.Glyphs, left: Float, measure: Float, body: Float) {
+    private fun drawPreviewLine(canvas: Canvas, glyphs: Book.Glyphs, left: Float, measure: Float, body: Float) {
         paint.textSize = body
         val centreOffset = -(paint.ascent() + paint.descent()) / 2f
         val y = height / 2f + centreOffset
@@ -869,7 +892,7 @@ class MushafPageView @JvmOverloads constructor(
     private fun drawLine(
         canvas: Canvas,
         words: List<String>,
-        glyphs: Mushaf.Glyphs,
+        glyphs: Book.Glyphs,
         left: Float,
         measure: Float,
         body: Float,
@@ -888,7 +911,7 @@ class MushafPageView @JvmOverloads constructor(
 
         val gaps = words.size - 1
         val spare = (measure - natural).coerceAtLeast(0f)
-        val short = natural < measure * Mushaf.centreBelow
+        val short = natural < measure * book.centreBelow
         val gap = when {
             gaps <= 0 -> 0f
             short -> minOf(centreGap * size, spare / gaps)
@@ -1022,7 +1045,7 @@ class MushafPageView @JvmOverloads constructor(
     }
 
     // Draws text right-aligned at [right]; returns where the next text ends
-    private fun drawPart(canvas: Canvas, text: String, right: Float, y: Float, glyphs: Mushaf.Glyphs, size: Float, pen: Paint): Float {
+    private fun drawPart(canvas: Canvas, text: String, right: Float, y: Float, glyphs: Book.Glyphs, size: Float, pen: Paint): Float {
         val w = wordWidth(text, glyphs, size)
         // A run read right to left, so a pause mark after its word lands where drawGlyphs puts it
         canvas.drawTextRun(text, 0, text.length, 0, text.length, right - w, y, true, pen)
@@ -1151,7 +1174,7 @@ class MushafPageView @JvmOverloads constructor(
         headGlyph(canvas, heads, cp, centre - heads.advance(cp) * size / heads.upem / 2f, y)
     }
 
-    private fun headGlyph(canvas: Canvas, heads: Mushaf.Glyphs, cp: Int, x: Float, y: Float) {
+    private fun headGlyph(canvas: Canvas, heads: Book.Glyphs, cp: Int, x: Float, y: Float) {
         val id = heads.id(cp)
         if (id < 0) return
         val face = Mushaf.headFace(context)
@@ -1170,8 +1193,8 @@ class MushafPageView @JvmOverloads constructor(
     /* The surah's own Basmalah, drawn from the face it lives in. */
     private fun basmalah(canvas: Canvas, words: List<String>, centre: Float, size: Float, y: Float) {
         if (words.isEmpty()) return
-        val from = Mushaf.basmalahPage
-        val glyphs = Mushaf.glyphs(context, from) ?: return
+        val from = book.basmalahPage
+        val glyphs = book.glyphs(context, from) ?: return
 
         val scale = size / glyphs.upem
         var total = 0f
@@ -1203,11 +1226,11 @@ class MushafPageView @JvmOverloads constructor(
         }
         if (n == 0) return
 
-        val face = Mushaf.font(context, from)
+        val face = book.font(context, from)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && face != null) {
             canvas.drawGlyphs(ids, 0, spots, 0, n, face, titlePaint)
         } else {
-            titlePaint.typeface = Mushaf.face(context, from)
+            titlePaint.typeface = book.face(context, from)
             titlePaint.textAlign = Paint.Align.LEFT
             var wx = centre + total / 2f
             for (word in words) {
@@ -1232,13 +1255,13 @@ class MushafPageView @JvmOverloads constructor(
         canvas.drawText(folioText, width / 2f, mid - (label.ascent() + label.descent()) / 2f, label)
     }
 
-    private fun lineWidth(words: List<String>, glyphs: Mushaf.Glyphs, size: Float): Float {
+    private fun lineWidth(words: List<String>, glyphs: Book.Glyphs, size: Float): Float {
         var sum = 0f
         for (word in words) sum += wordWidth(word, glyphs, size)
         return sum
     }
 
-    private fun wordWidth(word: String, glyphs: Mushaf.Glyphs, size: Float): Float {
+    private fun wordWidth(word: String, glyphs: Book.Glyphs, size: Float): Float {
         val scale = size / glyphs.upem
         var sum = 0f
         var i = 0

@@ -679,6 +679,8 @@ class ReaderActivity : LanguageActivity() {
 
     private fun redrawPages() {
         for (i in 0 until pager.childCount) pager.getChildAt(i).invalidate()
+        // The pictures shown mid-gesture are made again, so a page never flicks back to its other edition
+        if (current in 1..pages) prepareShots(current)
     }
 
     /* The word marked on the page now, from recitation, a long-press, search or Word; null when none. */
@@ -709,6 +711,11 @@ class ReaderActivity : LanguageActivity() {
         rc.syncWithRecite()
 
         Recite.onChange = heard
+        // A page's coloured font arriving redraws the pages, and their pictures with them
+        TajweedFonts.arrived = {
+            Settings.tajweedArrived()
+            redrawPages()
+        }
         clock.listening(Recite.isPlaying())
         // The page opens clear even mid-recitation; the lit word shows where it is, a tap brings the player
         if (Recite.playing != 0) {
@@ -737,6 +744,7 @@ class ReaderActivity : LanguageActivity() {
 
     override fun onPause() {
         super.onPause()
+        TajweedFonts.arrived = null
         clock.pause()
         WordVoice.stop()
         /* Only if it is still ours: see heard. */

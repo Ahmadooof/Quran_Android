@@ -60,7 +60,7 @@
     <string name="close">إغلاق</string>
     <string name="previous_ayah">الآية السابقة</string>
     <string name="next_ayah">الآية التالية</string>
-    <string name="label_locate">تتبع</string>
+    <string name="label_tajweed">تجويد</string>
     <string name="label_repeat">تكرار</string>
     <string name="label_translit">النطق</string>
     <string name="label_word">كلمة</string>

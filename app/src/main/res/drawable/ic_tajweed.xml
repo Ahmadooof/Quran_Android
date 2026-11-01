@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tajweed: a palette, for the letters coloured by rule. Outlined, tinted from code -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path
+        android:pathData="M12,3.2 C6.9,3.2 3,6.8 3,11.6 C3,15.9 6.3,19.6 10.4,19.6 C11.6,19.6 12.3,18.8 12.3,17.8 C12.3,16.8 11.5,16.3 11.5,15.3 C11.5,14.3 12.3,13.5 13.3,13.5 H15.6 C18.7,13.5 21,11.2 21,8.4 C21,5.5 17.1,3.2 12,3.2 Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M7.4,11.4 m-1.1,0 a1.1,1.1 0 1 0 2.2,0 a1.1,1.1 0 1 0 -2.2,0 M9.8,7.4 m-1.1,0 a1.1,1.1 0 1 0 2.2,0 a1.1,1.1 0 1 0 -2.2,0 M14.6,7.2 m-1.1,0 a1.1,1.1 0 1 0 2.2,0 a1.1,1.1 0 1 0 -2.2,0"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.4" />
+</vector>

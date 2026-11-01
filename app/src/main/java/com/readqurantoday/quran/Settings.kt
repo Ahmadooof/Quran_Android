@@ -144,6 +144,8 @@ object Settings {
 
     private const val TRANSLIT = "translit"
 
+    private const val TAJWEED = "tajweed"
+
     /* A Latin reading over the lit word; on until the reader turns it off. */
     /** A context that decides pronunciation for itself, as a video's drawing does, rather than by this setting. */
     interface OwnPhonetics { val phonetics: Boolean }
@@ -153,6 +155,17 @@ object Settings {
     fun setTranslit(context: Context, on: Boolean) {
         store(context).edit { putBoolean(TRANSLIT, on) }
     }
+
+    /** Whether pages are drawn in the coloured Tajweed edition. */
+    fun tajweed(context: Context) = store(context).getBoolean(TAJWEED, false)
+
+    fun setTajweed(context: Context, on: Boolean) {
+        store(context).edit { putBoolean(TAJWEED, on) }
+        restyled()
+    }
+
+    /** A page's coloured font arrived: pages and their pictures are drawn again. */
+    fun tajweedArrived() = restyled()
 
     // --- recently read ---
 
