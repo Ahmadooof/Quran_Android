@@ -1093,7 +1093,7 @@ class MushafPageView @JvmOverloads constructor(
         label.textAlign = Paint.Align.CENTER
         if (headJuz.isNotEmpty()) {
             val half = label.measureText(headJuz) / 2f + pad
-            if (adorned) frame.label(canvas, left + measure - half, mid, half, tall, edge, ink, paperColour)
+            if (adorned) frame.label(canvas, left + measure - half, mid, half, tall * SIDE_TALL, edge, ink, paperColour)
             canvas.drawText(headJuz, left + measure - half, y, label)
         }
 
@@ -1104,7 +1104,7 @@ class MushafPageView @JvmOverloads constructor(
 
         if (headSide.isNotEmpty()) {
             val half = label.measureText(headSide) / 2f + pad
-            if (adorned) frame.label(canvas, left + half, mid, half, tall, edge, ink, paperColour)
+            if (adorned) frame.label(canvas, left + half, mid, half, tall * SIDE_TALL, edge, ink, paperColour)
             canvas.drawText(headSide, left + half, y, label)
         }
         label.textSize = full
@@ -1299,6 +1299,8 @@ class MushafPageView @JvmOverloads constructor(
         // Of a label cartouche's height, what a title may fill
         private const val LABEL_CLEAR = 0.86f
         private const val LABEL_PAD = 0.28f
+        // The juz and page cartouches stand lower than the surah's, which must hold its marks
+        private const val SIDE_TALL = 0.82f
         // The folio's cartouche: its height and middle in the foot's margin, and padding either side of the figure
         private const val FOOT_TALL = 0.75f
         private const val FOOT_MID = 0.55f
