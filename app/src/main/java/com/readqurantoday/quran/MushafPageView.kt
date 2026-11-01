@@ -1075,15 +1075,12 @@ class MushafPageView @JvmOverloads constructor(
         val y = padTop + headBand * 0.62f
         val tall = headBand * LABEL_TALL
         val pad = tall * LABEL_PAD
+        // One size on every page: what the longest corner label and the longest surah name both fit at
+        val full = label.textSize
+        label.textSize = full * headFit(measure, pad)
+        thicken()
         // The surah's name the size of the juz and page beside it, not a surah's opening title
         val titleSize = label.textSize * HEAD_TITLE_MATCH
-
-        // Narrow screens shrink the side labels rather than let their cartouches touch the centred one
-        val full = label.textSize
-        val side = (measure - titleWidth(headSurah, titleSize)) / 2f - pad * 4f - full
-        val widest = maxOf(label.measureText(headSide), label.measureText(headJuz))
-        if (widest > side && side > 0f) label.textSize = full * side / widest
-        thicken()
 
         // The frame runs from the labels' middle down to the folio's, just outside the text
         val mid = y + (label.ascent() + label.descent()) / 2f
@@ -1109,6 +1106,17 @@ class MushafPageView @JvmOverloads constructor(
             canvas.drawText(headSide, left + half, y, label)
         }
         label.textSize = full
+    }
+
+    // The share of the labels' size at which the widest corner label and surah name sit side by side with a gap
+    private fun headFit(measure: Float, pad: Float): Float {
+        val heads = Mushaf.heads(context) ?: return 1f
+        val longest = context.getString(R.string.head_hizb_three, figures(HIZB_MOST, resources))
+        val label = label.measureText(longest)
+        val title = (1..SURAHS).maxOf { heads.advance(Mushaf.headCode(it)) } * this.label.textSize * HEAD_TITLE_MATCH / heads.upem
+        // Either side of the centre: half the title, a corner label, three paddings and a gap
+        val room = measure / 2f - pad * 3f - pad * HEAD_GAP
+        return (room / (label + title / 2f)).coerceAtMost(1f)
     }
 
     // Where the folio sits: the middle of the foot, which on a scrolling page is below the screen
@@ -1288,6 +1296,10 @@ class MushafPageView @JvmOverloads constructor(
         private const val LABEL_PAD = 0.5f
         // The titles font's letters stand smaller than the labels' at one size; this evens them
         private const val HEAD_TITLE_MATCH = 1.25f
+        // The least gap between neighbouring cartouches, in paddings, and the highest hizb
+        private const val HEAD_GAP = 0.5f
+        private const val HIZB_MOST = 60
+        private const val SURAHS = 114
 
         /** Furthest the page may be pinched. Past 3x the glyphs gain nothing. */
         const val MAX_ZOOM = 3f
