@@ -5,86 +5,205 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.withTranslation
+import androidx.core.graphics.withSave
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.min
+import kotlin.math.sin
 
-/** The band a surah opens with, after the printed mushaf's: a framed strip, starred either side, a cartouche for the title. */
+/**
+ * The band a surah opens with, after the printed mushaf's: a framed strip of arabesque either side,
+ * a medallion holding a lotus, scrolls curling out from it, and a notched cartouche for the title.
+ */
 class SurahBand {
 
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val line = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+    private val line = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+    }
     private val box = RectF()
-    private val star = Path()
-    private var starSize = 0f
+    private val cartouche = Path()
+
+    // One side panel in units of the band's height, x out from the cartouche; rebuilt when its width changes
+    private val shapes = Path()
+    private val ribbons = Path()
+    private val dots = Path()
+    private var panelWide = -1f
 
     /**
      * Draws the band [wide] across and [tall] high about ([centre], [mid]), leaving a cartouche [titleWide] across for the title.
-     * [ink] is the frame's colour; [paper] the page's, which the cartouche is filled with.
+     * [ink] draws the frame and outlines; [paper], the page's colour, fills the cartouche and the motifs.
      */
     fun draw(canvas: Canvas, centre: Float, mid: Float, wide: Float, tall: Float, titleWide: Float, ink: Int, paper: Int) {
-        val thick = tall * FRAME
+        val edge = tall * FRAME
         val left = centre - wide / 2f
         val right = centre + wide / 2f
         val top = mid - tall / 2f
         val bottom = mid + tall / 2f
 
-        // The strip: a soft tint of the frame colour, edged twice
-        fill.color = ColorUtils.setAlphaComponent(ink, TINT)
+        // The strip: a tint of the frame colour inside a double frame
+        fill.color = ColorUtils.setAlphaComponent(ink, GROUND)
         box.set(left, top, right, bottom)
-        canvas.drawRoundRect(box, thick * 2f, thick * 2f, fill)
+        canvas.drawRect(box, fill)
         line.color = ink
-        line.strokeWidth = thick
-        canvas.drawRoundRect(box, thick * 2f, thick * 2f, line)
-        val inset = thick * 3f
+        line.strokeWidth = edge
+        canvas.drawRect(box, line)
+        val inset = edge * 2.6f
         box.set(left + inset, top + inset, right - inset, bottom - inset)
-        line.strokeWidth = thick / 2f
-        canvas.drawRoundRect(box, thick, thick, line)
+        line.strokeWidth = edge / 2f
+        canvas.drawRect(box, line)
 
-        // The cartouche: rounded ends, the page's own colour, so the title reads as on the page
+        // The arabesque either side, mirrored about the cartouche
         val half = titleWide / 2f + tall * CARTOUCHE_PAD
-        val high = tall * CARTOUCHE / 2f
-        box.set(centre - half, mid - high, centre + half, mid + high)
-        fill.color = paper
-        canvas.drawRoundRect(box, high, high, fill)
-        line.strokeWidth = thick
-        canvas.drawRoundRect(box, high, high, line)
+        val panel = (right - edge * 4f - (centre + half)) / tall
+        if (panel > 0f) {
+            if (panel != panelWide) shapePanel(panel)
+            for (side in intArrayOf(1, -1)) canvas.withSave {
+                translate(centre + side * half, mid)
+                scale(side * tall, tall)
+                drawPanel(this, ink, paper)
+            }
+        }
 
-        // Eight-pointed stars along each side, from the cartouche out to the frame
-        val size = tall * STAR
-        if (size != starSize) shapeStar(size)
-        fill.color = ColorUtils.setAlphaComponent(ink, STARS)
-        val step = size * 1.8f
-        var x = centre + half + step / 2f
-        while (x + size < right - inset * 2f) {
-            canvas.withTranslation(x, mid) { drawPath(star, fill) }
-            canvas.withTranslation(2f * centre - x, mid) { drawPath(star, fill) }
-            x += step
+        // The cartouche: notched ends, the page's own colour, so the title reads as on the page
+        shapeCartouche(centre, mid, half, tall)
+        fill.color = paper
+        canvas.drawPath(cartouche, fill)
+        line.strokeWidth = edge
+        canvas.drawPath(cartouche, line)
+    }
+
+    // Outlines in units of the band's height, as the canvas is scaled to it
+    private fun drawPanel(canvas: Canvas, ink: Int, paper: Int) {
+        line.color = ink
+        line.strokeWidth = RIBBON_EDGE
+        canvas.drawPath(ribbons, line)
+        line.color = paper
+        line.strokeWidth = RIBBON
+        canvas.drawPath(ribbons, line)
+        fill.color = paper
+        canvas.drawPath(shapes, fill)
+        line.color = ink
+        line.strokeWidth = OUTLINE
+        canvas.drawPath(shapes, line)
+        fill.color = ink
+        canvas.drawPath(dots, fill)
+    }
+
+    private fun shapePanel(wide: Float) {
+        panelWide = wide
+        shapes.reset()
+        ribbons.reset()
+        dots.reset()
+        val cx = wide * 0.5f
+        val a = min(0.78f, wide * 0.24f)
+
+        // The medallion, edged twice, with a lotus inside pointing outward
+        almond(cx, a, 0.36f)
+        almond(cx, a * 0.84f, 0.29f)
+        val base = cx - a * 0.42f
+        petal(base, 0f, cx + a * 0.5f, 0f, 0.12f)
+        for (s in intArrayOf(-1, 1)) {
+            petal(base, 0f, cx + a * 0.18f, s * 0.19f, 0.075f)
+            petal(base, 0f, cx - a * 0.05f, s * 0.24f, 0.055f)
+        }
+        dots.addCircle(base - 0.02f, 0f, 0.045f, Path.Direction.CW)
+
+        // Scrolls out of both tips, above and below, each with a leaf and ending in a curl round a bud
+        for ((tip, end, way) in listOf(Triple(cx + a, wide - 0.06f, 1f), Triple(cx - a, 0.06f, -1f))) {
+            val span = end - tip
+            for (s in intArrayOf(-1, 1)) {
+                val c1x = tip + span * 0.25f; val c1y = s * 0.36f
+                val c2x = tip + span * 0.75f; val c2y = s * 0.4f
+                val ex = tip + span * 0.92f; val ey = s * 0.16f
+                ribbons.moveTo(tip, 0f)
+                ribbons.cubicTo(c1x, c1y, c2x, c2y, ex, ey)
+                val r = 0.11f
+                val ox = ex - way * r
+                val start = if (way > 0) 0f else PI.toFloat()
+                val turn = -s * way
+                for (i in 1..CURL_STEPS) {
+                    val t = i / CURL_STEPS.toFloat()
+                    val angle = start + turn * t * CURL_TURNS * 2f * PI.toFloat()
+                    val radius = r * (1f - 0.75f * t)
+                    ribbons.lineTo(ox + radius * cos(angle), ey + radius * sin(angle))
+                }
+                dots.addCircle(ox, ey, 0.025f, Path.Direction.CW)
+                // The leaf sits a third of the way along the scroll
+                val lx = cubicAt(tip, c1x, c2x, ex, LEAF_AT)
+                val ly = cubicAt(0f, c1y, c2y, ey, LEAF_AT)
+                petal(lx, ly, lx + way * 0.16f, ly - s * 0.13f, 0.045f)
+            }
         }
     }
 
-    // Two squares, one turned an eighth, about the origin
-    private fun shapeStar(size: Float) {
-        starSize = size
-        val r = size / 2f
-        val d = r * DIAGONAL
-        star.reset()
-        star.addRect(-r, -r, r, r, Path.Direction.CW)
-        star.moveTo(0f, -d)
-        star.lineTo(d, 0f)
-        star.lineTo(0f, d)
-        star.lineTo(-d, 0f)
-        star.close()
+    // A pointed oval from (cx - a, 0) to (cx + a, 0), b high either side
+    private fun almond(cx: Float, a: Float, b: Float) {
+        shapes.moveTo(cx - a, 0f)
+        shapes.cubicTo(cx - a * 0.45f, -b * 1.35f, cx + a * 0.45f, -b * 1.35f, cx + a, 0f)
+        shapes.cubicTo(cx + a * 0.45f, b * 1.35f, cx - a * 0.45f, b * 1.35f, cx - a, 0f)
+        shapes.close()
+    }
+
+    // A teardrop from (bx, by) to (tx, ty), [width] across at its fullest
+    private fun petal(bx: Float, by: Float, tx: Float, ty: Float, width: Float) {
+        val dx = tx - bx
+        val dy = ty - by
+        val length = hypot(dx, dy)
+        val nx = -dy / length * width
+        val ny = dx / length * width
+        shapes.moveTo(bx, by)
+        shapes.cubicTo(bx + dx * 0.3f + nx, by + dy * 0.3f + ny, bx + dx * 0.85f + nx * 0.5f, by + dy * 0.85f + ny * 0.5f, tx, ty)
+        shapes.cubicTo(bx + dx * 0.85f - nx * 0.5f, by + dy * 0.85f - ny * 0.5f, bx + dx * 0.3f - nx, by + dy * 0.3f - ny, bx, by)
+        shapes.close()
+    }
+
+    private fun cubicAt(p0: Float, p1: Float, p2: Float, p3: Float, t: Float): Float {
+        val u = 1f - t
+        return u * u * u * p0 + 3f * u * u * t * p1 + 3f * u * t * t * p2 + t * t * t * p3
+    }
+
+    // A box with rounded corners and a point at each end
+    private fun shapeCartouche(centre: Float, mid: Float, half: Float, tall: Float) {
+        val top = mid - tall * CARTOUCHE / 2f
+        val bottom = mid + tall * CARTOUCHE / 2f
+        val round = tall * NOTCH
+        val left = centre - half
+        val right = centre + half
+        cartouche.reset()
+        cartouche.moveTo(left + round, top)
+        cartouche.lineTo(right - round, top)
+        box.set(right - round * 2f, top, right, top + round * 2f)
+        cartouche.arcTo(box, 270f, 90f)
+        cartouche.lineTo(right + round * 0.55f, mid)
+        box.set(right - round * 2f, bottom - round * 2f, right, bottom)
+        cartouche.arcTo(box, 0f, 90f)
+        cartouche.lineTo(left + round, bottom)
+        box.set(left, bottom - round * 2f, left + round * 2f, bottom)
+        cartouche.arcTo(box, 90f, 90f)
+        cartouche.lineTo(left - round * 0.55f, mid)
+        box.set(left, top, left + round * 2f, top + round * 2f)
+        cartouche.arcTo(box, 180f, 90f)
+        cartouche.close()
     }
 
     private companion object {
         // Shares of the band's height
-        const val FRAME = 0.035f
+        const val FRAME = 0.028f
         const val CARTOUCHE = 0.72f
-        const val CARTOUCHE_PAD = 0.45f
-        const val STAR = 0.28f
-        // Alphas out of 255
-        const val TINT = 28
-        const val STARS = 150
-        // Half a square's diagonal, over half its side
-        const val DIAGONAL = 1.4142f
+        const val CARTOUCHE_PAD = 0.38f
+        const val NOTCH = 0.15f
+        const val RIBBON = 0.035f
+        const val RIBBON_EDGE = 0.06f
+        const val OUTLINE = 0.0154f
+        // The strip's tint, out of 255
+        const val GROUND = 72
+        // How a scroll curls at its end, and where its leaf grows
+        const val CURL_STEPS = 40
+        const val CURL_TURNS = 0.85f
+        const val LEAF_AT = 0.33f
     }
 }
