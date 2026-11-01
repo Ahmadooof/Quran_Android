@@ -267,8 +267,9 @@ object Mushaf {
     /** Surah N's printed title in the titles font. */
     fun headCode(surah: Int): Int = 0xF100 + surah - 1
 
-    /** How far a title glyph's middle stands above its baseline, in ems, so it can be centred in a box. */
-    const val HEAD_RISE = 0.156f
+    /** The title glyphs' full height with their marks, in ems, and how far its middle stands above the baseline. */
+    const val HEAD_TALL = 1.54f
+    const val HEAD_RISE = 0.2f
 
     /** Codepoint for surah N in the names face: E004 for surah 4, E114 for 114. */
     fun nameCode(surah: Int): Int = 0xE000 + Integer.parseInt(surah.toString().padStart(3, '0'), 16)

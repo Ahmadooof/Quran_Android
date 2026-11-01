@@ -33,6 +33,9 @@ class SurahBand {
     private val dots = Path()
     private var panelWide = -1f
 
+    /** The height a title may take inside a band [tall] high, its marks clear of the cartouche's edge. */
+    fun titleRoom(tall: Float) = tall * CARTOUCHE * CLEAR
+
     /**
      * Draws the band [wide] across and [tall] high about ([centre], [mid]), leaving a cartouche [titleWide] across for the title.
      * [ink] draws the frame and outlines; [paper], the page's colour, fills the cartouche and the motifs.
@@ -169,7 +172,9 @@ class SurahBand {
     private companion object {
         // Shares of the band's height
         const val FRAME = 0.028f
-        const val CARTOUCHE = 0.8f
+        const val CARTOUCHE = 0.86f
+        // Of the cartouche's height, what a title may fill
+        const val CLEAR = 0.86f
         const val CARTOUCHE_PAD = 0.55f
         const val RIBBON = 0.035f
         const val RIBBON_EDGE = 0.06f

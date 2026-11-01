@@ -776,9 +776,11 @@ class MushafPageView @JvmOverloads constructor(
                     atAyah = 1
                     atWord = 0
                     val mid = y - centreOffset
+                    // As large as the text, unless its marks would then touch the cartouche
+                    val size = minOf(body, band.titleRoom(step * BAND_TALL) / Mushaf.HEAD_TALL)
                     if (adorned) band.draw(canvas, left + measure / 2f, mid, measure, step * BAND_TALL,
-                        titleWidth(line.surah, body), markPaint.color, paperColour)
-                    title(canvas, line.surah, left + measure / 2f, body, mid + Mushaf.HEAD_RISE * body)
+                        titleWidth(line.surah, size), markPaint.color, paperColour)
+                    title(canvas, line.surah, left + measure / 2f, size, mid + Mushaf.HEAD_RISE * size)
                 }
                 "basmalah" -> basmalah(canvas, lineWords[i], left + measure / 2f, body, y)
                 else -> if (line.words.isNotEmpty()) {
@@ -1079,8 +1081,8 @@ class MushafPageView @JvmOverloads constructor(
         val full = label.textSize
         label.textSize = full * headFit(measure, pad)
         thicken()
-        // The surah's name the size of the juz and page beside it, not a surah's opening title
-        val titleSize = label.textSize * HEAD_TITLE_MATCH
+        // The surah's name the size of the juz and page beside it, kept small enough that its marks clear the cartouche
+        val titleSize = minOf(label.textSize * HEAD_TITLE_MATCH, tall * LABEL_CLEAR / Mushaf.HEAD_TALL)
 
         // The frame runs from the labels' middle down to the folio's, just outside the text
         val mid = y + (label.ascent() + label.descent()) / 2f
@@ -1292,7 +1294,9 @@ class MushafPageView @JvmOverloads constructor(
         // and its label cartouches' height in the head band and padding either side of their words
         private const val FRAME_EDGE = 1.2f
         private const val FRAME_GAP = 0.6f
-        private const val LABEL_TALL = 0.9f
+        private const val LABEL_TALL = 1.1f
+        // Of a label cartouche's height, what a title may fill
+        private const val LABEL_CLEAR = 0.86f
         private const val LABEL_PAD = 0.5f
         // The titles font's letters stand smaller than the labels' at one size; this evens them
         private const val HEAD_TITLE_MATCH = 1.25f
