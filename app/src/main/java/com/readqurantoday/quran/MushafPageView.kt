@@ -1122,7 +1122,7 @@ class MushafPageView @JvmOverloads constructor(
     }
 
     // Where the folio sits: the middle of the foot, which on a scrolling page is below the screen
-    private fun footMid() = pageTall - padBottom / 2f
+    private fun footMid() = pageTall - padBottom * FOOT_MID
 
     // The labels' weight as a stroke around each letter, in step with their size: shrunk labels thin with them
     private fun thicken() {
@@ -1216,9 +1216,10 @@ class MushafPageView @JvmOverloads constructor(
         label.textAlign = Paint.Align.CENTER
         val mid = footMid()
         if (adorned) {
-            val tall = headBand * LABEL_TALL
+            // Within the foot's margin, clear of the last line and of the page's edge
+            val tall = padBottom * FOOT_TALL
             val edge = resources.displayMetrics.density * FRAME_EDGE
-            frame.label(canvas, width / 2f, mid, label.measureText(folioText) / 2f + tall * LABEL_PAD, tall, edge, markPaint.color, paperColour)
+            frame.label(canvas, width / 2f, mid, label.measureText(folioText) / 2f + tall * FOOT_PAD, tall, edge, markPaint.color, paperColour)
         }
         canvas.drawText(folioText, width / 2f, mid - (label.ascent() + label.descent()) / 2f, label)
     }
@@ -1297,9 +1298,13 @@ class MushafPageView @JvmOverloads constructor(
         private const val LABEL_TALL = 1.1f
         // Of a label cartouche's height, what a title may fill
         private const val LABEL_CLEAR = 0.86f
-        private const val LABEL_PAD = 0.5f
+        private const val LABEL_PAD = 0.28f
+        // The folio's cartouche: its height and middle in the foot's margin, and padding either side of the figure
+        private const val FOOT_TALL = 0.75f
+        private const val FOOT_MID = 0.55f
+        private const val FOOT_PAD = 0.6f
         // The titles font's letters stand smaller than the labels' at one size; this evens them
-        private const val HEAD_TITLE_MATCH = 1.25f
+        private const val HEAD_TITLE_MATCH = 1.4f
         // The least gap between neighbouring cartouches, in paddings, and the highest hizb
         private const val HEAD_GAP = 0.5f
         private const val HIZB_MOST = 60
