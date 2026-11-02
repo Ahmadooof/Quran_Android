@@ -38,8 +38,8 @@ fun Activity.showTajweedLegend() {
     raise(dialog, view)
 }
 
-/** Word [word] of [surah]:[ayah] on [page] as the Tajweed edition prints it, large, with only the rules its colours mark. */
-fun Activity.showTajweedWord(page: Int, surah: Int, ayah: Int, word: Int) {
+/** Word [word] of [surah]:[ayah] on [page] as the Tajweed edition prints it, large, with only the rules its colours mark; [closed] hears it go. */
+fun Activity.showTajweedWord(page: Int, surah: Int, ayah: Int, word: Int, closed: () -> Unit) {
     val glyphs = Mushaf.tajweed.glyphsOf(page, surah, ayah, word) ?: return
     val table = Mushaf.tajweed.glyphs(this, page) ?: return
     val ids = glyphs.codePoints().toArray().map { table.id(it) }.filter { it >= 0 }
@@ -64,6 +64,7 @@ fun Activity.showTajweedWord(page: Int, surah: Int, ayah: Int, word: Int) {
         setText(R.string.tajweed_word_plain)
     })
     for (rule in rules) rows.addView(ruleRow(rows, rule))
+    dialog.setOnDismissListener { closed() }
     raise(dialog, view)
 }
 

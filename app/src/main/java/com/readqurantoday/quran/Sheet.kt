@@ -86,7 +86,8 @@ fun Activity.notice(said: String) {
 
 // Leaves the host's system bars as they are, so a sheet does not bring back hidden bars
 internal fun Activity.raise(dialog: Dialog, view: View) {
-    dialog.setContentView(view)
+    // Slid down by its grip as well as closed by a tap outside
+    dialog.setContentView(SheetDrag(this) { dialog.dismiss() }.apply { addView(view) })
 
     val bare = ViewCompat.getRootWindowInsets(window.decorView)
         ?.isVisible(WindowInsetsCompat.Type.systemBars()) == false
