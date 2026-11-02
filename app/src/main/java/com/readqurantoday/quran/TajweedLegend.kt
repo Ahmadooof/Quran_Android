@@ -10,19 +10,19 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 
-// One colour of the Tajweed edition: the font's palette slots it is painted from, its swatch, the rule it marks and how it is read
-private data class Rule(val slots: Set<Int>, val colour: Int, val name: Int, val note: Int)
+// One colour of the Tajweed edition: the font's palette slots it is painted from, its swatch, and the rule it marks
+private data class Rule(val slots: Set<Int>, val colour: Int, val name: Int)
 
-// Read off the font's own words, one colour at a time
+// Slots read off the font's own words; names as Dar Al-Maarifa's Tajweed mushaf, the font's source, gives them
 private val RULES = listOf(
-    Rule(setOf(3), R.color.tajweed_necessary, R.string.tajweed_necessary, R.string.tajweed_necessary_note),
-    Rule(setOf(9), R.color.tajweed_obligatory, R.string.tajweed_obligatory, R.string.tajweed_obligatory_note),
-    Rule(setOf(4), R.color.tajweed_permissible, R.string.tajweed_permissible, R.string.tajweed_permissible_note),
-    Rule(setOf(5), R.color.tajweed_natural, R.string.tajweed_natural, R.string.tajweed_natural_note),
-    Rule(setOf(6), R.color.tajweed_ghunnah, R.string.tajweed_ghunnah, R.string.tajweed_ghunnah_note),
-    Rule(setOf(8), R.color.tajweed_qalqalah, R.string.tajweed_qalqalah, R.string.tajweed_qalqalah_note),
-    Rule(setOf(7), R.color.tajweed_heavy, R.string.tajweed_heavy, R.string.tajweed_heavy_note),
-    Rule(setOf(1, 2, 15), R.color.tajweed_silent, R.string.tajweed_silent, R.string.tajweed_silent_note),
+    Rule(setOf(3), R.color.tajweed_necessary, R.string.tajweed_necessary),
+    Rule(setOf(9), R.color.tajweed_obligatory, R.string.tajweed_obligatory),
+    Rule(setOf(4), R.color.tajweed_permissible, R.string.tajweed_permissible),
+    Rule(setOf(5), R.color.tajweed_natural, R.string.tajweed_natural),
+    Rule(setOf(6), R.color.tajweed_ghunnah, R.string.tajweed_ghunnah),
+    Rule(setOf(8), R.color.tajweed_qalqalah, R.string.tajweed_qalqalah),
+    Rule(setOf(7), R.color.tajweed_heavy, R.string.tajweed_heavy),
+    Rule(setOf(1, 2, 15), R.color.tajweed_silent, R.string.tajweed_silent),
 )
 
 /** What the Tajweed edition's colours mean, on a sheet; letters left in the page's ink are read as ever. */
@@ -71,7 +71,6 @@ fun Activity.showTajweedWord(page: Int, surah: Int, ayah: Int, word: Int, closed
 private fun Activity.ruleRow(rows: LinearLayout, rule: Rule) = layoutInflater.inflate(R.layout.item_tajweed_rule, rows, false).apply {
     findViewById<ImageView>(R.id.rule_swatch).imageTintList = ColorStateList.valueOf(getColor(rule.colour))
     findViewById<TextView>(R.id.rule_name).setText(rule.name)
-    findViewById<TextView>(R.id.rule_note).setText(rule.note)
 }
 
 // The object character a word's span stands on; the word drawn three times the sheet's text, with room above and below
