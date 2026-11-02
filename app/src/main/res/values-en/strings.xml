@@ -437,4 +437,23 @@
     <string name="day_other_whole">Other surahs completed</string>
     <string name="places_tab_today">Pages today</string>
     <string name="places_tab_places">Last places</string>
+    <string name="tajweed_legend">Tajweed colours</string>
+    <string name="tajweed_legend_intro">Each colour marks a recitation rule. Letters left in the page colour are read as usual.</string>
+    <string name="tajweed_necessary">Necessary lengthening</string>
+    <string name="tajweed_necessary_note">Six counts</string>
+    <string name="tajweed_obligatory">Obligatory lengthening</string>
+    <string name="tajweed_obligatory_note">Four or five counts</string>
+    <string name="tajweed_permissible">Lengthening at a stop</string>
+    <string name="tajweed_permissible_note">Two, four or six counts when stopping</string>
+    <string name="tajweed_natural">Natural lengthening</string>
+    <string name="tajweed_natural_note">Two counts</string>
+    <string name="tajweed_ghunnah">Nasal sound (ghunnah)</string>
+    <string name="tajweed_ghunnah_note">Held through the nose for two counts</string>
+    <string name="tajweed_qalqalah">Echo (qalqalah)</string>
+    <string name="tajweed_qalqalah_note">A light bounce on a resting ق ط ب ج د</string>
+    <string name="tajweed_heavy">Heavy letter (tafkhim)</string>
+    <string name="tajweed_heavy_note">Said full and heavy</string>
+    <string name="tajweed_silent">Not pronounced</string>
+    <string name="tajweed_silent_note">Written but not read when joined to what comes before</string>
+    <string name="set_tajweed_legend">Tajweed colours</string>
 </resources>

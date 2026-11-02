@@ -516,4 +516,23 @@
     <string name="day_other_whole">سور أخرى مكتملة</string>
     <string name="places_tab_today">صفحات اليوم</string>
     <string name="places_tab_places">آخر المواضع</string>
+    <string name="tajweed_legend">ألوان التجويد</string>
+    <string name="tajweed_legend_intro">تدل الألوان على أحكام التلاوة، ويُقرأ ما بقي بلون الصفحة كالمعتاد.</string>
+    <string name="tajweed_necessary">مد لازم</string>
+    <string name="tajweed_necessary_note">ست حركات، مثل: الضّالّين</string>
+    <string name="tajweed_obligatory">مد واجب أو جائز منفصل</string>
+    <string name="tajweed_obligatory_note">أربع أو خمس حركات، مثل: جاء، يشاء</string>
+    <string name="tajweed_permissible">مد عارض للسكون</string>
+    <string name="tajweed_permissible_note">حركتان أو أربع أو ست عند الوقف، مثل: عليم</string>
+    <string name="tajweed_natural">مد طبيعي</string>
+    <string name="tajweed_natural_note">حركتان، مثل: به، وصلة هاء الضمير</string>
+    <string name="tajweed_ghunnah">غنة</string>
+    <string name="tajweed_ghunnah_note">صوت من الأنف بقدر حركتين، مثل: إنّ، ثمّ</string>
+    <string name="tajweed_qalqalah">قلقلة</string>
+    <string name="tajweed_qalqalah_note">نبرة في حروف «قطب جد» الساكنة، مثل: لقد، قبل</string>
+    <string name="tajweed_heavy">تفخيم</string>
+    <string name="tajweed_heavy_note">يُنطق الحرف مفخّمًا، مثل: قالوا، رحل</string>
+    <string name="tajweed_silent">لا يُنطق</string>
+    <string name="tajweed_silent_note">يُكتب ولا يُقرأ في الوصل، مثل همزة الوصل</string>
+    <string name="set_tajweed_legend">ألوان التجويد</string>
 </resources>

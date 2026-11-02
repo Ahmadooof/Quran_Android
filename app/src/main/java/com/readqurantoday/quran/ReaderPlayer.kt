@@ -184,10 +184,19 @@ class ReaderPlayer(
         }
         panel.findViewById<View>(R.id.p_play).setOnClickListener { play() }
         /* Tajweed: the pages in their coloured edition, or plain again. */
-        panel.findViewById<View>(R.id.p_tajweed).setOnClickListener {
-            Settings.setTajweed(host, !Settings.tajweed(host))
-            say()
-            reader.redrawPages()
+        panel.findViewById<View>(R.id.p_tajweed).apply {
+            setOnClickListener {
+                val on = !Settings.tajweed(host)
+                Settings.setTajweed(host, on)
+                say()
+                reader.redrawPages()
+                // The first time, the colours are explained, so they are no puzzle
+                if (on && !Settings.tajweedExplained(host)) {
+                    Settings.setTajweedExplained(host)
+                    host.showTajweedLegend()
+                }
+            }
+            setOnLongClickListener { host.showTajweedLegend(); true }
         }
         panel.findViewById<View>(R.id.p_reciter).setOnClickListener { pickReciter() }
         panel.findViewById<View>(R.id.p_repeat).setOnClickListener { pickRepeat() }

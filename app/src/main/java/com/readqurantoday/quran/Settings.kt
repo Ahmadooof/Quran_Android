@@ -145,6 +145,7 @@ object Settings {
     private const val TRANSLIT = "translit"
 
     private const val TAJWEED = "tajweed"
+    private const val TAJWEED_EXPLAINED = "tajweed-explained"
 
     /* A Latin reading over the lit word; on until the reader turns it off. */
     /** A context that decides pronunciation for itself, as a video's drawing does, rather than by this setting. */
@@ -163,6 +164,11 @@ object Settings {
         store(context).edit { putBoolean(TAJWEED, on) }
         restyled()
     }
+
+    /** Whether the Tajweed colours have been explained once. */
+    fun tajweedExplained(context: Context) = store(context).getBoolean(TAJWEED_EXPLAINED, false)
+
+    fun setTajweedExplained(context: Context) = store(context).edit { putBoolean(TAJWEED_EXPLAINED, true) }
 
     /** A page's coloured font arrived: pages and their pictures are drawn again. */
     fun tajweedArrived() = restyled()
