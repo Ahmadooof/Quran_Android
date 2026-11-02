@@ -6,8 +6,13 @@ import android.graphics.Paint
 import android.os.Build
 import android.text.style.ReplacementSpan
 
-/** One printed word of the mushaf inside running text, drawn from its page's own font, [scale] times the text's size. */
-class QuranWordSpan(private val context: Context, private val word: EndPages.Word, private val scale: Float) : ReplacementSpan() {
+/** One printed word of the mushaf inside running text, drawn from its page's own font in [book], [scale] times the text's size. */
+class QuranWordSpan(
+    private val context: Context,
+    private val word: EndPages.Word,
+    private val scale: Float,
+    private val book: Book = Mushaf.plain
+) : ReplacementSpan() {
 
     private val ids = IntArray(word.glyphs.length)
     private val spots = FloatArray(word.glyphs.length * 2)
@@ -25,7 +30,7 @@ class QuranWordSpan(private val context: Context, private val word: EndPages.Wor
     }
 
     override fun draw(canvas: Canvas, text: CharSequence?, start: Int, end: Int, x: Float, top: Int, y: Int, bottom: Int, paint: Paint) {
-        val glyphs = Mushaf.glyphs(context, word.page) ?: return
+        val glyphs = book.glyphs(context, word.page) ?: return
         val size = paint.textSize * scale
         val step = size / glyphs.upem
         // Right to left from the span's far edge, each glyph placed as the page places it
@@ -44,14 +49,14 @@ class QuranWordSpan(private val context: Context, private val word: EndPages.Wor
             n++
             pen -= advance
         }
-        val face = Mushaf.font(context, word.page)
+        val face = book.font(context, word.page)
         val saved = paint.textSize
         paint.textSize = size
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && face != null) {
             canvas.drawGlyphs(ids, 0, spots, 0, n, face, paint)
         } else {
             val typeface = paint.typeface
-            paint.typeface = Mushaf.face(context, word.page)
+            paint.typeface = book.face(context, word.page)
             var i = 0
             for (cp in codes) if (glyphs.id(cp) >= 0) {
                 canvas.drawText(String(Character.toChars(cp)), spots[i * 2], y.toFloat(), paint)
@@ -63,7 +68,7 @@ class QuranWordSpan(private val context: Context, private val word: EndPages.Wor
     }
 
     private fun wide(size: Float): Float {
-        val glyphs = Mushaf.glyphs(context, word.page) ?: return 0f
+        val glyphs = book.glyphs(context, word.page) ?: return 0f
         var sum = 0f
         for (cp in word.glyphs.codePoints()) {
             sum += if (glyphs.id(cp) < 0) INNER * size else glyphs.advance(cp) * size / glyphs.upem

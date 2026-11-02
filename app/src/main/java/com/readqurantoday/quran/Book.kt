@@ -104,6 +104,25 @@ class Book(private val asset: String, private val key: String, private val table
         return g
     }
 
+    /** The glyphs of word [word] of [surah]:[ayah] on [page], counting from where the page opens, or null if not there. */
+    fun glyphsOf(page: Int, surah: Int, ayah: Int, word: Int): String? {
+        var s = Ayat.surahAt(page)
+        var a = Ayat.ayahAt(page)
+        var w = Ayat.wordAt(page)
+        val marks = marksOn(page)
+        for (line in lines(page)) {
+            if (line.kind == "surah") { s = line.surah; a = 1; w = 0 }
+            if (line.kind != "ayah") continue
+            for (parts in line.words) {
+                val glyphs = parts.joinToString(" ")
+                if (marks.contains(glyphs)) { a++; w = 0; continue }
+                if (s == surah && a == ayah && w == word) return glyphs
+                w++
+            }
+        }
+        return null
+    }
+
     /** Release what no page in this range uses; keep the Basmalahs' always. */
     @Synchronized
     fun keepOnly(near: IntRange) {

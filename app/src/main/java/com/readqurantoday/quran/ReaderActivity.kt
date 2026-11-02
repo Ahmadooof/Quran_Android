@@ -307,7 +307,12 @@ class ReaderActivity : LanguageActivity() {
             )
             v.setOnClickListener { showChrome(!chrome) }
             v.setOnLongClickListener { view ->
-                (view as MushafPageView).wordUnder(lastTouchX, lastTouchY)?.let { controls.offer(surah = it[0], ayah = it[1], w = it[2]) }
+                val page = view as MushafPageView
+                page.wordUnder(lastTouchX, lastTouchY)?.let {
+                    controls.offer(surah = it[0], ayah = it[1], w = it[2])
+                    // In Tajweed, the word's rules are shown with it
+                    if (page.inTajweed) showTajweedWord(page.page, it[0], it[1], it[2])
+                }
                 true
             }
             v.setOnTouchListener { _, e -> lastTouchX = e.x; lastTouchY = e.y; false }

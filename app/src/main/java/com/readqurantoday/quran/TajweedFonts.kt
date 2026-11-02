@@ -135,6 +135,40 @@ object TajweedFonts : FontSource {
     /** How many of the 604 pages are here. */
     fun count(context: Context): Int = folder(context).listFiles()?.count { it.name.endsWith(".ttf") } ?: 0
 
+    // Each page's glyphs and the palette slots their colour layers use, read once from its font
+    private val slots = ConcurrentHashMap<Int, Map<Int, Set<Int>>>()
+
+    /** The palette slots [glyphIds] on [page] are coloured with: the Tajweed rules they carry. */
+    fun slotsOf(context: Context, page: Int, glyphIds: List<Int>): Set<Int> {
+        val all = slots.getOrPut(page) {
+            if (!has(context, page)) return emptySet()
+            layersOf(file(context, page).readBytes())
+        }
+        return glyphIds.flatMap { all[it].orEmpty() }.toSet()
+    }
+
+    // COLR v0: each coloured glyph's layers, as glyph and the palette slot each layer is painted with
+    private fun layersOf(bytes: ByteArray): Map<Int, Set<Int>> {
+        val b = ByteBuffer.wrap(bytes)
+        var colr = -1
+        for (i in 0 until (b.getShort(4).toInt() and 0xFFFF)) {
+            val record = 12 + 16 * i
+            if (String(bytes, record, 4, Charsets.US_ASCII) == "COLR") colr = b.getInt(record + 8)
+        }
+        if (colr < 0) return emptyMap()
+        val bases = colr + b.getInt(colr + 4)
+        val layers = colr + b.getInt(colr + 8)
+        val out = HashMap<Int, Set<Int>>()
+        for (i in 0 until (b.getShort(colr + 2).toInt() and 0xFFFF)) {
+            val at = bases + i * 6
+            val glyph = b.getShort(at).toInt() and 0xFFFF
+            val first = b.getShort(at + 2).toInt() and 0xFFFF
+            val count = b.getShort(at + 4).toInt() and 0xFFFF
+            out[glyph] = (first until first + count).map { b.getShort(layers + it * 4 + 2).toInt() and 0xFFFF }.toSet()
+        }
+        return out
+    }
+
     // The font's colour layers: plain letters follow the paint, and by night the night palette stands in for the day's
     private fun recolour(bytes: ByteArray, dark: Boolean): ByteArray {
         val b = ByteBuffer.wrap(bytes)

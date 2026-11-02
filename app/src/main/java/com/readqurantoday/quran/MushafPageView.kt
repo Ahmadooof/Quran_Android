@@ -71,6 +71,9 @@ class MushafPageView @JvmOverloads constructor(
     // The edition this page is drawn from: Tajweed when asked for and its font is here, else plain
     private var book: Book = Mushaf.plain
 
+    /** Whether this page is drawn in the Tajweed edition now. */
+    val inTajweed get() = book === Mushaf.tajweed
+
     /** Set where only the plain page will do, as where its words are cut out by colour. */
     var plainOnly = false
     private var table: Book.Glyphs? = null
@@ -126,6 +129,12 @@ class MushafPageView @JvmOverloads constructor(
     /* Ayah markers are drawn in a separate colour from the rest of the line. */
     private var markIds = IntArray(64)
     private var markSpots = FloatArray(128)
+
+    // The box behind a lit word where its own colours are kept, and where it was last drawn
+    private val litBoxPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val litBox = RectF()
+    private var litLeft = 0f
+    private var litRight = 0f
 
     /* Lit word glyphs, separated so they draw in litPaint on top of the glow. */
     private var litIds = IntArray(64)
@@ -544,6 +553,7 @@ class MushafPageView @JvmOverloads constructor(
         // Surah titles and the Basmalah are the page's own words, so they take the page's ink
         titlePaint.color = inkTrial ?: Settings.inkColor(context)
         litPaint.color = litTrial ?: Settings.highlightColor(context)
+        litBoxPaint.color = ColorUtils.setAlphaComponent(litPaint.color, LIT_BOX_ALPHA)
         inkSpread = spread(Settings.inkWeight(context))
         markSpread = spread(Settings.ayahWeight(context))
         litSpread = spread(Settings.litWeight(context))
@@ -945,6 +955,7 @@ class MushafPageView @JvmOverloads constructor(
             val isLit = !isMark && ofSurah == litSurah && ofAyah == litAyah && ofWord == litWord
 
             val began = x
+            if (isLit) litRight = x
             var pen = x
             var i = 0
             while (i < word.length) {
@@ -985,6 +996,7 @@ class MushafPageView @JvmOverloads constructor(
                 pen -= advance
             }
 
+            if (isLit) litLeft = pen
             if (!isMark) {
                 if (!laidOut) {
                     val top = y - slot * 0.44f
@@ -1001,6 +1013,14 @@ class MushafPageView @JvmOverloads constructor(
         }
         if (n == 0 && m == 0 && litN == 0) return
 
+        // In Tajweed the lit word keeps its colours, a soft box behind it showing which it is
+        val keepColours = book === Mushaf.tajweed
+        val litPen = if (keepColours) paint else litPaint
+        if (litN > 0 && keepColours) {
+            litBox.set(litLeft - gap / 2f, y - slot * 0.44f, litRight + gap / 2f, y + slot * 0.28f)
+            canvas.drawRoundRect(litBox, slot * LIT_ROUND, slot * LIT_ROUND, litBoxPaint)
+        }
+
         val face = font
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && face != null) {
             if (n > 0) drawRun(canvas, face, ids, spots, n, paint, inkSpread)
@@ -1009,8 +1029,8 @@ class MushafPageView @JvmOverloads constructor(
                 drawRun(canvas, face, markIds, markSpots, m, markPaint, markSpread)
             }
             if (litN > 0) {
-                litPaint.textSize = size
-                drawRun(canvas, face, litIds, litSpots, litN, litPaint, litSpread)
+                litPen.textSize = size
+                drawRun(canvas, face, litIds, litSpots, litN, litPen, if (keepColours) inkSpread else litSpread)
             }
         } else {
             // API < 31 has no glyph runs, so it falls back to text, thickened by the same nudging
@@ -1028,7 +1048,7 @@ class MushafPageView @JvmOverloads constructor(
                 val isMk = word.isNotEmpty() && marks.contains(word)
                 val pen = when {
                     isMk -> markPaint
-                    fbSurah == litSurah && fbAyah == litAyah && fbWord == litWord -> litPaint
+                    fbSurah == litSurah && fbAyah == litAyah && fbWord == litWord -> litPen
                     else -> paint
                 }
                 for (part in word.split(' ')) {
@@ -1334,6 +1354,9 @@ class MushafPageView @JvmOverloads constructor(
         private const val SIDE_TALL = 0.82f
         // How far the ornament's colour is drawn toward the page by night
         private const val NIGHT_RECEDE = 0.3f
+        // The box behind a lit word that keeps its colours: its alpha out of 255, and its corners as a share of a line
+        private const val LIT_BOX_ALPHA = 0x40
+        private const val LIT_ROUND = 0.12f
         // The folio's cartouche: its height and middle in the foot's margin, and padding either side of the figure
         private const val FOOT_TALL = 0.75f
         private const val FOOT_MID = 0.55f
