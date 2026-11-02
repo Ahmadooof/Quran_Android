@@ -75,37 +75,40 @@ def find(ref, words):
 
 
 def parts(text):
-    """A line's text and examples in order; an example is a list of words, each its page and glyphs."""
+    """A line's text and examples in order; an example is its words, each a page and glyphs, and the brackets it shows."""
     out, at = [], 0
-    for m in re.finditer(r'\[\[([^|\]]+)\|([^\]]+)\]\]', text):
+    for m in re.finditer(r'\[\[([^|\]]+)\|([^|\]]+)(?:\|([^\]]*))?\]\]', text):
         if m.start() > at:
             out.append(text[at:m.start()])
-        out.append({'q': [[t['page'], t['glyphs']] for t in find(m.group(1), m.group(2))]})
+        out.append({'q': [[t['page'], t['glyphs']] for t in find(m.group(1), m.group(2))], 'b': m.group(3) or '()'})
         at = m.end()
     if at < len(text):
         out.append(text[at:])
     return out
 
 
+# Printed lines in order; a line is a paragraph's last, set unjustified, when a blank line, a title or the page's end follows
 pages, examples = [], 0
-for raw in open(SRC, encoding='utf-8').read().split('\n'):
+for raw in open(SRC, encoding='utf-8').read().splitlines():
     line = raw.strip()
-    if not line or line.startswith('# ') and not pages or line.startswith('#') and not line.startswith('# ') and not line.startswith('## '):
+    if line.startswith('#') and not line.startswith('# '):
         continue
     if line.startswith('= '):
-        pages.append({'letter': line[2:], 'blocks': []})
+        pages.append({'letter': line[2:], 'lines': []})
         continue
-    if line == '@basmalah':
-        pages[-1]['blocks'].append({'k': 'basmalah'})
+    if not pages:
         continue
-    kind, body = 'p', line
-    for mark, k in (('## ', 'h2'), ('# ', 'h1'), ('- ', 'li')):
-        if line.startswith(mark):
-            kind, body = k, line[len(mark):]
-            break
-    block = {'k': kind, 'parts': parts(body)}
-    examples += sum(1 for x in block['parts'] if isinstance(x, dict))
-    pages[-1]['blocks'].append(block)
-
+    rows = pages[-1]['lines']
+    if not line or line.startswith('# ') or line == '@basmalah':
+        if rows and rows[-1]['k'] == 'line':
+            rows[-1]['k'] = 'end'
+        if line == '@basmalah':
+            rows.append({'k': 'basmalah'})
+        elif line:
+            rows.append({'k': 'title', 'parts': parts(line[2:])})
+        continue
+    row = {'k': 'line', 'parts': parts(line)}
+    examples += sum(1 for x in row['parts'] if isinstance(x, dict))
+    rows.append(row)
 json.dump({'pages': pages}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-print('pages', len(pages), 'examples', examples)
+print('pages', len(pages), 'lines', sum(len(p['lines']) for p in pages), 'examples', examples)

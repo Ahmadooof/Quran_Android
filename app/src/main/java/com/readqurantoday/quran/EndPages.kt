@@ -4,23 +4,24 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** The mushaf's closing pages, أ to ل: how it was written and marked. Built by tools/end_pages.py. */
+/** The mushaf's closing pages, أ to ل, line for line as printed: how it was written and marked. Built by tools/end_pages.py. */
 object EndPages {
 
     /** One printed word of a Quranic example: the mushaf page it is drawn from and its glyphs there. */
     data class Word(val page: Int, val glyphs: String)
 
-    /** A run of the page's text, or a Quranic example. */
+    /** A run of the page's text, or a Quranic example with the brackets it shows: "()", "(", ")" or none. */
     sealed interface Part {
         data class Text(val text: String) : Part
-        data class Quran(val words: List<Word>) : Part
+        data class Quran(val words: List<Word>, val brackets: String) : Part
     }
 
-    enum class Kind { BASMALAH, TITLE, SUBTITLE, PARAGRAPH, ITEM }
+    /** A printed line: the Basmalah, a title, a justified line, or a paragraph's last line. */
+    enum class Kind { BASMALAH, TITLE, LINE, END }
 
-    data class Block(val kind: Kind, val parts: List<Part>)
+    data class Line(val kind: Kind, val parts: List<Part>)
 
-    data class Page(val letter: String, val blocks: List<Block>)
+    data class Page(val letter: String, val lines: List<Line>)
 
     @Volatile
     var pages: List<Page> = emptyList()
@@ -32,24 +33,25 @@ object EndPages {
         val all = JSONObject(json).getJSONArray("pages")
         pages = (0 until all.length()).map { i ->
             val page = all.getJSONObject(i)
-            val blocks = page.getJSONArray("blocks")
-            Page(page.getString("letter"), (0 until blocks.length()).map { block(blocks.getJSONObject(it)) })
+            val lines = page.getJSONArray("lines")
+            Page(page.getString("letter"), (0 until lines.length()).map { line(lines.getJSONObject(it)) })
         }
     }
 
-    private fun block(o: JSONObject): Block {
+    private fun line(o: JSONObject): Line {
         val kind = when (o.getString("k")) {
             "basmalah" -> Kind.BASMALAH
-            "h1" -> Kind.TITLE
-            "h2" -> Kind.SUBTITLE
-            "li" -> Kind.ITEM
-            else -> Kind.PARAGRAPH
+            "title" -> Kind.TITLE
+            "end" -> Kind.END
+            else -> Kind.LINE
         }
         val parts = o.optJSONArray("parts") ?: JSONArray()
-        return Block(kind, (0 until parts.length()).map { i ->
-            val q = parts.optJSONObject(i)?.optJSONArray("q")
+        return Line(kind, (0 until parts.length()).map { i ->
+            val part = parts.optJSONObject(i)
+            val q = part?.optJSONArray("q")
             if (q == null) Part.Text(parts.getString(i))
-            else Part.Quran((0 until q.length()).map { j -> q.getJSONArray(j).let { Word(it.getInt(0), it.getString(1)) } })
+            else Part.Quran((0 until q.length()).map { j -> q.getJSONArray(j).let { Word(it.getInt(0), it.getString(1)) } },
+                part.optString("b", "()"))
         })
     }
 }
