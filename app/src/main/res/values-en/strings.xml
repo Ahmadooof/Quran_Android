@@ -446,7 +446,7 @@
     <string name="tajweed_ghunnah">Ghunnah / ikhfa</string>
     <string name="tajweed_qalqalah">Qalqalah</string>
     <string name="tajweed_heavy">Heavy sound (tafkhim)</string>
-    <string name="tajweed_silent">Not pronounced</string>
+    <string name="tajweed_silent">Silent letter</string>
     <string name="set_tajweed_legend">Tajweed colours</string>
     <string name="tajweed_word">Rules in this word</string>
     <string name="tajweed_word_plain">No coloured rules in this word; it is read as usual.</string>

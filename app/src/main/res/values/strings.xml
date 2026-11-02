@@ -525,7 +525,7 @@
     <string name="tajweed_ghunnah">غنة / إخفاء</string>
     <string name="tajweed_qalqalah">قلقلة</string>
     <string name="tajweed_heavy">تفخيم الصوت</string>
-    <string name="tajweed_silent">لا تُلفظ</string>
+    <string name="tajweed_silent">الحرف الساكن</string>
     <string name="set_tajweed_legend">ألوان التجويد</string>
     <string name="tajweed_word">أحكام هذه الكلمة</string>
     <string name="tajweed_word_plain">لا أحكام ملوّنة في هذه الكلمة، فتُقرأ كالمعتاد.</string>
