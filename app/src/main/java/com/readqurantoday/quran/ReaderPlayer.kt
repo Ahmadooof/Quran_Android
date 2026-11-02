@@ -57,6 +57,8 @@ class ReaderPlayer(
 
     init {
         wire()
+        // A screen made afresh, as after a theme change, shows the switches as they stand before anything else repaints them
+        sayToggles()
     }
 
     fun clearPending() {
@@ -164,6 +166,11 @@ class ReaderPlayer(
         tint(wordIcon, wordLabel, WordVoice.saying)
         wordIcon.imageAlpha = if (WordVoice.loading) 0x66 else 0xFF
         wordLabel.setText(if (WordVoice.loading) R.string.loading else R.string.label_word)
+        sayToggles()
+    }
+
+    // The switches that stay as set, read from the settings
+    private fun sayToggles() {
         tint(translitIcon, translitLabel, Settings.translit(host))
         tint(tajweedIcon, tajweedLabel, Settings.tajweed(host))
     }
